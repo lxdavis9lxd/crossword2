@@ -362,23 +362,43 @@ document.addEventListener('DOMContentLoaded', function() {
             // In a real app, this would come from the session/authentication system
             const userId = 1;
             
+            console.log('Saving game progress...');
+            console.log('Puzzle ID:', currentPuzzle.id);
+            console.log('Grid state length:', gridState.length);
+            
+            const requestBody = {
+                userId: userId,
+                puzzleId: currentPuzzle.id,
+                progress: JSON.stringify(gridState)
+            };
+            
+            console.log('Request body:', requestBody);
+            
             const response = await fetch('/game/save', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    userId: userId,
-                    puzzleId: currentPuzzle.id,
-                    progress: JSON.stringify(gridState)
-                })
+                body: JSON.stringify(requestBody)
             });
             
             if (!response.ok) {
                 throw new Error(`Failed to save game: ${response.status}`);
             }
             
-            alert('Game saved successfully!');
+            // Show success message
+            const saveButton = document.getElementById('save-button');
+            const originalText = saveButton.textContent;
+            saveButton.textContent = 'Saved!';
+            saveButton.disabled = true;
+            
+            // Reset button after 2 seconds
+            setTimeout(() => {
+                saveButton.textContent = originalText;
+                saveButton.disabled = false;
+            }, 2000);
+            
+            console.log('Game saved successfully!');
         } catch (error) {
             console.error('Error saving game:', error);
             alert('Failed to save game. Please try again.');
