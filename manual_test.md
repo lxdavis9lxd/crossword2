@@ -60,6 +60,49 @@ Test the application in different browsers to ensure compatibility:
 2. Verify that the grid and controls are usable on smaller screens
 3. Test touch interaction on touchscreen devices
 
+### 10. Testing Navigation Bar
+
+1. **Home Page Navigation**
+   - Visit the home page (`/`)
+   - Verify that you see the "Home", "Login", and "Register" buttons
+   - Other game-specific buttons should be hidden
+
+2. **After Login Navigation**
+   - After logging in, verify that the navigation bar shows:
+     - Home button (active)
+     - Dashboard button
+     - Logout button
+   - Game-specific buttons should be hidden
+
+3. **Dashboard Navigation**
+   - Navigate to the dashboard
+   - Verify that the "Dashboard" button is highlighted as active
+   - "Start Game" button should be initially disabled
+   - After selecting a difficulty level, the "Start Game" button should become enabled
+   - "Resume Game" button should be visible if you have saved games
+
+4. **Game Page Navigation**
+   - Start a new game and navigate to the game page
+   - Verify that all navigation buttons are present
+   - Before loading a puzzle:
+     - "Save Game" button should be disabled
+     - "Show Answers" button should be disabled
+     - "Load Puzzle" button should be enabled
+   - After loading a puzzle:
+     - "Save Game" button should become enabled
+     - "Show Answers" button should become enabled
+
+5. **Button Functionality**
+   - Test the "Load Puzzle" button - it should load the selected puzzle
+   - Test the "Save Game" button - it should save your progress
+   - Test the "Show Answers" button - it should reveal all answers
+   - Test the "Resume Game" button - it should open a modal with saved games
+
+6. **Mobile Responsiveness**
+   - Resize the browser window to a mobile size or test on a mobile device
+   - Verify that the navigation bar adjusts appropriately
+   - All buttons should be accessible and functional in mobile view
+
 ## Reporting Issues
 When reporting issues found during manual testing, please include:
 1. The specific test that failed

@@ -53,16 +53,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             });
             
-            // Check if dashboard form submit button exists
-            const dashboardSubmitBtn = document.querySelector('form[action="/game/start"] button[type="submit"]');
-            if (dashboardSubmitBtn) {
-                // Connect start game button to form submit
+            // Connect start game button to form submit
+            const submitGameForm = document.getElementById('submit-game-form');
+            if (submitGameForm) {
                 startGameBtn.addEventListener('click', function() {
-                    dashboardSubmitBtn.click();
+                    if (!startGameBtn.disabled) {
+                        submitGameForm.click();
+                    }
                 });
             }
         }
     }
+    
+    // Close modal when clicking outside of it
+    window.addEventListener('click', (event) => {
+        const modal = document.getElementById('saved-games-modal');
+        if (event.target === modal) {
+            closeSavedGamesModal();
+        }
+    });
     
     // Initialize - check the page
     if (window.location.pathname.includes('/game')) {
@@ -152,6 +161,17 @@ document.addEventListener('DOMContentLoaded', function() {
             if (showAnswersButton) {
                 showAnswersButton.disabled = false;
                 showAnswersButton.textContent = 'Show Answers';
+            }
+            
+            // Enable the save button
+            const saveButton = document.getElementById('save-button');
+            if (saveButton) {
+                saveButton.disabled = false;
+            }
+            
+            // Update navigation button states if function exists
+            if (window.updateButtonsAfterPuzzleLoad) {
+                window.updateButtonsAfterPuzzleLoad();
             }
         } catch (error) {
             console.error('Error loading puzzle details:', error);
@@ -592,6 +612,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 showAnswersButton.textContent = 'Show Answers';
             }
             
+            // Enable the save button
+            const saveButton = document.getElementById('save-button');
+            if (saveButton) {
+                saveButton.disabled = false;
+            }
+            
+            // Update navigation button states if function exists
+            if (window.updateButtonsAfterPuzzleLoad) {
+                window.updateButtonsAfterPuzzleLoad();
+            }
+            
             // Fill in the user's progress if available
             if (data.progress) {
                 try {
@@ -617,4 +648,7 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Failed to load saved game. Please try again.');
         }
     }
+    
+    // Expose functions for navigation.js to use
+    window.loadSelectedPuzzle = loadSelectedPuzzle;
 });

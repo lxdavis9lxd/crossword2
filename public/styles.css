@@ -109,10 +109,19 @@ button:hover {
 }
 
 /* Crossword Grid Styles */
+.game-area {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-top: 1rem;
+}
+
 #crossword-container {
     display: grid;
     gap: 0;
     margin: 2rem 0;
+    flex: 1;
+    min-width: 300px;
 }
 
 .crossword-cell {
@@ -285,6 +294,108 @@ button:hover {
     background-color: #fff;
 }
 
+/* Auth Pages Styles */
+.auth-section {
+    max-width: 500px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.auth-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.auth-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+.auth-form input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.auth-submit {
+    width: 100%;
+    padding: 0.8rem;
+    background-color: #0078d7;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.auth-submit:hover {
+    background-color: #0056a3;
+}
+
+.auth-switch {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+.auth-switch a {
+    color: #0078d7;
+    text-decoration: none;
+}
+
+.auth-switch a:hover {
+    text-decoration: underline;
+}
+
+/* Welcome Section Styles */
+.welcome-section {
+    text-align: center;
+    max-width: 800px;
+    margin: 4rem auto;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.welcome-section h2 {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.welcome-section p {
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 2rem;
+}
+
+.auth-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.auth-button {
+    display: inline-block;
+    padding: 0.8rem 2rem;
+    background-color: #0078d7;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 1.1rem;
+    transition: background-color 0.3s;
+}
+
+.auth-button:hover {
+    background-color: #0056a3;
+}
+
 /* Modal Styles */
 .modal {
     display: none;
@@ -381,6 +492,25 @@ button:hover {
     .crossword-input {
         font-size: 16px;
     }
+    
+    .game-area {
+        flex-direction: column;
+    }
+    
+    .clues-section {
+        margin-top: 1rem;
+    }
+    
+    .main-nav ul {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    nav ul li a, nav ul li button {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+        margin-bottom: 0.5rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -391,5 +521,23 @@ button:hover {
     
     .crossword-input {
         font-size: 14px;
+    }
+    
+    header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .logo {
+        margin-bottom: 1rem;
+    }
+    
+    .main-nav {
+        width: 100%;
+    }
+    
+    .auth-button {
+        padding: 0.6rem 1.5rem;
+        font-size: 1rem;
     }
 }
