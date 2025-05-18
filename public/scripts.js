@@ -41,13 +41,28 @@ document.addEventListener('DOMContentLoaded', function() {
         closeModalBtn.addEventListener('click', closeSavedGamesModal);
     }
     
-    // Close modal when clicking outside of it
-    window.addEventListener('click', (event) => {
-        const modal = document.getElementById('saved-games-modal');
-        if (event.target === modal) {
-            closeSavedGamesModal();
+    // Add event listener for Start Game button in dashboard
+    const startGameBtn = document.getElementById('start-game-btn');
+    if (startGameBtn && window.location.pathname.includes('/dashboard')) {
+        const levelRadios = document.querySelectorAll('input[name="level"]');
+        if (levelRadios.length > 0) {
+            // Enable the Start Game button when a level is selected
+            levelRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    startGameBtn.disabled = false;
+                });
+            });
+            
+            // Check if dashboard form submit button exists
+            const dashboardSubmitBtn = document.querySelector('form[action="/game/start"] button[type="submit"]');
+            if (dashboardSubmitBtn) {
+                // Connect start game button to form submit
+                startGameBtn.addEventListener('click', function() {
+                    dashboardSubmitBtn.click();
+                });
+            }
         }
-    });
+    }
     
     // Initialize - check the page
     if (window.location.pathname.includes('/game')) {

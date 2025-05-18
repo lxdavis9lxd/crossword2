@@ -7,14 +7,7 @@
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-    <header>
-        <h1>Crossword Game</h1>
-        <nav>
-            <ul>
-                <li><a href="/auth/logout">Logout</a></li>
-            </ul>
-        </nav>
-    </header>
+    <%- include('partials/navigation') %>
     <main>
         <section>
             <h2>Crossword Puzzle</h2>
@@ -33,8 +26,6 @@
                         <option>Select a difficulty first</option>
                     </select>
                 </div>
-                <button id="load-puzzle-btn">Load Puzzle</button>
-                <button id="resume-game-btn">Resume Saved Game</button>
             </div>
             
             <div id="puzzle-info" style="display: none;">
@@ -46,12 +37,17 @@
                 <!-- Crossword puzzle will be dynamically loaded here -->
             </div>
             
-            <div class="game-controls">
-                <button id="save-button">Save</button>
-                <button id="show-answers-button">Show Answers</button>
-            </div>
-            
             <div id="clues-container" class="clues-section" style="display: none;">
+                <div class="across-clues">
+                    <h3>Across</h3>
+                    <ol id="across-clues" class="clue-list"></ol>
+                </div>
+                <div class="down-clues">
+                    <h3>Down</h3>
+                    <ol id="down-clues" class="clue-list"></ol>
+                </div>
+            </div>
+        </section>>
                 <div class="across-clues">
                     <h3>Across</h3>
                     <ol id="across-clues" class="clue-list"></ol>
@@ -78,6 +74,7 @@
         </div>
     </div>
     
+    <script src="/navigation.js"></script>
     <script src="/scripts.js"></script>
 </body>
 </html>

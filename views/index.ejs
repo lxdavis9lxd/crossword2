@@ -1,10 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crossword App</title>
+    <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-    <h1>Welcome to the Crossword App!</h1>
-    <a href="/auth/login">Login</a> | <a href="/auth/register">Register</a>
+    <%- include('partials/navigation') %>
+    <main>
+        <section class="welcome-section">
+            <h2>Welcome to the Crossword App!</h2>
+            <p>Challenge yourself with our fun crossword puzzles!</p>
+            <div class="auth-buttons">
+                <a href="/auth/login" class="auth-button">Login</a>
+                <a href="/auth/register" class="auth-button">Register</a>
+            </div>
+        </section>
+    </main>
+    <script src="/navigation.js"></script>
 </body>
 </html>
