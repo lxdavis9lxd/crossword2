@@ -1,7 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const Sequelize = require('sequelize');
 const path = require('path');
+const bcrypt = require('bcrypt');
 const app = express();
 
 // Set up middleware
@@ -20,8 +22,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Import db and models
-const db = require('./models');
+// Connect to the SQLite3 database using Sequelize
+const sequelize = new Sequelize({
+  dialect: 'sqlite',
+  storage: 'database.sqlite'
+});
+
+// Import models
+const User = require('./models/user');
+const Puzzle = require('./models/puzzle');
+
+// Sync models
+sequelize.sync();
 
 // Set up routes
 const authRoutes = require('./routes/auth');

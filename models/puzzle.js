@@ -1,26 +1,22 @@
-module.exports = (sequelize, DataTypes) => {
-  const Puzzle = sequelize.define('Puzzle', {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true
-    },
-    level: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    puzzleData: {
-      type: DataTypes.TEXT,
-      allowNull: false
-    }
-  }, {
-    timestamps: true
-  });
+const { Sequelize, DataTypes } = require('sequelize');
+const sequelize = require('./index').sequelize;
 
-  // Define associations if needed
-  Puzzle.associate = function(models) {
-    // example: Puzzle.belongsTo(models.User);
-  };
+const Puzzle = sequelize.define('Puzzle', {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true
+  },
+  level: {
+    type: DataTypes.ENUM('easy', 'intermediate', 'advanced'),
+    allowNull: false
+  },
+  puzzleData: {
+    type: DataTypes.TEXT,
+    allowNull: false
+  }
+}, {
+  timestamps: true
+});
 
-  return Puzzle;
-};
+module.exports = Puzzle;
