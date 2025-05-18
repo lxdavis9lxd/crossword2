@@ -21,6 +21,11 @@ module.exports = (sequelize, DataTypes) => {
     password: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    progress: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      defaultValue: '{}'
     }
   }, {
     timestamps: true
