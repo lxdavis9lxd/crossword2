@@ -34,6 +34,13 @@ router.get('/dashboard', (req, res) => {
   res.render('dashboard');
 });
 
+// Start game route - redirects to the game page
+router.post('/start', (req, res) => {
+  const { level } = req.body;
+  // Redirect to game page with the selected level as a query parameter
+  res.redirect(`/game?level=${level}`);
+});
+
 // Save game progress
 router.post('/save', async (req, res) => {
   const { userId, puzzleId, progress } = req.body;

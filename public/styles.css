@@ -1,0 +1,192 @@
+
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 1rem;
+}
+
+header h1 {
+    margin: 0;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+}
+
+nav ul li {
+    margin-right: 1rem;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Form Styles */
+form {
+    margin-bottom: 2rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+select, button {
+    padding: 0.5rem;
+    font-size: 1rem;
+}
+
+button {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #555;
+}
+
+/* Crossword Grid Styles */
+#crossword-container {
+    display: grid;
+    gap: 0;
+    margin: 2rem 0;
+}
+
+.crossword-cell {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #999;
+    background-color: #fff;
+    position: relative;
+}
+
+.black-cell {
+    background-color: #333;
+}
+
+.cell-number {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    font-size: 10px;
+}
+
+.crossword-input {
+    width: 100%;
+    height: 100%;
+    border: none;
+    text-align: center;
+    font-size: 20px;
+    text-transform: uppercase;
+}
+
+.crossword-input:focus {
+    background-color: #e6f7ff;
+    outline: none;
+}
+
+/* Clues Section */
+.clues-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.across-clues, .down-clues {
+    flex: 1;
+    min-width: 300px;
+}
+
+.clue-list {
+    list-style-position: inside;
+    padding-left: 0;
+}
+
+.clue-item {
+    margin-bottom: 0.5rem;
+}
+
+/* Dashboard Specific Styles */
+.difficulty-options {
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.difficulty-option {
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.difficulty-option:hover {
+    background-color: #f0f0f0;
+}
+
+.difficulty-option.selected {
+    background-color: #333;
+    color: #fff;
+}
+
+#saved-games-list {
+    list-style: none;
+    padding: 0;
+}
+
+#saved-games-list li {
+    padding: 1rem;
+    border: 1px solid #ddd;
+    margin-bottom: 0.5rem;
+    border-radius: 4px;
+    background-color: #fff;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    main {
+        padding: 1rem;
+    }
+    
+    .crossword-cell {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .crossword-input {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .crossword-cell {
+        width: 25px;
+        height: 25px;
+    }
+    
+    .crossword-input {
+        font-size: 14px;
+    }
+}

@@ -26,7 +26,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize - check the page
     if (window.location.pathname.includes('/game')) {
         // We're on the game page
-        loadPuzzlesForLevel(); // Load puzzles for default level
+        
+        // Check if level is specified in the URL query parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const levelParam = urlParams.get('level');
+
+        if (levelParam && levelSelect) {
+            // Set the level select value based on URL parameter
+            levelSelect.value = levelParam;
+        }
+        
+        loadPuzzlesForLevel(); // Load puzzles for the selected level
     }
     
     // Functions
