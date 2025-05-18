@@ -46,6 +46,11 @@ router.post('/save', async (req, res) => {
   const { userId, puzzleId, progress } = req.body;
 
   try {
+    // Validate inputs
+    if (!userId || !puzzleId || !progress) {
+      return res.status(400).send('Missing required fields: userId, puzzleId, and progress are required');
+    }
+
     const user = await User.findByPk(userId);
     if (!user) {
       return res.status(404).send('User not found');
@@ -56,12 +61,22 @@ router.post('/save', async (req, res) => {
       return res.status(404).send('Puzzle not found');
     }
 
-    // Save game progress (this is a placeholder, implement actual saving logic)
+    // In a real app with a SavedGames model, you would do something like:
+    // await SavedGame.upsert({
+    //   userId: userId,
+    //   puzzleId: puzzleId,
+    //   progress: progress,
+    // });
+    
+    // For this simplified version, we'll store progress in the user model
+    // This assumes only one saved game per user. In a real app, use a separate model
     user.progress = progress;
     await user.save();
 
-    res.send('Game progress saved');
+    console.log(`Game progress saved for user ${userId} on puzzle ${puzzleId}`);
+    res.status(200).send('Game progress saved successfully');
   } catch (error) {
+    console.error('Error saving game progress:', error);
     res.status(500).send('Server error');
   }
 });

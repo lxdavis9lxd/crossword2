@@ -358,12 +358,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         try {
+            // For simplicity, we're using a hardcoded user ID (1)
+            // In a real app, this would come from the session/authentication system
+            const userId = 1;
+            
             const response = await fetch('/game/save', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
+                    userId: userId,
                     puzzleId: currentPuzzle.id,
                     progress: JSON.stringify(gridState)
                 })
