@@ -34,6 +34,7 @@
                     </select>
                 </div>
                 <button id="load-puzzle-btn">Load Puzzle</button>
+                <button id="resume-game-btn">Resume Saved Game</button>
             </div>
             
             <div id="puzzle-info" style="display: none;">
@@ -64,6 +65,19 @@
             <button id="save-button">Save</button>
         </section>
     </main>
+    
+    <!-- Modal for selecting saved games -->
+    <div id="saved-games-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3>Resume Saved Game</h3>
+            <div id="saved-games-list">
+                <!-- Saved games will be loaded here -->
+                <p class="loading-message">Loading saved games...</p>
+            </div>
+        </div>
+    </div>
+    
     <script src="/scripts.js"></script>
 </body>
 </html>

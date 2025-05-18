@@ -29,6 +29,26 @@ document.addEventListener('DOMContentLoaded', function() {
         showAnswersButton.addEventListener('click', showAnswers);
     }
     
+    // Add event listener for Resume Game button
+    const resumeGameBtn = document.getElementById('resume-game-btn');
+    if (resumeGameBtn) {
+        resumeGameBtn.addEventListener('click', openSavedGamesModal);
+    }
+    
+    // Add event listener for modal close button
+    const closeModalBtn = document.querySelector('.close-modal');
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', closeSavedGamesModal);
+    }
+    
+    // Close modal when clicking outside of it
+    window.addEventListener('click', (event) => {
+        const modal = document.getElementById('saved-games-modal');
+        if (event.target === modal) {
+            closeSavedGamesModal();
+        }
+    });
+    
     // Initialize - check the page
     if (window.location.pathname.includes('/game')) {
         // We're on the game page
@@ -417,6 +437,144 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('Error showing answers:', error);
             alert('Failed to show answers. Please try again.');
+        }
+    }
+    
+    // Function to open the saved games modal
+    function openSavedGamesModal() {
+        const modal = document.getElementById('saved-games-modal');
+        if (!modal) return;
+        
+        // Show the modal
+        modal.style.display = 'block';
+        
+        // Load saved games
+        loadSavedGames();
+    }
+    
+    // Function to close the saved games modal
+    function closeSavedGamesModal() {
+        const modal = document.getElementById('saved-games-modal');
+        if (!modal) return;
+        
+        // Hide the modal
+        modal.style.display = 'none';
+    }
+    
+    // Function to load saved games from the server
+    async function loadSavedGames() {
+        const savedGamesList = document.getElementById('saved-games-list');
+        if (!savedGamesList) return;
+        
+        // Show loading message
+        savedGamesList.innerHTML = '<p class="loading-message">Loading saved games...</p>';
+        
+        try {
+            // For simplicity, we're using a hard-coded user ID
+            // In a real app, you would get this from the session
+            const userId = 1;
+            
+            const response = await fetch(`/game/saved-games/${userId}`);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch saved games: ${response.status}`);
+            }
+            
+            const savedGames = await response.json();
+            
+            // Clear loading message
+            savedGamesList.innerHTML = '';
+            
+            if (savedGames.length === 0) {
+                savedGamesList.innerHTML = '<p class="no-saved-games">No saved games found.</p>';
+                return;
+            }
+            
+            // Create elements for each saved game
+            savedGames.forEach(game => {
+                const gameElement = document.createElement('div');
+                gameElement.className = 'saved-game-item';
+                gameElement.dataset.puzzleId = game.puzzleId;
+                gameElement.dataset.userId = game.userId;
+                
+                gameElement.innerHTML = `
+                    <div class="puzzle-title">${game.puzzleTitle || 'Untitled Puzzle'}</div>
+                    <div class="saved-date">Saved on: ${game.savedAt}</div>
+                    <div class="progress-info">
+                        <span class="level-badge ${game.puzzleLevel}">${game.puzzleLevel.charAt(0).toUpperCase() + game.puzzleLevel.slice(1)}</span>
+                        <span class="completion-percentage">Completion: ${game.completionPercentage}</span>
+                    </div>
+                `;
+                
+                // Add click event to load this saved game
+                gameElement.addEventListener('click', () => {
+                    loadSavedGame(game.userId, game.puzzleId);
+                    closeSavedGamesModal();
+                });
+                
+                savedGamesList.appendChild(gameElement);
+            });
+            
+        } catch (error) {
+            console.error('Error loading saved games:', error);
+            savedGamesList.innerHTML = '<p class="no-saved-games">Error loading saved games. Please try again.</p>';
+        }
+    }
+    
+    // Function to load a specific saved game
+    async function loadSavedGame(userId, puzzleId) {
+        try {
+            const response = await fetch(`/game/saved-games/${userId}/${puzzleId}`);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch saved game: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            // Store the puzzle
+            currentPuzzle = data.puzzle;
+            
+            // Parse puzzle data
+            const puzzleData = JSON.parse(data.puzzle.puzzleData);
+            
+            // Display puzzle info
+            displayPuzzleInfo(puzzleData);
+            
+            // Render the grid
+            renderCrosswordGrid(puzzleData);
+            
+            // Display clues
+            displayClues(puzzleData.clues);
+            
+            // Reset the show answers button
+            const showAnswersButton = document.getElementById('show-answers-button');
+            if (showAnswersButton) {
+                showAnswersButton.disabled = false;
+                showAnswersButton.textContent = 'Show Answers';
+            }
+            
+            // Fill in the user's progress if available
+            if (data.progress) {
+                try {
+                    const userProgress = JSON.parse(data.progress);
+                    
+                    // Fill in grid with saved progress
+                    const inputs = document.querySelectorAll('.crossword-input');
+                    inputs.forEach(input => {
+                        const index = parseInt(input.dataset.index);
+                        if (userProgress[index]) {
+                            input.value = userProgress[index];
+                        }
+                    });
+                    
+                    console.log('Saved game progress loaded successfully');
+                } catch (e) {
+                    console.error('Error parsing saved game progress:', e);
+                }
+            }
+            
+        } catch (error) {
+            console.error('Error loading saved game:', error);
+            alert('Failed to load saved game. Please try again.');
         }
     }
 });

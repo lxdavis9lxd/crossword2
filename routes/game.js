@@ -85,6 +85,84 @@ router.get('/progress/:userId', async (req, res) => {
   }
 });
 
+// List saved games for a user
+router.get('/saved-games/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
+
+    // For this example, we'll use a simplified approach
+    // In a real app, you would have a SavedGame model with relationships
+    // to both User and Puzzle models
+    
+    // Get all puzzles to display their info
+    const puzzles = await Puzzle.findAll();
+    
+    // Create a list of saved games with puzzle info
+    // In a real app, this would come from a SavedGame model query
+    const savedGames = [];
+    
+    // If user has saved progress, add it to the list
+    if (user.progress) {
+      // For this simplified version, we'll assume user has one saved game
+      // with the first puzzle
+      if (puzzles.length > 0) {
+        const savedAt = new Date().toLocaleString();
+        const puzzleData = JSON.parse(puzzles[0].puzzleData);
+        
+        savedGames.push({
+          id: 1,
+          userId: user.id,
+          puzzleId: puzzles[0].id,
+          progress: user.progress,
+          savedAt: savedAt,
+          puzzleTitle: puzzleData.title || 'Untitled Puzzle',
+          puzzleLevel: puzzles[0].level,
+          completionPercentage: '25%' // In a real app, calculate this
+        });
+      }
+    }
+    
+    res.json(savedGames);
+  } catch (error) {
+    console.error('Error retrieving saved games:', error);
+    res.status(500).send('Server error');
+  }
+});
+
+// Load a specific saved game
+router.get('/saved-games/:userId/:puzzleId', async (req, res) => {
+  const { userId, puzzleId } = req.params;
+
+  try {
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
+
+    const puzzle = await Puzzle.findByPk(puzzleId);
+    if (!puzzle) {
+      return res.status(404).send('Puzzle not found');
+    }
+    
+    // Get the user's progress
+    const progress = user.progress;
+    
+    // Return both the puzzle data and the user's progress
+    res.json({
+      puzzle: puzzle,
+      progress: progress
+    });
+  } catch (error) {
+    console.error('Error loading saved game:', error);
+    res.status(500).send('Server error');
+  }
+});
+
 // Game page route
 router.get('/', (req, res) => {
   res.render('game');
