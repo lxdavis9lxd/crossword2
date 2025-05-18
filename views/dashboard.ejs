@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Dashboard</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Crossword Game Dashboard</h1>
+        <nav>
+            <ul>
+                <li><a href="/auth/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h2>Select Difficulty Level</h2>
+            <form action="/game/start" method="POST">
+                <label>
+                    <input type="radio" name="level" value="easy" required> Easy
+                </label>
+                <label>
+                    <input type="radio" name="level" value="intermediate"> Intermediate
+                </label>
+                <label>
+                    <input type="radio" name="level" value="advanced"> Advanced
+                </label>
+                <button type="submit">Start Game</button>
+            </form>
+        </section>
+        <section>
+            <h2>Saved Games</h2>
+            <ul id="saved-games-list">
+                <!-- Saved games will be dynamically loaded here -->
+            </ul>
+        </section>
+    </main>
+    <script src="/scripts.js"></script>
+</body>
+</html>
