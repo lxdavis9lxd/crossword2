@@ -3,27 +3,517 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crossword Game</title>
-    <link rel="stylesheet" href="/styles.css">
+    <title>Crossword Game - <%= level %> Level</title>
+    <style>
+        .crossword-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 40px);
+            grid-template-rows: repeat(10, 40px);
+            grid-gap: 1px;
+            margin: 20px 0;
+        }
+        
+        .cell {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background-color: white;
+        }
+        
+        .cell.blocked {
+            background-color: #333;
+        }
+        
+        .cell-number {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            font-size: 10px;
+        }
+        
+        .clues-container {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .clues-section {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .cell input {
+            width: 90%;
+            height: 90%;
+            border: none;
+            text-align: center;
+            font-size: 20px;
+            text-transform: uppercase;
+        }
+        
+        #message {
+            margin-top: 20px;
+            padding: 10px;
+            display: none;
+        }
+        
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+        
+        /* New styles for timer and game controls */
+        .game-controls {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+        }
+        
+        .timer {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-right: 20px;
+            padding: 5px 10px;
+            background-color: #4a6ea9;
+            color: white;
+            border-radius: 5px;
+        }
+        
+        .control-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        #check-button, #save-button {
+            background-color: #4a6ea9;
+            color: white;
+        }
+        
+        #pause-button {
+            background-color: #f0ad4e;
+            color: white;
+        }
+        
+        #hint-button {
+            background-color: #5bc0de;
+            color: white;
+        }
+        
+        button:hover {
+            opacity: 0.9;
+        }
+        
+        .hint-highlight {
+            background-color: #d9edf7 !important;
+        }
+    </style>
 </head>
 <body>
     <header>
-        <h1>Crossword Game</h1>
+        <h1>Crossword Game - <%= level %> Level</h1>
         <nav>
             <ul>
+                <li><a href="/game/dashboard">Back to Dashboard</a></li>
                 <li><a href="/auth/logout">Logout</a></li>
             </ul>
         </nav>
     </header>
+    
     <main>
         <section>
             <h2>Crossword Puzzle</h2>
+            
             <div id="crossword-container">
-                <!-- Crossword puzzle will be dynamically loaded here -->
+                <div class="game-controls">
+                    <div class="timer" id="timer">00:00</div>
+                    <div class="control-buttons">
+                        <button id="pause-button">Pause</button>
+                        <button id="hint-button">Hint</button>
+                        <button id="check-button">Check Answers</button>
+                        <button id="save-button">Save Progress</button>
+                    </div>
+                </div>
+                
+                <div class="crossword-grid" id="crossword-grid">
+                    <!-- Grid will be dynamically generated in JavaScript -->
+                </div>
+                
+                <div class="clues-container">
+                    <div class="clues-section">
+                        <h3>Across</h3>
+                        <ol id="across-clues"></ol>
+                    </div>
+                    
+                    <div class="clues-section">
+                        <h3>Down</h3>
+                        <ol id="down-clues"></ol>
+                    </div>
+                </div>
+                
+                <div id="message"></div>
+                
+                <button id="check-button">Check Answers</button>
+                <button id="save-button">Save Progress</button>
             </div>
-            <button id="save-button">Save</button>
         </section>
     </main>
-    <script src="/scripts.js"></script>
+    
+    <script>
+        // Parse the puzzle data
+        const puzzleData = JSON.parse('<%= JSON.stringify(puzzle.puzzleData) %>'.replace(/&quot;/g, '"'));
+        const words = JSON.parse(puzzleData).words;
+        
+        // Get saved progress if available
+        const savedProgress = <%= savedProgress ? savedProgress : 'null' %>;
+        
+        // Set up the grid dimensions based on the words
+        let maxX = 0;
+        let maxY = 0;
+        
+        words.forEach(word => {
+            const wordLength = word.word.length;
+            
+            if (word.direction === 'across') {
+                maxX = Math.max(maxX, word.startX + wordLength);
+                maxY = Math.max(maxY, word.startY + 1);
+            } else { // 'down'
+                maxX = Math.max(maxX, word.startX + 1);
+                maxY = Math.max(maxY, word.startY + wordLength);
+            }
+        });
+        
+        // Add some buffer
+        maxX = Math.max(maxX, 10);
+        maxY = Math.max(maxY, 10);
+        
+        // Initialize the grid
+        const grid = document.getElementById('crossword-grid');
+        grid.style.gridTemplateColumns = `repeat(${maxX}, 40px)`;
+        grid.style.gridTemplateRows = `repeat(${maxY}, 40px)`;
+        
+        // Create a 2D array to represent the grid
+        const gridArray = Array(maxY).fill().map(() => Array(maxX).fill(null));
+        
+        // Populate the grid with the words
+        const cellsWithNumbers = new Map();
+        let numberCounter = 1;
+        
+        words.forEach(word => {
+            const { startX, startY, direction, word: wordText } = word;
+            
+            // Assign a number to the start of the word if it doesn't have one
+            const cellKey = `${startX},${startY}`;
+            if (!cellsWithNumbers.has(cellKey)) {
+                cellsWithNumbers.set(cellKey, numberCounter++);
+            }
+            
+            // Fill in the letters in the grid
+            for (let i = 0; i < wordText.length; i++) {
+                let x = startX;
+                let y = startY;
+                
+                if (direction === 'across') {
+                    x += i;
+                } else { // 'down'
+                    y += i;
+                }
+                
+                gridArray[y][x] = { letter: wordText[i], wordId: word.word };
+            }
+        });
+        
+        // Render the grid
+        for (let y = 0; y < maxY; y++) {
+            for (let x = 0; x < maxX; x++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.dataset.x = x;
+                cell.dataset.y = y;
+                
+                const cellContent = gridArray[y][x];
+                
+                if (cellContent) {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.maxLength = 1;
+                    input.dataset.x = x;
+                    input.dataset.y = y;
+                    input.dataset.correctLetter = cellContent.letter;
+                    cell.appendChild(input);
+                    
+                    // Add cell number if needed
+                    const cellKey = `${x},${y}`;
+                    if (cellsWithNumbers.has(cellKey)) {
+                        const numberSpan = document.createElement('span');
+                        numberSpan.className = 'cell-number';
+                        numberSpan.textContent = cellsWithNumbers.get(cellKey);
+                        cell.appendChild(numberSpan);
+                    }
+                } else {
+                    cell.classList.add('blocked');
+                }
+                
+                grid.appendChild(cell);
+            }
+        }
+        
+        // Build the clues lists
+        const acrossClues = document.getElementById('across-clues');
+        const downClues = document.getElementById('down-clues');
+        
+        words.forEach(word => {
+            const { startX, startY, direction, clue, word: wordText } = word;
+            const cellKey = `${startX},${startY}`;
+            const number = cellsWithNumbers.get(cellKey);
+            
+            const clueItem = document.createElement('li');
+            clueItem.innerHTML = `<strong>${number}.</strong> ${clue}`;
+            
+            if (direction === 'across') {
+                acrossClues.appendChild(clueItem);
+            } else { // 'down'
+                downClues.appendChild(clueItem);
+            }
+        });
+        
+        // Timer functionality
+        let seconds = 0;
+        let timerInterval;
+        let isPaused = false;
+        
+        function updateTimer() {
+            seconds++;
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            document.getElementById('timer').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+        
+        function startTimer() {
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+        
+        function pauseTimer() {
+            clearInterval(timerInterval);
+        }
+        
+        // Start the timer when the page loads
+        startTimer();
+        
+        // Pause button functionality
+        document.getElementById('pause-button').addEventListener('click', function() {
+            if (isPaused) {
+                // Resume
+                this.textContent = 'Pause';
+                startTimer();
+                // Enable inputs
+                document.querySelectorAll('.cell input').forEach(input => {
+                    input.disabled = false;
+                });
+            } else {
+                // Pause
+                this.textContent = 'Resume';
+                pauseTimer();
+                // Disable inputs
+                document.querySelectorAll('.cell input').forEach(input => {
+                    input.disabled = true;
+                });
+            }
+            isPaused = !isPaused;
+        });
+        
+        // Hint button functionality
+        document.getElementById('hint-button').addEventListener('click', function() {
+            // Get all empty or incorrect cells
+            const emptyCells = Array.from(document.querySelectorAll('.cell input')).filter(input => {
+                return !input.value || input.value.toUpperCase() !== input.dataset.correctLetter.toUpperCase();
+            });
+            
+            if (emptyCells.length === 0) {
+                return; // All cells are correct
+            }
+            
+            // Pick a random empty cell
+            const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+            
+            // Fill it with the correct letter
+            randomCell.value = randomCell.dataset.correctLetter;
+            randomCell.classList.add('hint-highlight');
+            
+            // Remove the highlight after 2 seconds
+            setTimeout(() => {
+                randomCell.classList.remove('hint-highlight');
+            }, 2000);
+        });
+        
+        // Check answers functionality
+        document.getElementById('check-button').addEventListener('click', function() {
+            const inputs = document.querySelectorAll('.cell input');
+            let allCorrect = true;
+            
+            inputs.forEach(input => {
+                const userLetter = input.value.toUpperCase();
+                const correctLetter = input.dataset.correctLetter.toUpperCase();
+                
+                if (userLetter === correctLetter) {
+                    input.style.backgroundColor = '#dff0d8';
+                } else {
+                    input.style.backgroundColor = '#f2dede';
+                    allCorrect = false;
+                }
+            });
+            
+            const messageDiv = document.getElementById('message');
+            messageDiv.style.display = 'block';
+            
+            if (allCorrect) {
+                messageDiv.className = 'success';
+                messageDiv.textContent = 'Congratulations! All answers are correct!';
+                
+                // Stop the timer when the puzzle is solved
+                pauseTimer();
+            } else {
+                messageDiv.className = 'error';
+                messageDiv.textContent = 'Some answers are incorrect. Try again!';
+                
+                // Clear incorrect answers after 3 seconds
+                setTimeout(() => {
+                    inputs.forEach(input => {
+                        if (input.value.toUpperCase() !== input.dataset.correctLetter.toUpperCase()) {
+                            input.style.backgroundColor = '';
+                        }
+                    });
+                }, 3000);
+            }
+        });
+        
+        // Save progress functionality
+        document.getElementById('save-button').addEventListener('click', function() {
+            const inputs = document.querySelectorAll('.cell input');
+            const progress = {};
+            
+            inputs.forEach(input => {
+                const x = input.dataset.x;
+                const y = input.dataset.y;
+                const key = `${x},${y}`;
+                progress[key] = input.value;
+            });
+            
+            // Also save the timer
+            progress.time = seconds;
+            
+            // Send the progress to the server
+            fetch('/game/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId: '<%= user.id %>',
+                    puzzleId: '<%= puzzle.id %>',
+                    progress: JSON.stringify(progress)
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    const messageDiv = document.getElementById('message');
+                    messageDiv.className = 'success';
+                    messageDiv.textContent = 'Progress saved successfully!';
+                    messageDiv.style.display = 'block';
+                    
+                    // Hide the message after 3 seconds
+                    setTimeout(() => {
+                        messageDiv.style.display = 'none';
+                    }, 3000);
+                }
+            })
+            .catch(error => {
+                console.error('Error saving progress:', error);
+            });
+        });
+        
+        // Keyboard navigation between cells
+        document.querySelectorAll('.cell input').forEach(input => {
+            input.addEventListener('keydown', function(e) {
+                const x = parseInt(this.dataset.x);
+                const y = parseInt(this.dataset.y);
+                
+                // Move to the next cell after typing a letter
+                if (e.key.length === 1 && e.key.match(/[a-zA-Z]/)) {
+                    this.value = e.key.toUpperCase();
+                    
+                    // Navigate to the next cell in the appropriate direction
+                    // This is a simplified version - ideally we'd determine which word the user is filling
+                    setTimeout(() => {
+                        const rightCell = document.querySelector(`input[data-x="${x + 1}"][data-y="${y}"]`);
+                        const downCell = document.querySelector(`input[data-x="${x}"][data-y="${y + 1}"]`);
+                        
+                        if (rightCell) {
+                            rightCell.focus();
+                        } else if (downCell) {
+                            downCell.focus();
+                        }
+                    }, 0);
+                    
+                    e.preventDefault();
+                }
+                // Navigate with arrow keys
+                else if (e.key === 'ArrowRight') {
+                    const nextInput = document.querySelector(`input[data-x="${x + 1}"][data-y="${y}"]`);
+                    if (nextInput) nextInput.focus();
+                    e.preventDefault();
+                }
+                else if (e.key === 'ArrowLeft') {
+                    const prevInput = document.querySelector(`input[data-x="${x - 1}"][data-y="${y}"]`);
+                    if (prevInput) prevInput.focus();
+                    e.preventDefault();
+                }
+                else if (e.key === 'ArrowDown') {
+                    const belowInput = document.querySelector(`input[data-x="${x}"][data-y="${y + 1}"]`);
+                    if (belowInput) belowInput.focus();
+                    e.preventDefault();
+                }
+                else if (e.key === 'ArrowUp') {
+                    const aboveInput = document.querySelector(`input[data-x="${x}"][data-y="${y - 1}"]`);
+                    if (aboveInput) aboveInput.focus();
+                    e.preventDefault();
+                }
+                // Backspace to clear and move back
+                else if (e.key === 'Backspace') {
+                    if (this.value) {
+                        this.value = '';
+                    } else {
+                        const prevInput = document.querySelector(`input[data-x="${x - 1}"][data-y="${y}"]`);
+                        if (prevInput) {
+                            prevInput.focus();
+                            prevInput.value = '';
+                        }
+                    }
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
 </body>
 </html>

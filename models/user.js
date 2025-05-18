@@ -21,6 +21,26 @@ module.exports = (sequelize, DataTypes) => {
     password: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    progress: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      defaultValue: '{}'
+    },
+    gamesPlayed: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
+    },
+    puzzlesSolved: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
+    },
+    streak: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
     }
   }, {
     timestamps: true
