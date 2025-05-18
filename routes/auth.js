@@ -83,17 +83,4 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Logout route
-router.get('/logout', (req, res) => {
-  // Destroy the session
-  req.session.destroy(err => {
-    if (err) {
-      return res.status(500).send('Error logging out');
-    }
-    
-    // Redirect to home page
-    res.redirect('/');
-  });
-});
-
 module.exports = router;
