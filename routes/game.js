@@ -29,6 +29,11 @@ router.get('/puzzles/details/:id', async (req, res) => {
   }
 });
 
+// Dashboard route
+router.get('/dashboard', (req, res) => {
+  res.render('dashboard');
+});
+
 // Save game progress
 router.post('/save', async (req, res) => {
   const { userId, puzzleId, progress } = req.body;

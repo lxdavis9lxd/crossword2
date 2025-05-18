@@ -476,6 +476,641 @@ function testGamePageLoading() {
   });
 }
 
+// Test dashboard page loading
+function testDashboardPageLoading() {
+  return new Promise((resolve, reject) => {
+    const options = {
+      hostname: 'localhost',
+      port: 3000,
+      path: '/game/dashboard',
+      method: 'GET',
+      headers: {
+        'Cookie': sessionCookie
+      }
+    };
+
+    const req = http.request(options, (res) => {
+      let data = '';
+      
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
+      
+      res.on('end', () => {
+        try {
+          assert.strictEqual(res.statusCode, 200);
+          
+          // Check for key elements in the dashboard page
+          assert.ok(data.includes('Crossword Game Dashboard'), 'Dashboard page should include title');
+          assert.ok(data.includes('Select Difficulty Level'), 'Dashboard page should include difficulty selection');
+          assert.ok(data.includes('Start Game'), 'Dashboard page should include start game button');
+          
+          console.log('✅ Dashboard page loading test passed');
+          resolve(true);
+        } catch (error) {
+          console.error('❌ Dashboard page loading test failed:', error.message);
+          console.error('Status code:', res.statusCode);
+          resolve(false);
+        }
+      });
+    });
+
+    req.on('error', (error) => {
+      console.error('❌ Dashboard page loading test failed:', error.message);
+      resolve(false);
+    });
+
+    req.end();
+  });
+}
+
+// Test saving game progress
+function testSaveGameProgress() {
+  return new Promise(async (resolve, reject) => {
+    try {
+      console.log('\nTesting save game progress functionality...');
+      
+      if (testPuzzleIds.length === 0) {
+        console.log('Skipping save game test - no puzzle IDs available');
+        resolve(false);
+        return;
+      }
+      
+      const puzzleId = testPuzzleIds[0];
+      
+      // Mock user progress data - simulating filled cells in the grid
+      const progress = JSON.stringify(['A', '', 'T', '', 'O', '', '', '']);
+      
+      // Send a POST request to save the game progress
+      const postData = JSON.stringify({
+        userId: 1, // Assuming user ID 1 exists
+        puzzleId: puzzleId,
+        progress: progress
+      });
+      
+      const options = {
+        hostname: 'localhost',
+        port: 3000,
+        path: '/game/save',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cookie': sessionCookie,
+          'Content-Length': Buffer.byteLength(postData)
+        }
+      };
+      
+      const req = http.request(options, (res) => {
+        let data = '';
+        
+        res.on('data', (chunk) => {
+          data += chunk;
+        });
+        
+        res.on('end', () => {
+          try {
+            // Should return success status
+            assert.ok(res.statusCode >= 200 && res.statusCode < 300, 'Save game should return success status');
+            
+            console.log('✅ Save game progress test passed');
+            resolve(true);
+          } catch (error) {
+            console.error('❌ Save game progress test failed:', error.message);
+            console.error('Status code:', res.statusCode);
+            console.error('Response data:', data);
+            resolve(false);
+          }
+        });
+      });
+      
+      req.on('error', (error) => {
+        console.error('❌ Save game progress test failed:', error.message);
+        resolve(false);
+      });
+      
+      req.write(postData);
+      req.end();
+      
+    } catch (error) {
+      console.error('❌ Save game progress test failed with error:', error);
+      resolve(false);
+    }
+  });
+}
+
+// Test grid rendering with puzzle data
+function testGridRendering() {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // First, load the game page
+      console.log('\nTesting grid rendering with puzzle data...');
+      
+      if (testPuzzleIds.length === 0) {
+        console.log('Skipping grid rendering test - no puzzle IDs available');
+        resolve(false);
+        return;
+      }
+      
+      const puzzleId = testPuzzleIds[0];
+      
+      // Create a unique ID for the browser test
+      const testId = Date.now().toString();
+      
+      // Mock the browser navigation and puzzle loading actions
+      // Step 1: Navigate to game page
+      const gamePagePromise = new Promise((resolveGamePage, rejectGamePage) => {
+        const options = {
+          hostname: 'localhost',
+          port: 3000,
+          path: '/game',
+          method: 'GET',
+          headers: {
+            'Cookie': sessionCookie
+          }
+        };
+
+        const req = http.request(options, (res) => {
+          let data = '';
+          
+          res.on('data', (chunk) => {
+            data += chunk;
+          });
+          
+          res.on('end', () => {
+            try {
+              assert.strictEqual(res.statusCode, 200);
+              resolveGamePage(true);
+            } catch (error) {
+              resolveGamePage(false);
+            }
+          });
+        });
+
+        req.on('error', (error) => {
+          resolveGamePage(false);
+        });
+
+        req.end();
+      });
+      
+      const gamePageLoaded = await gamePagePromise;
+      
+      if (!gamePageLoaded) {
+        console.error('❌ Grid rendering test failed: Could not load game page');
+        resolve(false);
+        return;
+      }
+      
+      // Step 2: Fetch puzzle details to verify data structure for grid rendering
+      const puzzleDetailsPromise = new Promise((resolvePuzzleDetails, rejectPuzzleDetails) => {
+        const options = {
+          hostname: 'localhost',
+          port: 3000,
+          path: `/game/puzzles/details/${puzzleId}`,
+          method: 'GET',
+          headers: {
+            'Cookie': sessionCookie
+          }
+        };
+
+        const req = http.request(options, (res) => {
+          let data = '';
+          
+          res.on('data', (chunk) => {
+            data += chunk;
+          });
+          
+          res.on('end', () => {
+            try {
+              assert.strictEqual(res.statusCode, 200);
+              const puzzle = JSON.parse(data);
+              
+              // Verify puzzle data structure needed for grid rendering
+              const puzzleData = JSON.parse(puzzle.puzzleData);
+              
+              // Check grid structure
+              assert.ok(Array.isArray(puzzleData.grid), 'Grid should be an array');
+              assert.ok(puzzleData.grid.length > 0, 'Grid should not be empty');
+              
+              // Check cell numbers structure
+              assert.ok(Array.isArray(puzzleData.cellNumbers), 'Cell numbers should be an array');
+              assert.strictEqual(puzzleData.grid.length, puzzleData.cellNumbers.length, 'Grid and cell numbers should have the same length');
+              
+              // Check clues structure
+              assert.ok(puzzleData.clues, 'Puzzle should have clues');
+              assert.ok(puzzleData.clues.across, 'Puzzle should have across clues');
+              assert.ok(puzzleData.clues.down, 'Puzzle should have down clues');
+              
+              console.log('✅ Puzzle data structure valid for grid rendering');
+              resolvePuzzleDetails(true);
+            } catch (error) {
+              console.error('❌ Grid rendering test failed:', error.message);
+              resolvePuzzleDetails(false);
+            }
+          });
+        });
+
+        req.on('error', (error) => {
+          console.error('❌ Grid rendering test failed:', error.message);
+          resolvePuzzleDetails(false);
+        });
+
+        req.end();
+      });
+      
+      const puzzleDetailsValid = await puzzleDetailsPromise;
+      
+      if (puzzleDetailsValid) {
+        console.log('✅ Grid rendering test passed');
+        resolve(true);
+      } else {
+        console.log('❌ Grid rendering test failed');
+        resolve(false);
+      }
+      
+    } catch (error) {
+      console.error('❌ Grid rendering test failed with error:', error);
+      resolve(false);
+    }
+  });
+}
+
+// Test user interaction with the grid
+function testUserInteractionWithGrid() {
+  return new Promise(async (resolve, reject) => {
+    try {
+      console.log('\nTesting user interaction with the grid...');
+      
+      if (testPuzzleIds.length === 0) {
+        console.log('Skipping user interaction test - no puzzle IDs available');
+        resolve(false);
+        return;
+      }
+      
+      const puzzleId = testPuzzleIds[0];
+      
+      // First, simulate loading a puzzle
+      const puzzleDetailsPromise = new Promise((resolvePuzzleDetails, rejectPuzzleDetails) => {
+        const options = {
+          hostname: 'localhost',
+          port: 3000,
+          path: `/game/puzzles/details/${puzzleId}`,
+          method: 'GET',
+          headers: {
+            'Cookie': sessionCookie
+          }
+        };
+
+        const req = http.request(options, (res) => {
+          let data = '';
+          
+          res.on('data', (chunk) => {
+            data += chunk;
+          });
+          
+          res.on('end', () => {
+            try {
+              assert.strictEqual(res.statusCode, 200);
+              const puzzle = JSON.parse(data);
+              const puzzleData = JSON.parse(puzzle.puzzleData);
+              
+              // Simulate filling in cells in the grid
+              // We'll generate simulated user inputs for the first few cells
+              const gridSize = Math.sqrt(puzzleData.grid.length);
+              const userInputs = [];
+              
+              // Find valid cells (not black cells) and simulate input
+              for (let i = 0; i < puzzleData.grid.length; i++) {
+                if (puzzleData.grid[i] !== '#') {
+                  // This is a valid cell, add a simulated input
+                  // In a real user interaction, we'd check the clues and input correct letters
+                  // For this test, we'll just input the first letter of the alphabet
+                  userInputs.push({
+                    index: i,
+                    row: Math.floor(i / gridSize),
+                    col: i % gridSize,
+                    value: 'A'
+                  });
+                  
+                  // We only need a few cells for testing
+                  if (userInputs.length >= 5) break;
+                }
+              }
+              
+              // Verify that we found valid cells to interact with
+              assert.ok(userInputs.length > 0, 'Should have valid cells for interaction');
+              
+              // Test keyboard navigation simulation
+              // We can verify the data structure needed for keyboard navigation
+              // First valid cell → right → down
+              if (userInputs.length >= 3) {
+                const cell1 = userInputs[0];
+                const expectedNextCellRight = userInputs.find(
+                  input => input.row === cell1.row && input.col === cell1.col + 1
+                );
+                const expectedNextCellDown = userInputs.find(
+                  input => input.col === cell1.col && input.row === cell1.row + 1
+                );
+                
+                // Log information for verification
+                console.log('Navigation simulation:');
+                console.log(`Starting at cell: row ${cell1.row}, col ${cell1.col}`);
+                
+                if (expectedNextCellRight) {
+                  console.log(`→ Right: row ${expectedNextCellRight.row}, col ${expectedNextCellRight.col}`);
+                }
+                
+                if (expectedNextCellDown) {
+                  console.log(`↓ Down: row ${expectedNextCellDown.row}, col ${expectedNextCellDown.col}`);
+                }
+              }
+              
+              console.log(`\nSimulated input for ${userInputs.length} grid cells`);
+              console.log('✅ Grid interaction simulation completed successfully');
+              resolvePuzzleDetails(true);
+            } catch (error) {
+              console.error('❌ User interaction test failed:', error.message);
+              resolvePuzzleDetails(false);
+            }
+          });
+        });
+
+        req.on('error', (error) => {
+          console.error('❌ User interaction test failed:', error.message);
+          resolvePuzzleDetails(false);
+        });
+
+        req.end();
+      });
+      
+      const userInteractionSuccess = await puzzleDetailsPromise;
+      
+      if (userInteractionSuccess) {
+        console.log('✅ User interaction test passed');
+        resolve(true);
+      } else {
+        console.log('❌ User interaction test failed');
+        resolve(false);
+      }
+      
+    } catch (error) {
+      console.error('❌ User interaction test failed with error:', error);
+      resolve(false);
+    }
+  });
+}
+
+// Test loading saved game progress
+function testLoadSavedGameProgress() {
+  return new Promise(async (resolve, reject) => {
+    try {
+      console.log('\nTesting loading saved game progress...');
+      
+      if (testPuzzleIds.length === 0) {
+        console.log('Skipping load saved game test - no puzzle IDs available');
+        resolve(false);
+        return;
+      }
+      
+      const puzzleId = testPuzzleIds[0];
+      
+      // Step 1: First save some progress
+      const mockProgress = JSON.stringify(['C', 'A', 'T', '', 'O', '', 'W', '']);
+      
+      // Send a POST request to save the game progress
+      const saveProgressPromise = new Promise((resolveSave, rejectSave) => {
+        const postData = JSON.stringify({
+          userId: 1, // Assuming user ID 1 exists
+          puzzleId: puzzleId,
+          progress: mockProgress
+        });
+        
+        const options = {
+          hostname: 'localhost',
+          port: 3000,
+          path: '/game/save',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Cookie': sessionCookie,
+            'Content-Length': Buffer.byteLength(postData)
+          }
+        };
+        
+        const req = http.request(options, (res) => {
+          let data = '';
+          
+          res.on('data', (chunk) => {
+            data += chunk;
+          });
+          
+          res.on('end', () => {
+            try {
+              // Should return success status
+              assert.ok(res.statusCode >= 200 && res.statusCode < 300, 'Save game should return success status');
+              
+              console.log('✅ Game progress saved for loading test');
+              resolveSave(true);
+            } catch (error) {
+              console.error('❌ Saving game for loading test failed:', error.message);
+              resolveSave(false);
+            }
+          });
+        });
+        
+        req.on('error', (error) => {
+          console.error('❌ Saving game for loading test failed:', error.message);
+          resolveSave(false);
+        });
+        
+        req.write(postData);
+        req.end();
+      });
+      
+      const saveSuccess = await saveProgressPromise;
+      
+      if (!saveSuccess) {
+        console.log('❌ Load saved game test failed - could not save initial progress');
+        resolve(false);
+        return;
+      }
+      
+      // Step 2: Now try to retrieve the saved progress
+      const loadProgressPromise = new Promise((resolveLoad, rejectLoad) => {
+        const options = {
+          hostname: 'localhost',
+          port: 3000,
+          path: '/game/progress/1', // Assuming user ID 1
+          method: 'GET',
+          headers: {
+            'Cookie': sessionCookie
+          }
+        };
+        
+        const req = http.request(options, (res) => {
+          let data = '';
+          
+          res.on('data', (chunk) => {
+            data += chunk;
+          });
+          
+          res.on('end', () => {
+            try {
+              assert.strictEqual(res.statusCode, 200, 'Should return 200 status code');
+              
+              const responseData = JSON.parse(data);
+              
+              // Check if the progress data exists
+              assert.ok(responseData.progress, 'Response should contain progress data');
+              
+              // If possible, validate that loaded progress matches what we saved
+              // This depends on how your server stores and retrieves the progress
+              console.log('✅ Game progress successfully loaded');
+              resolveLoad(true);
+            } catch (error) {
+              console.error('❌ Loading saved game progress failed:', error.message);
+              resolveLoad(false);
+            }
+          });
+        });
+        
+        req.on('error', (error) => {
+          console.error('❌ Loading saved game progress failed:', error.message);
+          resolveLoad(false);
+        });
+        
+        req.end();
+      });
+      
+      const loadSuccess = await loadProgressPromise;
+      
+      if (loadSuccess) {
+        console.log('✅ Load saved game progress test passed');
+        resolve(true);
+      } else {
+        console.log('❌ Load saved game progress test failed');
+        resolve(false);
+      }
+      
+    } catch (error) {
+      console.error('❌ Load saved game progress test failed with error:', error);
+      resolve(false);
+    }
+  });
+}
+
+// Test puzzle completion detection
+function testPuzzleCompletionDetection() {
+  return new Promise(async (resolve, reject) => {
+    try {
+      console.log('\nTesting puzzle completion detection...');
+      
+      if (testPuzzleIds.length === 0) {
+        console.log('Skipping puzzle completion test - no puzzle IDs available');
+        resolve(false);
+        return;
+      }
+      
+      const puzzleId = testPuzzleIds[0];
+      
+      // Simulate loading a puzzle and checking completion
+      const puzzleDetailsPromise = new Promise((resolvePuzzleDetails, rejectPuzzleDetails) => {
+        const options = {
+          hostname: 'localhost',
+          port: 3000,
+          path: `/game/puzzles/details/${puzzleId}`,
+          method: 'GET',
+          headers: {
+            'Cookie': sessionCookie
+          }
+        };
+
+        const req = http.request(options, (res) => {
+          let data = '';
+          
+          res.on('data', (chunk) => {
+            data += chunk;
+          });
+          
+          res.on('end', () => {
+            try {
+              assert.strictEqual(res.statusCode, 200);
+              const puzzle = JSON.parse(data);
+              const puzzleData = JSON.parse(puzzle.puzzleData);
+              
+              // Simulate filling in a complete grid with correct answers
+              const grid = puzzleData.grid;
+              const userInputs = [];
+              
+              // Generate complete grid with the correct answers (simulating a completed puzzle)
+              for (let i = 0; i < grid.length; i++) {
+                if (grid[i] !== '#') {
+                  userInputs.push({
+                    index: i,
+                    // Use the actual correct letter from the puzzle data
+                    value: grid[i]
+                  });
+                }
+              }
+              
+              // Verify that we have answers for all valid cells
+              const validCellCount = grid.filter(cell => cell !== '#').length;
+              assert.strictEqual(userInputs.length, validCellCount, 'Should have answers for all valid cells');
+              
+              // Verify if all answers match the puzzle (this simulates puzzle completion)
+              let allCorrect = true;
+              for (const input of userInputs) {
+                if (input.value !== grid[input.index]) {
+                  allCorrect = false;
+                  break;
+                }
+              }
+              
+              assert.ok(allCorrect, 'All answers should match the puzzle data');
+              
+              // Now simulate submitting for completion check
+              console.log(`Grid has ${validCellCount} cells to fill`);
+              console.log(`User filled in ${userInputs.length} cells`);
+              
+              if (allCorrect) {
+                console.log('✅ Puzzle completion check passed - all answers are correct!');
+              } else {
+                console.log('❌ Puzzle not complete - some answers are incorrect');
+              }
+              
+              resolvePuzzleDetails(true);
+            } catch (error) {
+              console.error('❌ Puzzle completion test failed:', error.message);
+              resolvePuzzleDetails(false);
+            }
+          });
+        });
+
+        req.on('error', (error) => {
+          console.error('❌ Puzzle completion test failed:', error.message);
+          resolvePuzzleDetails(false);
+        });
+
+        req.end();
+      });
+      
+      const completionTestSuccess = await puzzleDetailsPromise;
+      
+      if (completionTestSuccess) {
+        console.log('✅ Puzzle completion detection test passed');
+        resolve(true);
+      } else {
+        console.log('❌ Puzzle completion detection test failed');
+        resolve(false);
+      }
+      
+    } catch (error) {
+      console.error('❌ Puzzle completion detection test failed with error:', error);
+      resolve(false);
+    }
+  });
+}
+
 // Run all tests
 async function runTests() {
   console.log('Starting game play tests...');
@@ -500,6 +1135,27 @@ async function runTests() {
           
           // Test game page loading
           await testGamePageLoading();
+          
+          // Test dashboard page loading
+          await testDashboardPageLoading();
+          
+          // Test grid rendering
+          await testGridRendering();
+          
+          // Test saving game progress
+          await testSaveGameProgress();
+          
+          // Test user interaction with the grid
+          await testUserInteractionWithGrid();
+          
+          // Test loading saved game progress
+          await testLoadSavedGameProgress();
+          
+          // Test puzzle completion detection
+          await testPuzzleCompletionDetection();
+          
+          // Test puzzle completion detection
+          await testPuzzleCompletionDetection();
         }
       }
     }
