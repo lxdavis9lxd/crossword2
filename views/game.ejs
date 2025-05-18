@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crossword Game - <%= level %> Level</title>
+    <meta name="puzzle-id" content="<%= puzzle.id %>">
     <style>
         .crossword-grid {
             display: grid;
@@ -143,6 +144,7 @@
     <main>
         <section>
             <h2>Crossword Puzzle</h2>
+            <div id="puzzle-id" data-puzzle-id="<%= puzzle.id %>" style="display: none;">Puzzle ID: <%= puzzle.id %></div>
             
             <div id="crossword-container">
                 <div class="game-controls">

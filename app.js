@@ -29,8 +29,8 @@ const sequelize = new Sequelize({
 const User = require('./models/user');
 const Puzzle = require('./models/puzzle');
 
-// Sync models
-sequelize.sync();
+// Sync models without dropping tables
+sequelize.sync({ force: false });
 
 // Set up routes
 const authRoutes = require('./routes/auth');

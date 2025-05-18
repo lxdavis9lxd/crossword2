@@ -31,6 +31,26 @@ const User = sequelize.define('User', {
   password: {
     type: Sequelize.STRING,
     allowNull: false
+  },
+  progress: {
+    type: Sequelize.TEXT,
+    allowNull: true,
+    defaultValue: '{}'
+  },
+  gamesPlayed: {
+    type: Sequelize.INTEGER,
+    allowNull: false,
+    defaultValue: 0
+  },
+  puzzlesSolved: {
+    type: Sequelize.INTEGER,
+    allowNull: false,
+    defaultValue: 0
+  },
+  streak: {
+    type: Sequelize.INTEGER,
+    allowNull: false,
+    defaultValue: 0
   }
 }, {
   timestamps: true
@@ -65,7 +85,7 @@ const db = {
 };
 
 // Sync models with database
-sequelize.sync({ force: true })
+sequelize.sync({ force: false })
   .then(() => {
     console.log('Database synced successfully.');
   })
