@@ -43,6 +43,8 @@ const samplePuzzles = [
   {
     level: 'easy',
     puzzleData: JSON.stringify({
+      title: "Pets and Animals",
+      theme: "A simple crossword about common pets and animal terms",
       grid: [
         'C', 'A', 'T', '#',
         'O', '#', 'O', '#',
@@ -69,6 +71,8 @@ const samplePuzzles = [
   {
     level: 'intermediate',
     puzzleData: JSON.stringify({
+      title: "Word Games",
+      theme: "Crossword puzzle with terms related to puzzles and word games",
       grid: [
         'P', 'U', 'Z', 'Z', 'L', 'E',
         'A', '#', 'E', '#', 'I', '#',

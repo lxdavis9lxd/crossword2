@@ -23,6 +23,12 @@ document.addEventListener('DOMContentLoaded', function() {
         saveButton.addEventListener('click', saveGame);
     }
     
+    // Add event listener for Show Answers button
+    const showAnswersButton = document.getElementById('show-answers-button');
+    if (showAnswersButton) {
+        showAnswersButton.addEventListener('click', showAnswers);
+    }
+    
     // Initialize - check the page
     if (window.location.pathname.includes('/game')) {
         // We're on the game page
@@ -97,11 +103,39 @@ document.addEventListener('DOMContentLoaded', function() {
             // Parse puzzle data
             const puzzleData = JSON.parse(puzzle.puzzleData);
             
+            // Display puzzle info (title and theme)
+            displayPuzzleInfo(puzzleData);
+            
             // Render the crossword grid
             renderCrosswordGrid(puzzleData);
+            
+            // Display clues
+            displayClues(puzzleData.clues);
+            
+            // Reset the show answers button
+            const showAnswersButton = document.getElementById('show-answers-button');
+            if (showAnswersButton) {
+                showAnswersButton.disabled = false;
+                showAnswersButton.textContent = 'Show Answers';
+            }
         } catch (error) {
             console.error('Error loading puzzle details:', error);
             alert('Failed to load puzzle. Please try again.');
+        }
+    }
+    
+    function displayPuzzleInfo(puzzleData) {
+        const puzzleInfoContainer = document.getElementById('puzzle-info');
+        const puzzleTitleElement = document.getElementById('puzzle-title');
+        const puzzleThemeElement = document.getElementById('puzzle-theme');
+        
+        // Check if puzzle has title and theme
+        if (puzzleData.title && puzzleData.theme) {
+            puzzleTitleElement.textContent = puzzleData.title;
+            puzzleThemeElement.textContent = puzzleData.theme;
+            puzzleInfoContainer.style.display = 'block';
+        } else {
+            puzzleInfoContainer.style.display = 'none';
         }
     }
     
@@ -229,7 +263,63 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function displayClues(clues) {
-        // To be implemented if clue display is needed
+        // Get clue container elements
+        const cluesContainer = document.getElementById('clues-container');
+        const acrossCluesList = document.getElementById('across-clues');
+        const downCluesList = document.getElementById('down-clues');
+        
+        // Clear existing clues
+        acrossCluesList.innerHTML = '';
+        downCluesList.innerHTML = '';
+        
+        // Check if we have clues to display
+        if (!clues || (!clues.across && !clues.down)) {
+            cluesContainer.style.display = 'none';
+            return;
+        }
+        
+        // Display across clues
+        if (clues.across && clues.across.length > 0) {
+            clues.across.forEach(clue => {
+                const listItem = document.createElement('li');
+                listItem.className = 'clue-item';
+                listItem.innerHTML = `<strong>${clue.number}.</strong> ${clue.clue}`;
+                listItem.dataset.number = clue.number;
+                listItem.dataset.direction = 'across';
+                acrossCluesList.appendChild(listItem);
+            });
+        }
+        
+        // Display down clues
+        if (clues.down && clues.down.length > 0) {
+            clues.down.forEach(clue => {
+                const listItem = document.createElement('li');
+                listItem.className = 'clue-item';
+                listItem.innerHTML = `<strong>${clue.number}.</strong> ${clue.clue}`;
+                listItem.dataset.number = clue.number;
+                listItem.dataset.direction = 'down';
+                downCluesList.appendChild(listItem);
+            });
+        }
+        
+        // Show the clues container
+        cluesContainer.style.display = 'flex';
+        
+        // Add event listeners to clues for highlighting
+        const allClueItems = document.querySelectorAll('.clue-item');
+        allClueItems.forEach(item => {
+            item.addEventListener('click', handleClueClick);
+        });
+    }
+    
+    function handleClueClick(event) {
+        // To be implemented: Highlight the corresponding cells when a clue is clicked
+        const clueNumber = event.currentTarget.dataset.number;
+        const direction = event.currentTarget.dataset.direction;
+        console.log(`Clue clicked: ${clueNumber} ${direction}`);
+        
+        // Highlight the cells corresponding to this clue
+        // This would require mapping from clue numbers to grid positions
     }
     
     async function saveGame() {
@@ -267,6 +357,66 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('Error saving game:', error);
             alert('Failed to save game. Please try again.');
+        }
+    }
+    
+    // Function to show the correct answers in the grid
+    function showAnswers() {
+        if (!currentPuzzle) {
+            alert('Please load a puzzle first');
+            return;
+        }
+        
+        try {
+            // Get the puzzle data
+            const puzzleData = JSON.parse(currentPuzzle.puzzleData);
+            const grid = puzzleData.grid;
+            
+            // Get all input cells
+            const inputs = document.querySelectorAll('.crossword-input');
+            
+            // Confirm before showing answers
+            const confirmed = confirm('Are you sure you want to reveal all answers? This cannot be undone.');
+            if (!confirmed) {
+                return;
+            }
+            
+            // Populate each cell with the correct answer
+            inputs.forEach(input => {
+                const index = parseInt(input.dataset.index);
+                
+                // Skip black cells (should already be filtered by input selector)
+                if (grid[index] === '#') {
+                    return;
+                }
+                
+                // Store the user's current input
+                const userInput = input.value;
+                
+                // Set the cell value to the correct answer
+                input.value = grid[index];
+                
+                // Apply visual feedback - different styling based on whether they had it right
+                if (userInput && userInput.toUpperCase() === grid[index].toUpperCase()) {
+                    input.classList.add('correct-answer');
+                } else {
+                    input.classList.add('revealed-answer');
+                }
+                
+                // Disable the input to prevent further changes
+                input.disabled = true;
+            });
+            
+            // Disable the show answers button after use
+            const showAnswersButton = document.getElementById('show-answers-button');
+            if (showAnswersButton) {
+                showAnswersButton.disabled = true;
+                showAnswersButton.textContent = 'Answers Revealed';
+            }
+            
+        } catch (error) {
+            console.error('Error showing answers:', error);
+            alert('Failed to show answers. Please try again.');
         }
     }
 });

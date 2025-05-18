@@ -1,4 +1,3 @@
-
 /* General Styles */
 body {
     font-family: Arial, sans-serif;
@@ -112,6 +111,10 @@ button:hover {
     flex-wrap: wrap;
     gap: 2rem;
     margin-top: 2rem;
+    padding: 1rem;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .across-clues, .down-clues {
@@ -119,13 +122,88 @@ button:hover {
     min-width: 300px;
 }
 
+.across-clues h3, .down-clues h3 {
+    color: #333;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 0.5rem;
+    margin-top: 0;
+}
+
 .clue-list {
-    list-style-position: inside;
-    padding-left: 0;
+    list-style-position: outside;
+    padding-left: 1.5rem;
 }
 
 .clue-item {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.8rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    padding: 0.3rem;
+    border-radius: 4px;
+}
+
+.clue-item:hover {
+    background-color: #e6f7ff;
+}
+
+.clue-item.active {
+    background-color: #e6f7ff;
+    font-weight: bold;
+}
+
+/* Puzzle Info Styles */
+#puzzle-info {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background-color: #f0f8ff;
+    border-radius: 8px;
+    border-left: 4px solid #0078d7;
+}
+
+#puzzle-title {
+    margin-top: 0;
+    color: #0078d7;
+}
+
+#puzzle-theme {
+    margin-bottom: 0;
+    color: #555;
+    font-style: italic;
+}
+
+/* Game Controls Styles */
+.game-controls {
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+#save-button {
+    background-color: #28a745;
+}
+
+#save-button:hover {
+    background-color: #218838;
+}
+
+#show-answers-button {
+    background-color: #17a2b8;
+}
+
+#show-answers-button:hover {
+    background-color: #138496;
+}
+
+.correct-answer {
+    background-color: #d4edda;
+    color: #155724;
+    font-weight: bold;
+}
+
+.revealed-answer {
+    background-color: #fff3cd;
+    color: #856404;
+    font-weight: bold;
 }
 
 /* Dashboard Specific Styles */
