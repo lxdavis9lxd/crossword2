@@ -5,7 +5,7 @@ const fs = require('fs');
 // Initialize Sequelize
 const sequelize = new Sequelize({
   dialect: 'sqlite',
-  storage: 'database.sqlite',
+  storage: path.join(__dirname, '../temp/database.sqlite'),
   logging: console.log
 });
 

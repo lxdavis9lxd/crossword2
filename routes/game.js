@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { Puzzle, User } = require('../models');
+const { isAuthenticated } = require('../middleware/auth');
+
+// Apply authentication middleware to all game routes
+router.use(isAuthenticated);
 
 // Fetch puzzles based on difficulty level
 router.get('/puzzles/:level', async (req, res) => {
@@ -36,26 +40,50 @@ router.get('/dashboard', (req, res) => {
 
 // Save game progress
 router.post('/save', async (req, res) => {
-  const { userId, puzzleId, progress } = req.body;
+  if (!req.session.user) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  const { puzzleId, progress } = req.body;
+  const userId = req.session.user.id;
 
   try {
     const user = await User.findByPk(userId);
     if (!user) {
-      return res.status(404).send('User not found');
+      return res.status(404).json({ error: 'User not found' });
     }
 
     const puzzle = await Puzzle.findByPk(puzzleId);
     if (!puzzle) {
-      return res.status(404).send('Puzzle not found');
+      return res.status(404).json({ error: 'Puzzle not found' });
     }
 
-    // Save game progress (this is a placeholder, implement actual saving logic)
-    user.progress = progress;
+    // Check if user has a progress field
+    let userProgress = {};
+    if (user.progress) {
+      // If progress is stored as a string, parse it
+      if (typeof user.progress === 'string') {
+        try {
+          userProgress = JSON.parse(user.progress);
+        } catch (e) {
+          userProgress = {};
+        }
+      } else {
+        userProgress = user.progress;
+      }
+    }
+    
+    // Update the progress for this specific puzzle
+    userProgress[puzzleId] = progress;
+    
+    // Save the updated progress
+    user.progress = JSON.stringify(userProgress);
     await user.save();
 
-    res.send('Game progress saved');
+    res.status(200).json({ message: 'Game progress saved successfully' });
   } catch (error) {
-    res.status(500).send('Server error');
+    console.error('Error saving game progress:', error);
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
@@ -81,6 +109,33 @@ router.get('/progress/:userId', async (req, res) => {
 // Game page route
 router.get('/', (req, res) => {
   res.render('game');
+});
+
+// Start a new game
+router.post('/start', async (req, res) => {
+  const { level } = req.body;
+  
+  if (!level) {
+    return res.status(400).send('Difficulty level is required');
+  }
+  
+  try {
+    // Get random puzzle of the selected difficulty level
+    const puzzles = await Puzzle.findAll({ where: { level } });
+    
+    if (!puzzles || puzzles.length === 0) {
+      return res.status(404).send('No puzzles found for the selected difficulty level');
+    }
+    
+    // Choose a random puzzle
+    const randomPuzzle = puzzles[Math.floor(Math.random() * puzzles.length)];
+    
+    // Redirect to the game page with the puzzle ID
+    res.redirect(`/game?puzzleId=${randomPuzzle.id}`);
+  } catch (error) {
+    console.error('Error starting game:', error);
+    res.status(500).send('Server error');
+  }
 });
 
 module.exports = router;
