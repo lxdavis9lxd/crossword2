@@ -3,6 +3,8 @@ const { Puzzle } = require('./models');
 const samplePuzzleData = {
   easy: [
     {
+      title: "Animal Kingdom",
+      description: "A simple crossword about animals and basic words. Perfect for beginners!",
       grid: [
         "C", "A", "T", " ",
         "A", "P", "E", " ",
@@ -23,6 +25,8 @@ const samplePuzzleData = {
       }
     },
     {
+      title: "Daily Words",
+      description: "Everyday vocabulary for casual crossword solvers. Simple and fun!",
       grid: [
         "D", "O", "G", " ",
         "A", "R", "E", " ",
@@ -45,6 +49,8 @@ const samplePuzzleData = {
   ],
   intermediate: [
     {
+      title: "Office Items",
+      description: "A moderately challenging puzzle featuring common items found in an office environment. Test your vocabulary!",
       grid: [
         "C", "A", "T", "S", " ",
         "O", "P", "E", "N", " ",
@@ -70,6 +76,8 @@ const samplePuzzleData = {
   ],
   advanced: [
     {
+      title: "Vocabulary Challenge",
+      description: "An advanced crossword puzzle for word enthusiasts. Features longer words and more challenging clues to test your lexical prowess!",
       grid: [
         "C", "A", "S", "T", "L", "E", " ",
         "O", "R", "A", "T", "O", "R", " ",
