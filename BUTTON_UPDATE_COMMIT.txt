@@ -1,0 +1,11 @@
+Additional Puzzle Theme Enhancement - Button Update
+
+This update includes:
+
+- Improved dashboard experience by adding the selected puzzle's theme to the "Start Game" button text
+- The button now dynamically updates to show "Play 'Theme Name'" when a puzzle is selected
+- Added reset functionality to revert the button text when changing difficulty levels
+- Enhanced button styling to visually highlight when a themed puzzle is selected
+- Ensured consistent display of puzzle themes throughout the selection process
+
+This change builds on the previous theme enhancements to create a more engaging and intuitive user experience.
