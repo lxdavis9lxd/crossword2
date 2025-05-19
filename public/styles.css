@@ -461,6 +461,16 @@ button:disabled {
     font-size: 1.5rem;
 }
 
+#puzzle-info .puzzle-description {
+    margin: 0 auto 15px;
+    color: #555;
+    font-size: 1rem;
+    line-height: 1.5;
+    max-width: 80%;
+    font-style: italic;
+    padding: 0 10px;
+}
+
 .puzzle-metadata {
     font-size: 0.9rem;
     color: #666;

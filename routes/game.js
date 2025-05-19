@@ -205,13 +205,21 @@ router.get('/', async (req, res) => {
       return res.status(404).send('Puzzle not found');
     }
     
+    // Parse the puzzle data to get theme and description
+    const puzzleData = JSON.parse(puzzle.puzzleData);
+    const title = puzzleData.title || `Puzzle #${puzzle.id}`;
+    const description = puzzleData.description || 
+      `A ${puzzle.level} level crossword puzzle with ${puzzleData.clues.across.length} across and ${puzzleData.clues.down.length} down clues.`;
+    
     // Store the current puzzle in the session
     req.session.currentPuzzle = puzzle.id;
     
-    // Pass the puzzle ID and user to the game page
+    // Pass the puzzle ID, theme, description and user to the game page
     res.render('game', { 
       puzzleId: puzzle.id, 
       level: puzzle.level,
+      title: title,
+      description: description,
       user: req.session.user 
     });
   } catch (error) {

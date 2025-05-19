@@ -1,0 +1,16 @@
+Enhanced Puzzle Theme Display on Dashboard and Game Pages
+
+This commit includes:
+
+1. Enhanced Dashboard Display
+   - Ensured puzzle cards on dashboard show themed names instead of generic identifiers
+   - Verified proper display of puzzle descriptions on each card
+   - Confirmed styling for descriptions is visually appealing
+
+2. Enhanced Game Page
+   - Updated game route to pass puzzle theme and description to the game page
+   - Modified game.ejs template to display themed puzzle titles
+   - Added styling for puzzle descriptions on the game page
+   - Updated loadSelectedPuzzle function to dynamically update title and description
+
+These improvements provide a more cohesive user experience by consistently displaying themed puzzle information throughout the application.
