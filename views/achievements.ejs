@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Achievements - Crossword Game</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        .achievements-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .achievement-card {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .achievement-card.earned {
+            border-color: #4CAF50;
+            background-color: #e8f5e9;
+            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.2);
+        }
+        
+        .achievement-card.locked {
+            opacity: 0.7;
+            filter: grayscale(0.8);
+        }
+        
+        .achievement-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #666;
+        }
+        
+        .achievement-card.earned .achievement-icon {
+            color: #ffa500;
+        }
+        
+        .achievement-name {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            color: #333;
+        }
+        
+        .achievement-description {
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+        
+        .achievement-date {
+            font-size: 0.85rem;
+            color: #777;
+            margin-top: auto;
+        }
+        
+        .loading-message, .error-message {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .error-message {
+            color: #d9534f;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Crossword Game</h1>
+        <nav>
+            <ul>
+                <li><a href="/game/dashboard">Dashboard</a></li>
+                <li><a href="/achievements" class="active">Achievements</a></li>
+                <li><a href="/auth/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main class="container">
+        <h2>My Achievements</h2>
+        <p>Track your progress and earn special badges as you solve puzzles!</p>
+        
+        <div id="achievements-container" class="achievements-container">
+            <p class="loading-message">Loading achievements...</p>
+        </div>
+    </main>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAchievements();
+        });
+        
+        async function loadAchievements() {
+            const achievementsContainer = document.getElementById('achievements-container');
+            
+            try {
+                const response = await fetch('/achievements');
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch achievements: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Clear loading message
+                achievementsContainer.innerHTML = '';
+                
+                if (data.success && data.achievements.length > 0) {
+                    // Create achievement cards
+                    data.achievements.forEach(achievement => {
+                        const card = document.createElement('div');
+                        card.className = `achievement-card ${achievement.earned ? 'earned' : 'locked'}`;
+                        
+                        // Map achievement icon to Font Awesome icon
+                        let iconClass = 'fas fa-trophy';
+                        if (achievement.icon === 'trophy-bronze') iconClass = 'fas fa-trophy';
+                        if (achievement.icon === 'trophy-silver') iconClass = 'fas fa-award';
+                        if (achievement.icon === 'trophy-gold') iconClass = 'fas fa-medal';
+                        if (achievement.icon === 'star-gold') iconClass = 'fas fa-star';
+                        if (achievement.icon === 'clock') iconClass = 'fas fa-clock';
+                        if (achievement.icon === 'checkmark') iconClass = 'fas fa-check-circle';
+                        
+                        // Format the date if available
+                        let dateText = '';
+                        if (achievement.earned && achievement.dateAwarded) {
+                            const date = new Date(achievement.dateAwarded);
+                            dateText = `Earned on ${date.toLocaleDateString()}`;
+                        }
+                        
+                        card.innerHTML = `
+                            <div class="achievement-icon">
+                                <i class="${iconClass}"></i>
+                            </div>
+                            <h3 class="achievement-name">${achievement.name}</h3>
+                            <p class="achievement-description">${achievement.description}</p>
+                            ${dateText ? `<p class="achievement-date">${dateText}</p>` : ''}
+                        `;
+                        
+                        achievementsContainer.appendChild(card);
+                    });
+                } else {
+                    achievementsContainer.innerHTML = '<p class="error-message">No achievements found.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading achievements:', error);
+                achievementsContainer.innerHTML = `<p class="error-message">Error loading achievements: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

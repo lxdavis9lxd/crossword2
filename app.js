@@ -39,6 +39,7 @@ const db = require('./models');
 // Set up routes
 const authRoutes = require('./routes/auth');
 const gameRoutes = require('./routes/game');
+const achievementRoutes = require('./routes/achievements');
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -73,10 +74,19 @@ app.use((err, req, res, next) => {
 
 app.use('/auth', authRoutes);
 app.use('/game', gameRoutes);
+app.use('/achievements', achievementRoutes);
 
 // Home route
 app.get('/', (req, res) => {
   res.render('index');
+});
+
+// Achievements page route
+app.get('/achievements', (req, res) => {
+  if (!req.session.userId) {
+    return res.redirect('/auth/login');
+  }
+  res.render('achievements');
 });
 
 // Start the server

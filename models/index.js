@@ -17,13 +17,18 @@ const db = {
 // Import model definitions from individual files
 const User = require('./user')(sequelize, Sequelize.DataTypes);
 const Puzzle = require('./puzzle')(sequelize, Sequelize.DataTypes);
+const Achievement = require('./achievement')(sequelize, Sequelize.DataTypes);
+const UserAchievement = require('./userAchievement')(sequelize, Sequelize.DataTypes);
 
 // Add models to the db object
 db.User = User;
 db.Puzzle = Puzzle;
+db.Achievement = Achievement;
+db.UserAchievement = UserAchievement;
 
 // Setup associations
-// User.hasMany(Puzzle); // Uncomment if needed
+User.associate(db);
+Achievement.associate(db);
 
 // Sync models with database
 sequelize.sync({ force: false })

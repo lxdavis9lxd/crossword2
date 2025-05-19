@@ -145,6 +145,14 @@ button:disabled {
     box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
 }
 
+.difficulty-rating {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    font-size: 1.2rem;
+    color: #ffa500;
+    letter-spacing: 2px;
+}
+
 .puzzle-preview {
     margin-top: 0.5rem;
 }

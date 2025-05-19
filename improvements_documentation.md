@@ -19,11 +19,19 @@ Saved games were not appearing on the dashboard due to a double serialization is
 
 ### 2. Themed Puzzle Titles and Descriptions
 
-**Status:**
+**Problem:**
+Puzzle theme names and descriptions were not showing up properly on the dashboard and game pages.
+
+**Solution:**
 - All puzzles now have theme-appropriate titles and descriptions
-- Frontend displays these titles and descriptions on the puzzle cards
-- Saved games list shows puzzle titles instead of just IDs
-- This makes the gaming experience more immersive and user-friendly
+- Updated the dashboard display to properly show titles and descriptions
+- Enhanced the game page to prominently display the puzzle title and description
+- Improved the saved games list to show puzzle titles instead of just IDs
+
+**Key Files Changed:**
+- `/workspaces/crossword2/views/game.ejs` - Updated to display title and description
+- `/workspaces/crossword2/public/styles.css` - Added styling for puzzle information
+- `/workspaces/crossword2/public/scripts.js` - Enhanced to properly show themed puzzles
 
 **Testing:**
 - Created comprehensive test scripts to verify functionality
