@@ -183,6 +183,7 @@
             <button id="check-button">Check Answers</button>
             <button id="save-button">Save Progress</button>
             <button id="hint-button">Get Hint</button>
+            <button id="show-answers-button" class="show-answers-btn">Show Answers</button>
         </div>
         
         <div class="saved-games-sidebar">
@@ -237,6 +238,7 @@
                     });
                 });
                 document.getElementById('hint-button').addEventListener('click', () => getHint(puzzle.grid));
+                document.getElementById('show-answers-button').addEventListener('click', () => showAnswers(puzzle.grid));
                 
             } catch (error) {
                 console.error('Error loading puzzle:', error);
@@ -543,6 +545,30 @@
         function loadSavedGame(puzzleId) {
             // Redirect to the same puzzle with the saved progress
             window.location.href = `/game?puzzleId=${puzzleId}`;
+        }
+        
+        function showAnswers(grid) {
+            // Confirm with the user before showing all answers
+            if (!confirm('Are you sure you want to see all answers? This will reveal the entire puzzle.')) {
+                return;
+            }
+            
+            const inputs = document.querySelectorAll('.crossword-cell input');
+            
+            inputs.forEach(input => {
+                const index = parseInt(input.dataset.index);
+                const correctAnswer = grid[index].toUpperCase();
+                input.value = correctAnswer;
+                input.style.color = '#8e44ad'; // Purple color to indicate revealed answers
+                input.readOnly = true; // Make the inputs read-only after revealing answers
+            });
+            
+            // Disable the check answers button since answers are already shown
+            document.getElementById('check-button').disabled = true;
+            document.getElementById('hint-button').disabled = true;
+            document.getElementById('show-answers-button').disabled = true;
+            
+            showMessage('All answers have been revealed', 'info');
         }
     </script>
 </body>

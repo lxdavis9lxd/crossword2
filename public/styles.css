@@ -413,3 +413,24 @@ button:disabled {
 .view-all-link:hover {
     text-decoration: underline;
 }
+
+.show-answers-btn {
+    background-color: #e74c3c;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.show-answers-btn:hover {
+    background-color: #c0392b;
+}
+
+.show-answers-btn:disabled {
+    background-color: #bdc3c7;
+}
+
+/* Add info message type */
+#message.info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
