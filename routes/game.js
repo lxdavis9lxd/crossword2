@@ -83,7 +83,20 @@ router.post('/save', async (req, res) => {
       user.progress = JSON.parse(user.progress);
     }
     
-    user.progress[puzzleId] = progress;
+    // Parse the progress if it's a JSON string to avoid double serialization
+    if (typeof progress === 'string') {
+      try {
+        // Parse once to get the actual progress data
+        user.progress[puzzleId] = JSON.parse(progress);
+      } catch (e) {
+        // If it's not valid JSON, store as is
+        user.progress[puzzleId] = progress;
+      }
+    } else {
+      user.progress[puzzleId] = progress;
+    }
+    
+    // Save the update
     await user.save({
       fields: ['progress']
     });
@@ -121,9 +134,21 @@ router.get('/progress/:userId', async (req, res) => {
       return res.json({ progress: {} });
     }
     
-    // For each saved game, add a timestamp
+    // For each saved game, ensure proper format
     for (const puzzleId in progress) {
-      formattedProgress[puzzleId] = progress[puzzleId];
+      // Check if progress data is a string and needs parsing
+      if (typeof progress[puzzleId] === 'string') {
+        try {
+          // Try to parse it if it's still a string (it shouldn't be at this point, but just in case)
+          formattedProgress[puzzleId] = JSON.parse(progress[puzzleId]);
+        } catch (e) {
+          // If not a valid JSON string, use as is
+          formattedProgress[puzzleId] = progress[puzzleId];
+        }
+      } else {
+        // Already an object, use as is
+        formattedProgress[puzzleId] = progress[puzzleId];
+      }
     }
 
     res.json({ progress: formattedProgress });

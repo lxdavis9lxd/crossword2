@@ -348,7 +348,7 @@
                     },
                     body: JSON.stringify({
                         puzzleId,
-                        progress: JSON.stringify(progress)
+                        progress: progress // Send progress as is, not stringified
                     })
                 })
                 .then(response => {
@@ -421,14 +421,22 @@
                     return;
                 }
                 
-                // Parse the saved progress
-                const savedProgress = JSON.parse(progress[puzzleId]);
+                // Parse the saved progress if it's a string
+                const savedProgress = typeof progress[puzzleId] === 'string' 
+                    ? JSON.parse(progress[puzzleId]) 
+                    : progress[puzzleId];
+                
+                // Make sure savedProgress is valid data
+                if (!savedProgress || typeof savedProgress !== 'object') {
+                    console.error('Invalid progress data for puzzle', puzzleId);
+                    return;
+                }
                 
                 // Apply the saved progress to the grid
                 const inputs = document.querySelectorAll('.crossword-cell input');
                 inputs.forEach(input => {
                     const index = input.dataset.index;
-                    if (savedProgress[index]) {
+                    if (savedProgress[index] && savedProgress[index] !== '') {
                         input.value = savedProgress[index];
                     }
                 });
@@ -490,7 +498,9 @@
                         if (!puzzleResponse.ok) continue;
                         
                         const puzzle = await puzzleResponse.json();
-                        const savedProgress = JSON.parse(progress[puzzleId]);
+                        const savedProgress = typeof progress[puzzleId] === 'string'
+                            ? JSON.parse(progress[puzzleId])
+                            : progress[puzzleId];
                         
                         // Calculate completion percentage
                         const puzzleData = JSON.parse(puzzle.puzzleData);
