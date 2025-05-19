@@ -2,23 +2,22 @@
 
 ## Files Modified
 
-1. **`/workspaces/crossword2/add_sample_puzzles.js`**
-   - Updated to include themed titles and descriptions for all puzzles
+1. **`/workspaces/crossword2/public/scripts.js`**
+   - Enhanced puzzle cards to display themed titles instead of generic identifiers
+   - Added proper display of puzzle descriptions on each card
+   - Ensured fallback descriptions are generated when themed ones aren't available
 
-2. **`/workspaces/crossword2/routes/game.js`**
-   - Fixed progress data handling to prevent double serialization
-   - Added proper validation for progress data
+2. **`/workspaces/crossword2/public/styles.css`**
+   - Already had proper styling for puzzle descriptions
+   - Description styling includes max height, ellipsis overflow, and italic font
 
-3. **`/workspaces/crossword2/public/scripts.js`**
-   - Enhanced to display puzzle titles and descriptions
-   - Updated saved games list to show puzzle titles
-   - Added difficulty rating stars display for puzzles
+## Files Added
 
-4. **`/workspaces/crossword2/models/puzzle.js`**
-   - Added difficultyRating field to Puzzle model
-
-5. **`/workspaces/crossword2/models/user.js`**
-   - Added completedPuzzles field to track finished puzzles
+1. **`/workspaces/crossword2/check_puzzle_themes.js`**
+   - Added script to verify puzzle theme data
+   
+2. **`/workspaces/crossword2/direct_check_puzzles.js`**
+   - Added script to directly query the database for puzzle themes
    - Added association to achievements
 
 6. **`/workspaces/crossword2/views/game.ejs`**

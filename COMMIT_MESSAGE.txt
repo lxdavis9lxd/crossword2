@@ -1,14 +1,16 @@
-Implemented Puzzle Difficulty Ratings and User Achievements System
+Fix Puzzle Tabs to Display Themed Names and Descriptions
 
 This commit includes:
 
-1. Feature: Puzzle Difficulty Ratings
-- Added difficulty rating (1-5) to puzzles based on level and grid size
-- Added star rating display to puzzle cards on the dashboard
-- Added CSS styling for difficulty rating display
+1. Enhancement: Themed Puzzle Names
+- Replaced generic puzzle identifiers (#1, #2, etc.) with meaningful themed names
+- Ensured themed titles are properly extracted from puzzle data
+- Improved visual hierarchy of puzzle card information
 
-2. Feature: User Achievements System
-- Added 6 default achievements with different criteria
+2. Enhancement: Puzzle Descriptions
+- Added descriptive text to each puzzle card 
+- Used themed descriptions from puzzle data when available
+- Created fallback description text with puzzle details when needed
 - Created achievement tracking system and notifications
 - Added new achievements page to display earned and locked badges
 - Enhanced game completion to check for newly earned achievements
