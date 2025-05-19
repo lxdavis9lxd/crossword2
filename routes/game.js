@@ -77,29 +77,57 @@ router.post('/save', async (req, res) => {
 
     // For simplicity, we're saving progress in the user model
     // In a real app, you'd likely have a separate GameProgress model
+    let userProgress = {};
+    
+    // Initialize progress if it doesn't exist or parse it if it's a string
     if (!user.progress) {
-      user.progress = {};
+      userProgress = {};
     } else if (typeof user.progress === 'string') {
-      user.progress = JSON.parse(user.progress);
+      try {
+        userProgress = JSON.parse(user.progress);
+      } catch (e) {
+        userProgress = {};
+      }
+    } else {
+      userProgress = user.progress;
     }
     
+    console.log('Initial user progress:', userProgress);
+    
     // Parse the progress if it's a JSON string to avoid double serialization
+    let progressData;
     if (typeof progress === 'string') {
       try {
         // Parse once to get the actual progress data
-        user.progress[puzzleId] = JSON.parse(progress);
+        progressData = JSON.parse(progress);
+        console.log('Progress parsed from string:', progressData);
       } catch (e) {
         // If it's not valid JSON, store as is
-        user.progress[puzzleId] = progress;
+        progressData = progress;
+        console.log('Progress used as-is (parsing failed):', progress);
       }
     } else {
-      user.progress[puzzleId] = progress;
+      progressData = progress;
+      console.log('Progress used as-is (not a string):', progress);
     }
+    
+    // Store the progress data for this puzzle
+    userProgress[puzzleId] = progressData;
+    
+    // Update the user's progress
+    user.progress = userProgress;
+    
+    // Log the user's progress object before saving
+    console.log('User progress before save:', user.progress);
     
     // Save the update
     await user.save({
       fields: ['progress']
     });
+    
+    // Verify the save worked by reading it back
+    const verifyUser = await User.findByPk(userId);
+    console.log('User progress after save:', verifyUser.progress);
 
     res.status(200).json({ success: true, message: 'Game progress saved' });
   } catch (error) {
@@ -125,6 +153,9 @@ router.get('/progress/:userId', async (req, res) => {
 
     // Retrieve game progress
     const progress = user.progress;
+    console.log('Raw progress from user model:', progress);
+    console.log('User ID:', userId);
+    console.log('Progress type:', typeof progress);
     
     // Format the response data with additional metadata
     const formattedProgress = {};
