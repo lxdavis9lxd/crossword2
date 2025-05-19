@@ -1,32 +1,43 @@
+// filepath: /workspaces/crossword2/public/scripts.js
 document.addEventListener('DOMContentLoaded', function() {
     // Get DOM elements
     const levelSelect = document.getElementById('level-select');
-    const puzzleSelect = document.getElementById('puzzle-select');
-    const loadPuzzleBtn = document.getElementById('load-puzzle-btn');
-    const crosswordContainer = document.getElementById('crossword-container');
+    const loadPuzzlesBtn = document.getElementById('load-puzzles-btn');
+    const puzzlesContainer = document.getElementById('puzzles-container');
+    const selectedLevelInput = document.getElementById('selected-level');
+    const selectedPuzzleIdInput = document.getElementById('selected-puzzle-id');
+    const startGameBtn = document.getElementById('start-game-btn');
     const saveButton = document.getElementById('save-button');
+    const savedGamesList = document.getElementById('saved-games-list');
+    const crosswordContainer = document.getElementById('crossword-container');
     
     // Current state
     let currentPuzzle = null;
     let currentGrid = [];
+    let selectedPuzzleCard = null;
     
     // Add event listeners
     if (levelSelect) {
-        levelSelect.addEventListener('change', loadPuzzlesForLevel);
+        levelSelect.addEventListener('change', function() {
+            selectedLevelInput.value = levelSelect.value;
+            // Automatically load puzzles when level changes
+            if (loadPuzzlesBtn) {
+                loadPuzzlesBtn.click();
+            }
+        });
     }
     
-    if (loadPuzzleBtn) {
-        loadPuzzleBtn.addEventListener('click', loadSelectedPuzzle);
+    if (loadPuzzlesBtn) {
+        loadPuzzlesBtn.addEventListener('click', loadPuzzlesForLevel);
     }
     
     if (saveButton) {
         saveButton.addEventListener('click', saveGame);
     }
     
-    // Initialize - check the page
-    if (window.location.pathname.includes('/game')) {
-        // We're on the game page
-        loadPuzzlesForLevel(); // Load puzzles for default level
+    // Initialize saved games list if we're on the dashboard
+    if (window.location.pathname.includes('/dashboard')) {
+        loadSavedGames();
     }
     
     // Functions
@@ -34,38 +45,78 @@ document.addEventListener('DOMContentLoaded', function() {
         const level = levelSelect.value;
         console.log('Loading puzzles for level:', level);
         
+        // Update the hidden input 
+        selectedLevelInput.value = level;
+        
+        // Clear previous selection
+        selectedPuzzleIdInput.value = '';
+        startGameBtn.disabled = true;
+        
         try {
-            const response = await fetch(`/game/puzzles/${level}`);
+            puzzlesContainer.innerHTML = '<p>Loading puzzles...</p>';
+            
+            const response = await fetch('/game/puzzles/' + level);
             if (!response.ok) {
-                throw new Error(`Failed to fetch puzzles: ${response.status}`);
+                throw new Error('Failed to fetch puzzles: ' + response.status);
             }
             
             const puzzles = await response.json();
             console.log('Puzzles loaded:', puzzles);
             
-            // Clear current options
-            puzzleSelect.innerHTML = '';
+            // Clear current puzzles
+            puzzlesContainer.innerHTML = '';
             
             if (puzzles.length === 0) {
-                puzzleSelect.innerHTML = '<option>No puzzles available</option>';
+                puzzlesContainer.innerHTML = '<p class="no-puzzles-message">No puzzles available for this level</p>';
             } else {
-                // Add puzzle options
+                // Create a card for each puzzle
                 puzzles.forEach(puzzle => {
-                    const option = document.createElement('option');
-                    option.value = puzzle.id;
-                    option.textContent = `Puzzle #${puzzle.id}`;
-                    puzzleSelect.appendChild(option);
+                    const puzzleCard = document.createElement('div');
+                    puzzleCard.className = 'puzzle-card';
+                    puzzleCard.dataset.puzzleId = puzzle.id;
+                    
+                    // Parse the puzzle data to get dimensions for preview
+                    const puzzleData = JSON.parse(puzzle.puzzleData);
+                    const gridSize = Math.sqrt(puzzleData.grid.length);
+                    
+                    puzzleCard.innerHTML = 
+                        '<h4>Puzzle #' + puzzle.id + '</h4>' + 
+                        '<div class="puzzle-preview">' +
+                            '<div class="grid-size">' + gridSize + 'x' + gridSize + '</div>' +
+                            '<div class="preview-info">' +
+                                '<p>' + puzzleData.clues.across.length + ' Across</p>' +
+                                '<p>' + puzzleData.clues.down.length + ' Down</p>' +
+                            '</div>' +
+                        '</div>';
+                    
+                    puzzleCard.addEventListener('click', function() {
+                        // Remove selection from previously selected card
+                        if (selectedPuzzleCard) {
+                            selectedPuzzleCard.classList.remove('selected');
+                        }
+                        
+                        // Add selection to this card
+                        puzzleCard.classList.add('selected');
+                        selectedPuzzleCard = puzzleCard;
+                        
+                        // Update hidden input with selected puzzle ID
+                        selectedPuzzleIdInput.value = puzzle.id;
+                        
+                        // Enable the start game button
+                        startGameBtn.disabled = false;
+                    });
+                    
+                    puzzlesContainer.appendChild(puzzleCard);
                 });
             }
         } catch (error) {
             console.error('Error loading puzzles:', error);
-            puzzleSelect.innerHTML = '<option>Error loading puzzles</option>';
+            puzzlesContainer.innerHTML = '<p class="error-message">Error loading puzzles: ' + error.message + '</p>';
         }
     }
     
-    async function loadSelectedPuzzle() {
-        const puzzleId = puzzleSelect.value;
-        if (!puzzleId || puzzleId === 'No puzzles available' || puzzleId === 'Error loading puzzles') {
+    async function loadSelectedPuzzle(puzzleId) {
+        if (!puzzleId) {
             alert('Please select a valid puzzle');
             return;
         }
@@ -73,9 +124,9 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Loading puzzle ID:', puzzleId);
         
         try {
-            const response = await fetch(`/game/puzzles/details/${puzzleId}`);
+            const response = await fetch('/game/puzzles/details/' + puzzleId);
             if (!response.ok) {
-                throw new Error(`Failed to fetch puzzle details: ${response.status}`);
+                throw new Error('Failed to fetch puzzle details: ' + response.status);
             }
             
             const puzzle = await response.json();
@@ -95,9 +146,74 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    async function loadSavedGames() {
+        if (!savedGamesList) return;
+        
+        try {
+            // Assuming a route that returns the user's saved games
+            const userId = document.querySelector('meta[name="user-id"]')?.content;
+            if (!userId) {
+                console.error('User ID not found');
+                return;
+            }
+            
+            const response = await fetch('/game/progress/' + userId);
+            if (!response.ok) {
+                throw new Error('Failed to fetch saved games: ' + response.status);
+            }
+            
+            const data = await response.json();
+            const progress = data.progress || {};
+            
+            // Clear the list
+            savedGamesList.innerHTML = '';
+            
+            if (Object.keys(progress).length === 0) {
+                savedGamesList.innerHTML = '<li class="no-saved-games">No saved games found</li>';
+                return;
+            }
+            
+            // Fetch puzzle details for each saved game
+            for (const puzzleId in progress) {
+                try {
+                    const puzzleResponse = await fetch('/game/puzzles/details/' + puzzleId);
+                    if (!puzzleResponse.ok) continue;
+                    
+                    const puzzle = await puzzleResponse.json();
+                    const puzzleData = JSON.parse(puzzle.puzzleData);
+                    const gridSize = Math.sqrt(puzzleData.grid.length);
+                    
+                    const savedGameItem = document.createElement('li');
+                    savedGameItem.className = 'saved-game-item';
+                    savedGameItem.innerHTML = 
+                        '<div class="saved-game-info">' +
+                            '<h4>Puzzle #' + puzzle.id + ' (' + puzzle.level + ')</h4>' +
+                            '<p>' + gridSize + 'x' + gridSize + ' grid</p>' +
+                        '</div>' +
+                        '<button class="load-saved-game-btn" data-puzzle-id="' + puzzle.id + '">' +
+                            'Continue' +
+                        '</button>';
+                    
+                    // Add event listener to the button
+                    const loadButton = savedGameItem.querySelector('.load-saved-game-btn');
+                    loadButton.addEventListener('click', function() {
+                        window.location.href = '/game?puzzleId=' + puzzle.id;
+                    });
+                    
+                    savedGamesList.appendChild(savedGameItem);
+                } catch (error) {
+                    console.error('Error loading saved game for puzzle ' + puzzleId + ':', error);
+                }
+            }
+        } catch (error) {
+            console.error('Error loading saved games:', error);
+            savedGamesList.innerHTML = '<li class="error-message">Error loading saved games</li>';
+        }
+    }
+    
     function renderCrosswordGrid(puzzleData) {
-        if (!puzzleData || !puzzleData.grid) {
-            console.error('Invalid puzzle data');
+        if (!puzzleData || !puzzleData.grid || !crosswordContainer) {
+            console.error('Invalid puzzle data or crossword container not found');
             return;
         }
         
@@ -109,7 +225,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Set the grid template
         const gridSize = Math.sqrt(grid.length);
-        crosswordContainer.style.gridTemplateColumns = `repeat(${gridSize}, 40px)`;
+        crosswordContainer.style.gridTemplateColumns = 'repeat(' + gridSize + ', 40px)';
         
         // Create cells
         for (let i = 0; i < grid.length; i++) {
@@ -210,7 +326,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Check if the cell is valid (not a black cell)
             if (currentGrid[index] !== '#') {
-                const nextInput = document.querySelector(`.crossword-input[data-index="${index}"]`);
+                const nextInput = document.querySelector('.crossword-input[data-index="' + index + '"]');
                 if (nextInput) {
                     nextInput.focus();
                 }
@@ -250,13 +366,22 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
             if (!response.ok) {
-                throw new Error(`Failed to save game: ${response.status}`);
+                throw new Error('Failed to save game: ' + response.status);
             }
             
             alert('Game saved successfully!');
         } catch (error) {
             console.error('Error saving game:', error);
             alert('Failed to save game. Please try again.');
+        }
+    }
+    
+    // Initialize the game if we're on the game page with a puzzleId
+    if (window.location.pathname === '/game') {
+        const urlParams = new URLSearchParams(window.location.search);
+        const puzzleId = urlParams.get('puzzleId');
+        if (puzzleId) {
+            loadSelectedPuzzle(puzzleId);
         }
     }
 });

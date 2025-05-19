@@ -73,8 +73,12 @@ router.post('/login', async (req, res) => {
       return res.status(400).send('Invalid email or password');
     }
 
-    // Set user session
-    req.session.user = user;
+    // Set user session with only necessary information
+    req.session.user = {
+      id: user.id,
+      username: user.username,
+      email: user.email
+    };
 
     // Redirect to game dashboard
     res.redirect('/game/dashboard');

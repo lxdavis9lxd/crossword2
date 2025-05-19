@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <% if (user) { %>
+    <meta name="user-id" content="<%= user.id %>">
+    <% } %>
     <title>Game Dashboard</title>
     <link rel="stylesheet" href="/styles.css">
 </head>
@@ -17,24 +20,39 @@
     </header>
     <main>
         <section>
-            <h2>Select Difficulty Level</h2>
-            <form action="/game/start" method="POST">
-                <label>
-                    <input type="radio" name="level" value="easy" required> Easy
-                </label>
-                <label>
-                    <input type="radio" name="level" value="intermediate"> Intermediate
-                </label>
-                <label>
-                    <input type="radio" name="level" value="advanced"> Advanced
-                </label>
-                <button type="submit">Start Game</button>
-            </form>
+            <h2>Select a Puzzle</h2>
+            <div class="puzzle-selection">
+                <div class="level-selection">
+                    <h3>Step 1: Choose Difficulty Level</h3>
+                    <select id="level-select">
+                        <option value="easy">Easy</option>
+                        <option value="intermediate">Intermediate</option>
+                        <option value="advanced">Advanced</option>
+                    </select>
+                    <button id="load-puzzles-btn">Load Puzzles</button>
+                </div>
+                
+                <div class="puzzle-list-container">
+                    <h3>Step 2: Select a Puzzle</h3>
+                    <div id="puzzles-container" class="puzzles-grid">
+                        <!-- Puzzles will be loaded here -->
+                        <p class="no-puzzles-message">Select a difficulty level and click "Load Puzzles"</p>
+                    </div>
+                </div>
+
+                <form id="puzzle-form" action="/game/start" method="POST">
+                    <input type="hidden" id="selected-level" name="level" value="easy">
+                    <input type="hidden" id="selected-puzzle-id" name="puzzleId" value="">
+                    <button type="submit" id="start-game-btn" disabled>Start Game</button>
+                </form>
+            </div>
         </section>
+        
         <section>
             <h2>Saved Games</h2>
             <ul id="saved-games-list">
                 <!-- Saved games will be dynamically loaded here -->
+                <li class="no-saved-games">Loading saved games...</li>
             </ul>
         </section>
     </main>

@@ -35,7 +35,7 @@ router.get('/puzzles/details/:id', async (req, res) => {
 
 // Dashboard route
 router.get('/dashboard', (req, res) => {
-  res.render('dashboard');
+  res.render('dashboard', { user: req.session.user });
 });
 
 // Save game progress
@@ -98,34 +98,71 @@ router.get('/progress/:userId', async (req, res) => {
 });
 
 // Game page route
-router.get('/', (req, res) => {
-  res.render('game');
+router.get('/', async (req, res) => {
+  const { puzzleId } = req.query;
+  
+  // If no puzzleId is provided, just render the game page
+  if (!puzzleId) {
+    return res.render('game');
+  }
+
+  try {
+    // Verify the puzzle exists
+    const puzzle = await Puzzle.findByPk(puzzleId);
+    if (!puzzle) {
+      return res.status(404).send('Puzzle not found');
+    }
+    
+    // Store the current puzzle in the session
+    req.session.currentPuzzle = puzzle.id;
+    
+    // Pass the puzzle ID to the game page
+    res.render('game', { puzzleId: puzzle.id, level: puzzle.level });
+  } catch (error) {
+    console.error('Error loading game:', error);
+    res.status(500).send('Server error');
+  }
 });
 
 // Start a new game
 router.post('/start', async (req, res) => {
-  const { level } = req.body;
+  const { level, puzzleId } = req.body;
   
   if (!level) {
     return res.status(400).send('Difficulty level is required');
   }
   
   try {
-    // Get a random puzzle of the selected difficulty level
-    const puzzles = await Puzzle.findAll({ where: { level } });
+    let puzzle;
     
-    if (!puzzles || puzzles.length === 0) {
-      return res.status(404).send('No puzzles found for the selected difficulty level');
+    if (puzzleId) {
+      // If a specific puzzle ID is provided, load that puzzle
+      puzzle = await Puzzle.findByPk(puzzleId);
+      if (!puzzle) {
+        return res.status(404).send('Puzzle not found');
+      }
+      
+      // Verify the puzzle has the correct level
+      if (puzzle.level !== level) {
+        return res.status(400).send('Puzzle does not match the selected difficulty level');
+      }
+    } else {
+      // Otherwise, get a random puzzle of the selected difficulty level
+      const puzzles = await Puzzle.findAll({ where: { level } });
+      
+      if (!puzzles || puzzles.length === 0) {
+        return res.status(404).send('No puzzles found for the selected difficulty level');
+      }
+      
+      // Choose a random puzzle
+      puzzle = puzzles[Math.floor(Math.random() * puzzles.length)];
     }
     
-    // Choose a random puzzle
-    const randomPuzzle = puzzles[Math.floor(Math.random() * puzzles.length)];
-    
     // Store the selected puzzle in the session
-    req.session.currentPuzzle = randomPuzzle.id;
+    req.session.currentPuzzle = puzzle.id;
     
     // Redirect to the game page
-    res.redirect(`/game?puzzleId=${randomPuzzle.id}`);
+    res.redirect(`/game?puzzleId=${puzzle.id}`);
   } catch (error) {
     console.error('Error starting game:', error);
     res.status(500).send('Server error');
