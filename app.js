@@ -45,6 +45,7 @@ const adminRoutes = require('./routes/admin');
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('Global error handler:', err);
+  console.error('Error stack:', err.stack);
   
   // Handle different types of errors
   if (err.name === 'SequelizeValidationError') {
@@ -77,6 +78,14 @@ app.use('/auth', authRoutes);
 app.use('/game', gameRoutes);
 app.use('/achievements', achievementRoutes);
 app.use('/admin', adminRoutes);
+
+// Debug route for session
+app.get('/debug-session', (req, res) => {
+  res.json({
+    session: req.session,
+    user: req.session.user || null
+  });
+});
 
 // Home route
 app.get('/', (req, res) => {

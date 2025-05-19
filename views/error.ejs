@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error - Crossword Game</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="error-container">
+            <h1><%= message %></h1>
+            <div class="error-details">
+                <p><%= details %></p>
+            </div>
+            <div class="error-actions">
+                <a href="/" class="button primary">Go to Home</a>
+                <a href="/game/dashboard" class="button secondary">Go to Dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .error-container {
+            max-width: 600px;
+            margin: 4rem auto;
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .error-container h1 {
+            color: #d32f2f;
+            margin-bottom: 1.5rem;
+        }
+        
+        .error-details {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        
+        .error-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        .button {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .button.primary {
+            background-color: #4caf50;
+            color: white;
+        }
+        
+        .button.primary:hover {
+            background-color: #45a049;
+        }
+        
+        .button.secondary {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .button.secondary:hover {
+            background-color: #e0e0e0;
+        }
+    </style>
+</body>
+</html>
