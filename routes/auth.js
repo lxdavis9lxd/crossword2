@@ -2,6 +2,8 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const router = express.Router();
 const { User } = require('../models');
+const { Sequelize } = require('sequelize');
+const sequelize = require('../models').sequelize;
 
 // GET route for registration page
 router.get('/register', (req, res) => {
@@ -53,18 +55,26 @@ router.post('/register', async (req, res) => {
 
 // Login route
 router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+  const { emailOrUsername, password } = req.body;
 
   // Validate form data
-  if (!email || !password) {
+  if (!emailOrUsername || !password) {
     return res.status(400).send('All fields are required');
   }
 
   try {
-    // Find the user by email
-    const user = await User.findOne({ where: { email } });
+    // Find the user by email or username
+    const user = await User.findOne({ 
+      where: {
+        [sequelize.Op.or]: [
+          { email: emailOrUsername },
+          { username: emailOrUsername }
+        ]
+      } 
+    });
+
     if (!user) {
-      return res.status(400).send('Invalid email or password');
+      return res.status(400).send('Invalid email/username or password');
     }
 
     // Check if the user account is active
@@ -75,7 +85,7 @@ router.post('/login', async (req, res) => {
     // Compare the password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).send('Invalid email or password');
+      return res.status(400).send('Invalid email/username or password');
     }
 
     // Set user session with only necessary information
