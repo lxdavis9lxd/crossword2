@@ -147,6 +147,7 @@
     <main class="crossword-container">
         <div id="puzzle-info">
             <h2>Loading puzzle...</h2>
+            <div class="puzzle-description"></div>
             <% if (typeof puzzleId !== 'undefined') { %>
             <div class="puzzle-metadata">
                 <p>Puzzle ID: <span id="current-puzzle-id"><%= puzzleId %></span></p>
@@ -216,7 +217,13 @@
                 const puzzle = JSON.parse(puzzleData.puzzleData);
                 
                 // Update puzzle info
-                document.querySelector('#puzzle-info h2').textContent = `${puzzleData.level.charAt(0).toUpperCase() + puzzleData.level.slice(1)} Puzzle`;
+                // Get title and description
+                const title = puzzle.title ? puzzle.title : `${puzzleData.level.charAt(0).toUpperCase() + puzzleData.level.slice(1)} Puzzle`;
+                const description = puzzle.description ? puzzle.description : '';
+                
+                // Update the display
+                document.querySelector('#puzzle-info h2').textContent = title;
+                document.querySelector('#puzzle-info .puzzle-description').textContent = description;
                 
                 // Generate grid
                 generateGrid(puzzle.grid, puzzle.cellNumbers);
@@ -509,13 +516,16 @@
                             idx !== 'lastPlayed' && savedProgress[idx] !== '').length;
                         const completionPercentage = Math.round((filledCells / totalCells) * 100);
                         
+                        // Get the puzzle title if available
+                        const title = puzzleData.title ? puzzleData.title : `Puzzle #${puzzle.id}`;
+                        
                         // Create the list item for the saved game
                         const savedGameItem = document.createElement('li');
                         savedGameItem.className = 'saved-game-sidebar-item';
                         savedGameItem.innerHTML = `
                             <div class="saved-game-sidebar-info">
-                                <h4>Puzzle #${puzzle.id} (${puzzle.level})</h4>
-                                <p>${completionPercentage}% complete</p>
+                                <h4>${title}</h4>
+                                <p>${puzzle.level} - ${completionPercentage}% complete</p>
                             </div>
                             <button class="load-saved-game-sidebar-btn" data-puzzle-id="${puzzle.id}">
                                 Switch
