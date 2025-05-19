@@ -1,9 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const { Puzzle, User } = require('../models');
-const { isAuthenticated } = require('../middleware/auth');
+const { isAuthenticated, isAuthenticatedApi } = require('../middleware/auth');
 
-// Apply authentication middleware to all game routes
+// API route for testing session protection (used by automated tests)
+// This route needs to be defined BEFORE the global middleware
+router.get('/api/session-test', isAuthenticatedApi, (req, res) => {
+  res.status(200).json({ success: true, message: 'Authentication successful' });
+});
+
+// Apply authentication middleware to all other game routes
 router.use(isAuthenticated);
 
 // Fetch puzzles based on difficulty level

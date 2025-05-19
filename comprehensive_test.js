@@ -215,7 +215,7 @@ function testSessionProtection() {
     const options = {
       hostname: 'localhost',
       port: 3000,
-      path: '/game/dashboard',
+      path: '/game/api/session-test',
       method: 'GET',
       headers: {
         'Cookie': sessionCookie
@@ -231,13 +231,26 @@ function testSessionProtection() {
       
       res.on('end', () => {
         try {
-          // Should allow access to dashboard with valid session
+          // Should return 200 for successful authentication via API
           assert.strictEqual(res.statusCode, 200);
+          
+          // Parse response data
+          const responseData = JSON.parse(data);
+          assert.strictEqual(responseData.success, true);
+          
           console.log('✅ Session protection test passed');
           resolve(true);
         } catch (error) {
           console.error('❌ Session protection test failed:', error.message);
           console.error('Status code:', res.statusCode);
+          if (data) {
+            try {
+              const responseData = JSON.parse(data);
+              console.error('Response data:', responseData);
+            } catch (e) {
+              console.error('Response data:', data);
+            }
+          }
           resolve(false);
         }
       });
