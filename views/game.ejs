@@ -104,6 +104,33 @@
             font-weight: bold;
             color: #4CAF50;
         }
+
+        .saved-games-sidebar {
+            margin-top: 20px;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        
+        .saved-games-sidebar h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        
+        .saved-games-sidebar ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .saved-games-sidebar li {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .saved-games-sidebar li:last-child {
+            border-bottom: none;
+        }
     </style>
 </head>
 <body>
@@ -157,6 +184,13 @@
             <button id="save-button">Save Progress</button>
             <button id="hint-button">Get Hint</button>
         </div>
+        
+        <div class="saved-games-sidebar">
+            <h3>Your Saved Games</h3>
+            <ul id="saved-games-sidebar-list">
+                <li class="loading-saved-games">Loading...</li>
+            </ul>
+        </div>
     </main>
     
     <script>
@@ -192,9 +226,16 @@
                 // Check for saved progress and load it
                 await loadSavedProgress(puzzleId);
                 
+                // Load saved games sidebar
+                await loadSavedGamesSidebar(puzzleId);
+                
                 // Add event listeners
                 document.getElementById('check-button').addEventListener('click', () => checkAnswers(puzzle.grid));
-                document.getElementById('save-button').addEventListener('click', () => saveProgress(puzzleId));
+                document.getElementById('save-button').addEventListener('click', () => {
+                    saveProgress(puzzleId).catch(error => {
+                        console.error('Error saving progress:', error);
+                    });
+                });
                 document.getElementById('hint-button').addEventListener('click', () => getHint(puzzle.grid));
                 
             } catch (error) {
@@ -292,27 +333,36 @@
                 progress[index] = input.value.toUpperCase();
             });
             
-            // Save progress to the server
-            fetch('/game/save', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    puzzleId,
-                    progress: JSON.stringify(progress)
+            // Add timestamp for when the game was saved
+            progress.lastPlayed = new Date().toISOString();
+            
+            // Return a promise for the save operation
+            return new Promise((resolve, reject) => {
+                // Save progress to the server
+                fetch('/game/save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        puzzleId,
+                        progress: JSON.stringify(progress)
+                    })
                 })
-            })
-            .then(response => {
-                if (response.ok) {
-                    showMessage('Progress saved successfully!', 'success');
-                } else {
+                .then(response => {
+                    if (response.ok) {
+                        showMessage('Progress saved successfully!', 'success');
+                        resolve(true);
+                    } else {
+                        showMessage('Failed to save progress', 'error');
+                        reject(new Error('Failed to save progress'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error saving progress:', error);
                     showMessage('Failed to save progress', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error saving progress:', error);
-                showMessage('Failed to save progress', 'error');
+                    reject(error);
+                });
             });
         }
         
@@ -386,6 +436,113 @@
                 console.error('Error loading saved progress:', error);
                 showMessage('Failed to load saved progress', 'error');
             }
+        }
+        
+        async function loadSavedGamesSidebar(currentPuzzleId) {
+            try {
+                // Get the current user ID
+                const userId = document.querySelector('meta[name="user-id"]')?.content;
+                if (!userId) {
+                    console.log('No user ID found, cannot load saved games sidebar');
+                    return;
+                }
+                
+                // Get the saved games list container
+                const savedGamesList = document.getElementById('saved-games-sidebar-list');
+                
+                // Fetch user's progress data
+                const response = await fetch(`/game/progress/${userId}`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch saved games: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                const progress = data.progress || {};
+                
+                // Clear the list
+                savedGamesList.innerHTML = '';
+                
+                if (Object.keys(progress).length === 0) {
+                    savedGamesList.innerHTML = '<li class="no-saved-games">No saved games found</li>';
+                    return;
+                }
+                
+                // Sort puzzle IDs by last played date (most recent first)
+                const sortedPuzzleIds = Object.keys(progress).sort((a, b) => {
+                    const progressA = JSON.parse(progress[a]);
+                    const progressB = JSON.parse(progress[b]);
+                    const timeA = progressA.lastPlayed ? new Date(progressA.lastPlayed).getTime() : 0;
+                    const timeB = progressB.lastPlayed ? new Date(progressB.lastPlayed).getTime() : 0;
+                    return timeB - timeA;
+                });
+                
+                // Add each saved game to the sidebar (limited to 5 most recent)
+                const recentPuzzles = sortedPuzzleIds.slice(0, 5);
+                
+                for (const puzzleId of recentPuzzles) {
+                    try {
+                        // Skip the current puzzle
+                        if (puzzleId === currentPuzzleId) continue;
+                        
+                        const puzzleResponse = await fetch(`/game/puzzles/details/${puzzleId}`);
+                        if (!puzzleResponse.ok) continue;
+                        
+                        const puzzle = await puzzleResponse.json();
+                        const savedProgress = JSON.parse(progress[puzzleId]);
+                        
+                        // Calculate completion percentage
+                        const puzzleData = JSON.parse(puzzle.puzzleData);
+                        const totalCells = Object.keys(puzzleData.grid).filter(idx => puzzleData.grid[idx] !== '#').length;
+                        const filledCells = Object.keys(savedProgress).filter(idx => 
+                            idx !== 'lastPlayed' && savedProgress[idx] !== '').length;
+                        const completionPercentage = Math.round((filledCells / totalCells) * 100);
+                        
+                        // Create the list item for the saved game
+                        const savedGameItem = document.createElement('li');
+                        savedGameItem.className = 'saved-game-sidebar-item';
+                        savedGameItem.innerHTML = `
+                            <div class="saved-game-sidebar-info">
+                                <h4>Puzzle #${puzzle.id} (${puzzle.level})</h4>
+                                <p>${completionPercentage}% complete</p>
+                            </div>
+                            <button class="load-saved-game-sidebar-btn" data-puzzle-id="${puzzle.id}">
+                                Switch
+                            </button>
+                        `;
+                        
+                        // Add event listener to the button
+                        const loadButton = savedGameItem.querySelector('.load-saved-game-sidebar-btn');
+                        loadButton.addEventListener('click', function() {
+                            // Save current progress before switching
+                            saveProgress(currentPuzzleId).then(() => {
+                                window.location.href = `/game?puzzleId=${puzzleId}`;
+                            });
+                        });
+                        
+                        savedGamesList.appendChild(savedGameItem);
+                    } catch (error) {
+                        console.error(`Error loading saved game for puzzle ${puzzleId}:`, error);
+                    }
+                }
+                
+                // Add a link to view all saved games
+                const viewAllItem = document.createElement('li');
+                viewAllItem.className = 'view-all-saved-games';
+                viewAllItem.innerHTML = `
+                    <a href="/game/dashboard" class="view-all-link">View all saved games</a>
+                `;
+                savedGamesList.appendChild(viewAllItem);
+                
+            } catch (error) {
+                console.error('Error loading saved games sidebar:', error);
+                document.getElementById('saved-games-sidebar-list').innerHTML = 
+                    '<li class="error-message">Error loading saved games</li>';
+            }
+        }
+        
+        function loadSavedGame(puzzleId) {
+            // Redirect to the same puzzle with the saved progress
+            window.location.href = `/game?puzzleId=${puzzleId}`;
         }
     </script>
 </body>
