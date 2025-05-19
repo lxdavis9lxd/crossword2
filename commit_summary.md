@@ -12,12 +12,44 @@
    - Verified themed descriptions are shown when available
    - Tested fallback description generation for puzzles without descriptions
 
+## Implementation Details
+
+1. **Theme Display Logic in `scripts.js`**
+   - Uses themed titles: `const title = puzzleData.title ? puzzleData.title : `Puzzle #${puzzle.id}`;`
+   - Presents descriptions: `let description = puzzleData.description ? puzzleData.description : `A ${level} level...`;`
+   - Formats cards with proper HTML structure showing titles and descriptions
+
+2. **CSS Styling in `styles.css`**
+   - Properly styles puzzle descriptions with appropriate font size and spacing
+   - Applies text truncation for long descriptions using ellipsis
+   - Maintains consistent visual hierarchy with theme titles prominently displayed
+
 ## Testing Files Added
 
 1. **`/workspaces/crossword2/dashboard_theme_tester.js`**
    - Created dedicated test server for visual verification
    - Implements API endpoint to check theme information
    - Provides visual interface for testing all puzzle levels
+
+2. **`/workspaces/crossword2/comprehensive_test_themes.js`**
+   - Directly tests puzzle themes in the database
+   - Verifies all puzzles have proper themes and descriptions
+   - Confirms the dashboard will display themed names
+
+3. **`/workspaces/crossword2/direct_test_puzzle_themes.js`**
+   - Tests theme display logic directly from API endpoints
+   - Simulates what users will see on the dashboard
+   - Verifies theme name extraction works as expected
+
+4. **`/workspaces/crossword2/check_puzzle_theme_display.js`**
+   - Simple verification of API response data
+   - Checks if theme data exists and is accessible
+   - Confirms all puzzle titles are themed
+
+5. **`/workspaces/crossword2/verify_puzzle_display.js`**
+   - Extracts puzzle data to verify theme existence
+   - Cross-checks expected themes with database content
+   - Confirms implementation will show proper themes
 
 2. **`/workspaces/crossword2/test_puzzle_themes.js`** and **`/workspaces/crossword2/test_puzzle_themes_api.js`**
    - Automated tests for verifying puzzle themes via API
