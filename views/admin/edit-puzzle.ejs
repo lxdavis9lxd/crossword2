@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Puzzle - Admin</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/admin-styles.css">
+</head>
+<body class="admin-body">
+    <header class="admin-header">
+        <h1>Edit Puzzle</h1>
+        <nav>
+            <ul>
+                <li><a href="/admin">Dashboard</a></li>
+                <li><a href="/admin/users">Users</a></li>
+                <li><a href="/admin/puzzles" class="active">Puzzles</a></li>
+                <li><a href="/admin/import-puzzles">Import Puzzles</a></li>
+                <li><a href="/game/dashboard">Game Dashboard</a></li>
+                <li><a href="/auth/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main class="admin-main">
+        <div class="admin-form">
+            <h2>Edit Puzzle: <%= puzzle.title || 'Untitled Puzzle' %></h2>
+            
+            <% if (typeof error !== 'undefined') { %>
+                <div class="error-message">
+                    <%= error %>
+                </div>
+            <% } %>
+            
+            <form action="/admin/puzzles/<%= puzzle.id %>" method="POST">
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" id="title" name="title" class="form-control" value="<%= puzzle.title || '' %>">
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" class="form-control" rows="4"><%= puzzle.description || '' %></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="level">Difficulty Level</label>
+                    <select id="level" name="level" class="form-select">
+                        <option value="easy" <%= puzzle.level === 'easy' ? 'selected' : '' %>>Easy</option>
+                        <option value="intermediate" <%= puzzle.level === 'intermediate' ? 'selected' : '' %>>Intermediate</option>
+                        <option value="advanced" <%= puzzle.level === 'advanced' ? 'selected' : '' %>>Advanced</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="difficultyRating">Difficulty Rating (1-5)</label>
+                    <div class="rating-stars">
+                        <% for (let i = 1; i <= 5; i++) { %>
+                            <input type="radio" id="rating<%= i %>" name="difficultyRating" value="<%= i %>" 
+                                  <%= puzzle.difficultyRating === i ? 'checked' : '' %>>
+                            <label for="rating<%= i %>">★</label>
+                        <% } %>
+                    </div>
+                </div>
+                
+                <div class="form-notice">
+                    <p>Note: To edit the puzzle grid and clues, please export the puzzle, modify it in Excel, and then import it again.</p>
+                </div>
+                
+                <div class="form-actions">
+                    <a href="/admin/puzzles/<%= puzzle.id %>" class="admin-button secondary">Cancel</a>
+                    <button type="submit" class="admin-button primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </main>
+    
+    <footer class="admin-footer">
+        <p>&copy; <%= new Date().getFullYear() %> Crossword Game Administration</p>
+    </footer>
+    
+    <style>
+        .rating-stars {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+        }
+        
+        .rating-stars input {
+            display: none;
+        }
+        
+        .rating-stars label {
+            font-size: 1.5rem;
+            color: #ddd;
+            cursor: pointer;
+            transition: color 0.2s;
+            margin-right: 0.25rem;
+        }
+        
+        .rating-stars label:hover,
+        .rating-stars label:hover ~ label,
+        .rating-stars input:checked ~ label {
+            color: #FFC107;
+        }
+        
+        .form-notice {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1.5rem 0;
+            border-left: 4px solid #2E7D32;
+            font-size: 0.9rem;
+        }
+    </style>
+</body>
+</html>

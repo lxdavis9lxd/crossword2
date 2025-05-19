@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit User - Admin</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/admin-styles.css">
+</head>
+<body class="admin-body">
+    <header class="admin-header">
+        <h1>Edit User</h1>
+        <nav>
+            <ul>
+                <li><a href="/admin">Dashboard</a></li>
+                <li><a href="/admin/users" class="active">Users</a></li>
+                <li><a href="/admin/puzzles">Puzzles</a></li>
+                <li><a href="/admin/import-puzzles">Import Puzzles</a></li>
+                <li><a href="/game/dashboard">Game Dashboard</a></li>
+                <li><a href="/auth/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main class="admin-main">
+        <div class="admin-form">
+            <h2>Edit User: <%= user.username %></h2>
+            
+            <% if (typeof error !== 'undefined') { %>
+                <div class="error-message">
+                    <%= error %>
+                </div>
+            <% } %>
+            
+            <form action="/admin/users/<%= user.id %>" method="POST">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" class="form-control" value="<%= user.username %>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" class="form-control" value="<%= user.email %>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password (leave blank to keep current)</label>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Enter new password">
+                </div>
+                
+                <div class="form-group">
+                    <label for="role">Role</label>
+                    <select id="role" name="role" class="form-select" <%= user.id === locals.user.id ? 'disabled' : '' %>>
+                        <option value="user" <%= user.role === 'user' ? 'selected' : '' %>>User</option>
+                        <option value="admin" <%= user.role === 'admin' ? 'selected' : '' %>>Admin</option>
+                    </select>
+                    <% if (user.id === locals.user.id) { %>
+                        <small class="form-text">You cannot change your own role.</small>
+                        <input type="hidden" name="role" value="admin">
+                    <% } %>
+                </div>
+                
+                <div class="form-group">
+                    <label for="isActive">Status</label>
+                    <select id="isActive" name="isActive" class="form-select" <%= user.id === locals.user.id ? 'disabled' : '' %>>
+                        <option value="true" <%= user.isActive ? 'selected' : '' %>>Active</option>
+                        <option value="false" <%= !user.isActive ? 'selected' : '' %>>Inactive</option>
+                    </select>
+                    <% if (user.id === locals.user.id) { %>
+                        <small class="form-text">You cannot deactivate your own account.</small>
+                        <input type="hidden" name="isActive" value="true">
+                    <% } %>
+                </div>
+                
+                <div class="form-actions">
+                    <a href="/admin/users/<%= user.id %>" class="admin-button secondary">Cancel</a>
+                    <button type="submit" class="admin-button primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </main>
+    
+    <footer class="admin-footer">
+        <p>&copy; <%= new Date().getFullYear() %> Crossword Game Administration</p>
+    </footer>
+    
+    <style>
+        .form-text {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 0.25rem;
+            display: block;
+        }
+        
+        select:disabled {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+        }
+    </style>
+</body>
+</html>

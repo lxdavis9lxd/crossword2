@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puzzle Details - Admin</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/admin-styles.css">
+</head>
+<body class="admin-body">
+    <header class="admin-header">
+        <h1>Puzzle Details</h1>
+        <nav>
+            <ul>
+                <li><a href="/admin">Dashboard</a></li>
+                <li><a href="/admin/users">Users</a></li>
+                <li><a href="/admin/puzzles" class="active">Puzzles</a></li>
+                <li><a href="/admin/import-puzzles">Import Puzzles</a></li>
+                <li><a href="/game/dashboard">Game Dashboard</a></li>
+                <li><a href="/auth/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main class="admin-main">
+        <section class="admin-controls">
+            <div class="controls-left">
+                <h2>Puzzle: <%= puzzle.title || 'Untitled Puzzle' %></h2>
+            </div>
+            <div class="controls-right">
+                <a href="/admin/puzzles/<%= puzzle.id %>/edit" class="admin-button primary">Edit Puzzle</a>
+                <a href="/admin/puzzles" class="admin-button secondary">Back to Puzzles</a>
+            </div>
+        </section>
+        
+        <section class="admin-content">
+            <div class="puzzle-details-grid">
+                <div class="puzzle-info-card">
+                    <h3>Puzzle Information</h3>
+                    <div class="info-item">
+                        <span class="info-label">Title:</span>
+                        <span class="info-value"><%= puzzle.title || 'Untitled Puzzle' %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Level:</span>
+                        <span class="info-value badge badge-<%= 
+                            puzzle.level === 'easy' ? 'success' : 
+                            puzzle.level === 'intermediate' ? 'primary' : 
+                            'secondary' 
+                        %>">
+                            <%= puzzle.level %>
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Difficulty:</span>
+                        <span class="info-value">
+                            <div class="difficulty-stars">
+                                <% for (let i = 1; i <= 5; i++) { %>
+                                    <span class="star <%= i <= puzzle.difficultyRating ? 'filled' : '' %>">★</span>
+                                <% } %>
+                            </div>
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Created:</span>
+                        <span class="info-value"><%= new Date(puzzle.createdAt).toLocaleDateString() %></span>
+                    </div>
+                    <div class="info-item description">
+                        <span class="info-label">Description:</span>
+                        <span class="info-value"><%= puzzle.description || 'No description available.' %></span>
+                    </div>
+                </div>
+                
+                <div class="puzzle-preview-card">
+                    <h3>Puzzle Preview</h3>
+                    <div class="puzzle-grid-container">
+                        <div class="puzzle-grid" id="puzzle-grid"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="puzzle-clues">
+                <div class="clues-section">
+                    <h3>Across Clues</h3>
+                    <ul class="clue-list">
+                        <% if (puzzleData.clues && puzzleData.clues.across && puzzleData.clues.across.length > 0) { %>
+                            <% puzzleData.clues.across.sort((a, b) => a.number - b.number).forEach(clue => { %>
+                                <li class="clue-item">
+                                    <span class="clue-number"><%= clue.number %>.</span>
+                                    <span class="clue-text"><%= clue.clue %></span>
+                                </li>
+                            <% }); %>
+                        <% } else { %>
+                            <li class="no-clues">No across clues available.</li>
+                        <% } %>
+                    </ul>
+                </div>
+                
+                <div class="clues-section">
+                    <h3>Down Clues</h3>
+                    <ul class="clue-list">
+                        <% if (puzzleData.clues && puzzleData.clues.down && puzzleData.clues.down.length > 0) { %>
+                            <% puzzleData.clues.down.sort((a, b) => a.number - b.number).forEach(clue => { %>
+                                <li class="clue-item">
+                                    <span class="clue-number"><%= clue.number %>.</span>
+                                    <span class="clue-text"><%= clue.clue %></span>
+                                </li>
+                            <% }); %>
+                        <% } else { %>
+                            <li class="no-clues">No down clues available.</li>
+                        <% } %>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="admin-actions puzzle-actions">
+                <form action="/admin/puzzles/<%= puzzle.id %>/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this puzzle? This action cannot be undone.');" class="delete-form">
+                    <button type="submit" class="admin-button danger">Delete Puzzle</button>
+                </form>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="admin-footer">
+        <p>&copy; <%= new Date().getFullYear() %> Crossword Game Administration</p>
+    </footer>
+    
+    <style>
+        .puzzle-details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .puzzle-details-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .puzzle-info-card, .puzzle-preview-card {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+        
+        .info-item {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            width: 120px;
+            color: #555;
+        }
+        
+        .info-value {
+            flex: 1;
+        }
+        
+        .description .info-value {
+            background-color: #fff;
+            padding: 1rem;
+            border-radius: 4px;
+            border: 1px solid #eee;
+            min-height: 80px;
+        }
+        
+        .difficulty-stars {
+            display: flex;
+        }
+        
+        .star {
+            color: #ddd;
+            font-size: 1.1rem;
+        }
+        
+        .star.filled {
+            color: #FFC107;
+        }
+        
+        .puzzle-grid-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            margin-top: 1rem;
+        }
+        
+        .puzzle-grid {
+            display: grid;
+            border: 2px solid #333;
+        }
+        
+        .puzzle-cell {
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #999;
+            font-weight: bold;
+            position: relative;
+            background-color: white;
+        }
+        
+        .puzzle-cell.black {
+            background-color: #333;
+        }
+        
+        .cell-number {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            font-size: 10px;
+            font-weight: normal;
+        }
+        
+        .puzzle-clues {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .puzzle-clues {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .clues-section {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+        
+        .clue-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .clue-item {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .clue-item:last-child {
+            border-bottom: none;
+        }
+        
+        .clue-number {
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+        
+        .no-clues {
+            color: #888;
+            font-style: italic;
+            padding: 1rem 0;
+        }
+        
+        .puzzle-actions {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        
+        .admin-button.danger {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        
+        .admin-button.danger:hover {
+            background-color: #ffcdd2;
+        }
+    </style>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Parse the puzzle data
+            const puzzleData = <%= JSON.stringify(puzzleData) %>;
+            const grid = puzzleData.grid;
+            
+            if (!grid || !Array.isArray(grid)) {
+                document.getElementById('puzzle-grid').innerHTML = 'Invalid puzzle grid data';
+                return;
+            }
+            
+            // Determine grid dimensions (assuming square grid)
+            const size = Math.sqrt(grid.length);
+            if (!Number.isInteger(size)) {
+                document.getElementById('puzzle-grid').innerHTML = 'Invalid grid dimensions';
+                return;
+            }
+            
+            // Create the grid
+            const puzzleGrid = document.getElementById('puzzle-grid');
+            puzzleGrid.style.gridTemplateColumns = `repeat(${size}, 30px)`;
+            puzzleGrid.style.gridTemplateRows = `repeat(${size}, 30px)`;
+            
+            // Cell numbers map
+            const cellNumbers = {};
+            
+            // Determine cell numbers based on across and down clues
+            if (puzzleData.clues) {
+                if (puzzleData.clues.across) {
+                    puzzleData.clues.across.forEach(clue => {
+                        cellNumbers[clue.number] = true;
+                    });
+                }
+                
+                if (puzzleData.clues.down) {
+                    puzzleData.clues.down.forEach(clue => {
+                        cellNumbers[clue.number] = true;
+                    });
+                }
+            }
+            
+            // Create grid cells
+            for (let i = 0; i < grid.length; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'puzzle-cell';
+                
+                const cellContent = grid[i];
+                if (cellContent === '.') {
+                    cell.classList.add('black');
+                } else {
+                    // Check if this cell should have a number
+                    const row = Math.floor(i / size);
+                    const col = i % size;
+                    const cellIndex = row * size + col;
+                    
+                    // Determine if this cell starts an across or down word
+                    let shouldNumberCell = false;
+                    
+                    // Across: This cell is not black, and either it's the leftmost cell or the cell to its left is black
+                    const startsAcross = col === 0 || grid[cellIndex - 1] === '.';
+                    
+                    // Down: This cell is not black, and either it's the topmost cell or the cell above it is black
+                    const startsDown = row === 0 || grid[cellIndex - size] === '.';
+                    
+                    shouldNumberCell = startsAcross || startsDown;
+                    
+                    if (shouldNumberCell) {
+                        // Find the cell number by counting preceding starting positions
+                        let cellNumber = 1;
+                        for (let j = 0; j < i; j++) {
+                            const prevRow = Math.floor(j / size);
+                            const prevCol = j % size;
+                            const prevIndex = prevRow * size + prevCol;
+                            
+                            if (grid[prevIndex] !== '.') {
+                                const prevStartsAcross = prevCol === 0 || grid[prevIndex - 1] === '.';
+                                const prevStartsDown = prevRow === 0 || grid[prevIndex - size] === '.';
+                                
+                                if (prevStartsAcross || prevStartsDown) {
+                                    cellNumber++;
+                                }
+                            }
+                        }
+                        
+                        const numberSpan = document.createElement('span');
+                        numberSpan.className = 'cell-number';
+                        numberSpan.textContent = cellNumber;
+                        cell.appendChild(numberSpan);
+                    }
+                }
+                
+                puzzleGrid.appendChild(cell);
+            }
+        });
+    </script>
+</body>
+</html>

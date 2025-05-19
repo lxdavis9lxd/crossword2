@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - Admin</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/admin-styles.css">
+</head>
+<body class="admin-body">
+    <header class="admin-header">
+        <h1>User Management</h1>
+        <nav>
+            <ul>
+                <li><a href="/admin">Dashboard</a></li>
+                <li><a href="/admin/users" class="active">Users</a></li>
+                <li><a href="/admin/puzzles">Puzzles</a></li>
+                <li><a href="/admin/import-puzzles">Import Puzzles</a></li>
+                <li><a href="/game/dashboard">Game Dashboard</a></li>
+                <li><a href="/auth/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main class="admin-main">
+        <section class="admin-controls">
+            <div class="controls-left">
+                <h2>User Accounts</h2>
+            </div>
+            <div class="controls-right">
+                <a href="/admin/users/new" class="admin-button primary">Create New User</a>
+            </div>
+        </section>
+        
+        <section class="admin-content">
+            <div class="admin-data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (users && users.length > 0) { %>
+                            <% users.forEach(user => { %>
+                                <tr>
+                                    <td><%= user.id %></td>
+                                    <td><%= user.username %></td>
+                                    <td><%= user.email %></td>
+                                    <td>
+                                        <span class="badge badge-<%= user.role === 'admin' ? 'primary' : 'secondary' %>">
+                                            <%= user.role %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-<%= user.isActive ? 'success' : 'danger' %>">
+                                            <%= user.isActive ? 'Active' : 'Inactive' %>
+                                        </span>
+                                    </td>
+                                    <td><%= new Date(user.createdAt).toLocaleDateString() %></td>
+                                    <td class="actions">
+                                        <a href="/admin/users/<%= user.id %>" class="action-link view">View</a>
+                                        <a href="/admin/users/<%= user.id %>/edit" class="action-link edit">Edit</a>
+                                        <% if (user.id !== locals.user.id) { %>
+                                            <form action="/admin/users/<%= user.id %>/delete" method="POST" onsubmit="return confirm('Are you sure you want to deactivate this user?');" class="inline-form">
+                                                <button type="submit" class="action-link delete">Delete</button>
+                                            </form>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="7" class="no-data">No users found</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="admin-footer">
+        <p>&copy; <%= new Date().getFullYear() %> Crossword Game Administration</p>
+    </footer>
+</body>
+</html>

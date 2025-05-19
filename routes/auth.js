@@ -67,6 +67,11 @@ router.post('/login', async (req, res) => {
       return res.status(400).send('Invalid email or password');
     }
 
+    // Check if the user account is active
+    if (!user.isActive) {
+      return res.status(400).send('This account has been deactivated. Please contact an administrator.');
+    }
+
     // Compare the password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
@@ -77,7 +82,8 @@ router.post('/login', async (req, res) => {
     req.session.user = {
       id: user.id,
       username: user.username,
-      email: user.email
+      email: user.email,
+      role: user.role
     };
 
     // Redirect to game dashboard

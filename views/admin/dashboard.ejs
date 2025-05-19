@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Crossword Game</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/admin-styles.css">
+</head>
+<body class="admin-body">
+    <header class="admin-header">
+        <h1>Administration Dashboard</h1>
+        <nav>
+            <ul>
+                <li><a href="/admin">Dashboard</a></li>
+                <li><a href="/admin/users">Users</a></li>
+                <li><a href="/admin/puzzles">Puzzles</a></li>
+                <li><a href="/admin/import-puzzles">Import Puzzles</a></li>
+                <li><a href="/game/dashboard">Game Dashboard</a></li>
+                <li><a href="/auth/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main class="admin-main">
+        <section class="admin-stats">
+            <h2>System Overview</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Users</h3>
+                    <p class="stat-number"><%= userCount %></p>
+                    <a href="/admin/users" class="stat-action">Manage Users</a>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>Total Puzzles</h3>
+                    <p class="stat-number"><%= puzzleCount %></p>
+                    <a href="/admin/puzzles" class="stat-action">Manage Puzzles</a>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>Admin Users</h3>
+                    <p class="stat-number"><%= adminCount %></p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="admin-puzzles-overview">
+            <h2>Puzzles by Difficulty</h2>
+            
+            <div class="puzzle-stats">
+                <div class="puzzle-stat-item">
+                    <h3>Easy</h3>
+                    <div class="puzzle-stat-bar" style="width: <%= (puzzleStats.easy / puzzleCount * 100) || 0 %>%"></div>
+                    <p><%= puzzleStats.easy %> puzzles</p>
+                </div>
+                
+                <div class="puzzle-stat-item">
+                    <h3>Intermediate</h3>
+                    <div class="puzzle-stat-bar" style="width: <%= (puzzleStats.intermediate / puzzleCount * 100) || 0 %>%"></div>
+                    <p><%= puzzleStats.intermediate %> puzzles</p>
+                </div>
+                
+                <div class="puzzle-stat-item">
+                    <h3>Advanced</h3>
+                    <div class="puzzle-stat-bar" style="width: <%= (puzzleStats.advanced / puzzleCount * 100) || 0 %>%"></div>
+                    <p><%= puzzleStats.advanced %> puzzles</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="admin-actions">
+            <h2>Quick Actions</h2>
+            
+            <div class="action-buttons">
+                <a href="/admin/users/new" class="action-button">
+                    <span class="action-icon">👤</span>
+                    Create New User
+                </a>
+                
+                <a href="/admin/import-puzzles" class="action-button">
+                    <span class="action-icon">📥</span>
+                    Import Puzzles
+                </a>
+                
+                <a href="/admin/export-puzzles" class="action-button">
+                    <span class="action-icon">📤</span>
+                    Export Puzzles
+                </a>
+                
+                <a href="/admin/puzzle-template" class="action-button">
+                    <span class="action-icon">📋</span>
+                    Download Template
+                </a>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="admin-footer">
+        <p>&copy; <%= new Date().getFullYear() %> Crossword Game Administration</p>
+    </footer>
+</body>
+</html>

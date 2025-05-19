@@ -40,6 +40,7 @@ const db = require('./models');
 const authRoutes = require('./routes/auth');
 const gameRoutes = require('./routes/game');
 const achievementRoutes = require('./routes/achievements');
+const adminRoutes = require('./routes/admin');
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -75,6 +76,7 @@ app.use((err, req, res, next) => {
 app.use('/auth', authRoutes);
 app.use('/game', gameRoutes);
 app.use('/achievements', achievementRoutes);
+app.use('/admin', adminRoutes);
 
 // Home route
 app.get('/', (req, res) => {

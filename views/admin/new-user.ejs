@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New User - Admin</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/admin-styles.css">
+</head>
+<body class="admin-body">
+    <header class="admin-header">
+        <h1>Create New User</h1>
+        <nav>
+            <ul>
+                <li><a href="/admin">Dashboard</a></li>
+                <li><a href="/admin/users" class="active">Users</a></li>
+                <li><a href="/admin/puzzles">Puzzles</a></li>
+                <li><a href="/admin/import-puzzles">Import Puzzles</a></li>
+                <li><a href="/game/dashboard">Game Dashboard</a></li>
+                <li><a href="/auth/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main class="admin-main">
+        <div class="admin-form">
+            <h2>Create New User</h2>
+            
+            <% if (typeof error !== 'undefined') { %>
+                <div class="error-message">
+                    <%= error %>
+                </div>
+            <% } %>
+            
+            <form action="/admin/users" method="POST">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" class="form-control" 
+                           value="<%= typeof formData !== 'undefined' ? formData.username : '' %>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" class="form-control" 
+                           value="<%= typeof formData !== 'undefined' ? formData.email : '' %>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="role">Role</label>
+                    <select id="role" name="role" class="form-select">
+                        <option value="user" <%= typeof formData !== 'undefined' && formData.role === 'user' ? 'selected' : '' %>>User</option>
+                        <option value="admin" <%= typeof formData !== 'undefined' && formData.role === 'admin' ? 'selected' : '' %>>Admin</option>
+                    </select>
+                </div>
+                
+                <div class="form-actions">
+                    <a href="/admin/users" class="admin-button secondary">Cancel</a>
+                    <button type="submit" class="admin-button primary">Create User</button>
+                </div>
+            </form>
+        </div>
+    </main>
+    
+    <footer class="admin-footer">
+        <p>&copy; <%= new Date().getFullYear() %> Crossword Game Administration</p>
+    </footer>
+</body>
+</html>

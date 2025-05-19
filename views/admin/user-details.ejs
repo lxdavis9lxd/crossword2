@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Details - Admin</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/admin-styles.css">
+</head>
+<body class="admin-body">
+    <header class="admin-header">
+        <h1>User Details</h1>
+        <nav>
+            <ul>
+                <li><a href="/admin">Dashboard</a></li>
+                <li><a href="/admin/users" class="active">Users</a></li>
+                <li><a href="/admin/puzzles">Puzzles</a></li>
+                <li><a href="/admin/import-puzzles">Import Puzzles</a></li>
+                <li><a href="/game/dashboard">Game Dashboard</a></li>
+                <li><a href="/auth/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main class="admin-main">
+        <section class="admin-controls">
+            <div class="controls-left">
+                <h2>User Profile: <%= user.username %></h2>
+            </div>
+            <div class="controls-right">
+                <a href="/admin/users/<%= user.id %>/edit" class="admin-button primary">Edit User</a>
+                <a href="/admin/users" class="admin-button secondary">Back to Users</a>
+            </div>
+        </section>
+        
+        <section class="admin-content">
+            <div class="user-details-grid">
+                <div class="user-info-card">
+                    <h3>Account Information</h3>
+                    <div class="info-item">
+                        <span class="info-label">Username:</span>
+                        <span class="info-value"><%= user.username %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value"><%= user.email %></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Role:</span>
+                        <span class="info-value badge badge-<%= user.role === 'admin' ? 'primary' : 'secondary' %>">
+                            <%= user.role %>
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Status:</span>
+                        <span class="info-value badge badge-<%= user.isActive ? 'success' : 'danger' %>">
+                            <%= user.isActive ? 'Active' : 'Inactive' %>
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Joined:</span>
+                        <span class="info-value"><%= new Date(user.createdAt).toLocaleDateString() %></span>
+                    </div>
+                </div>
+                
+                <div class="user-stats-card">
+                    <h3>User Statistics</h3>
+                    <div class="stat-item">
+                        <span class="stat-label">Completed Puzzles:</span>
+                        <span class="stat-value"><%= user.completedPuzzles.length %></span>
+                    </div>
+                    <div class="stat-breakdown">
+                        <h4>Completed by Difficulty</h4>
+                        <% 
+                            // Count puzzle completions by level
+                            let completedByLevel = {
+                                easy: 0,
+                                intermediate: 0,
+                                advanced: 0
+                            };
+                            
+                            // Assuming completedPuzzles includes the level information
+                            if (user.completedPuzzles && user.completedPuzzles.length > 0) {
+                                user.completedPuzzles.forEach(puzzle => {
+                                    if (puzzle.level && completedByLevel.hasOwnProperty(puzzle.level)) {
+                                        completedByLevel[puzzle.level]++;
+                                    }
+                                });
+                            }
+                        %>
+                        <div class="level-stats">
+                            <div class="level-stat">
+                                <span class="level-name">Easy:</span>
+                                <span class="level-count"><%= completedByLevel.easy %></span>
+                            </div>
+                            <div class="level-stat">
+                                <span class="level-name">Intermediate:</span>
+                                <span class="level-count"><%= completedByLevel.intermediate %></span>
+                            </div>
+                            <div class="level-stat">
+                                <span class="level-name">Advanced:</span>
+                                <span class="level-count"><%= completedByLevel.advanced %></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="user-activity">
+                <h3>Recent Activity</h3>
+                <% if (user.completedPuzzles && user.completedPuzzles.length > 0) { %>
+                    <table class="activity-table">
+                        <thead>
+                            <tr>
+                                <th>Puzzle</th>
+                                <th>Level</th>
+                                <th>Completed On</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% 
+                                // Sort completed puzzles by completion date (newest first)
+                                const sortedPuzzles = [...user.completedPuzzles].sort((a, b) => {
+                                    return new Date(b.completedAt) - new Date(a.completedAt);
+                                }).slice(0, 10); // Show only the 10 most recent
+                            %>
+                            <% sortedPuzzles.forEach(puzzle => { %>
+                                <tr>
+                                    <td><%= puzzle.title || `Puzzle #${puzzle.id}` %></td>
+                                    <td><span class="badge badge-secondary"><%= puzzle.level %></span></td>
+                                    <td><%= new Date(puzzle.completedAt).toLocaleString() %></td>
+                                    <td><%= puzzle.timeToComplete ? Math.floor(puzzle.timeToComplete / 60) + 'm ' + (puzzle.timeToComplete % 60) + 's' : 'N/A' %></td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                <% } else { %>
+                    <p class="no-activity">No activity recorded for this user.</p>
+                <% } %>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="admin-footer">
+        <p>&copy; <%= new Date().getFullYear() %> Crossword Game Administration</p>
+    </footer>
+    
+    <style>
+        .user-details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .user-details-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .user-info-card, .user-stats-card {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+        
+        .info-item, .stat-item {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .info-label, .stat-label {
+            font-weight: bold;
+            width: 120px;
+            color: #555;
+        }
+        
+        .level-stats {
+            margin-top: 1rem;
+        }
+        
+        .level-stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .level-stat:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .activity-table th, .activity-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .no-activity {
+            color: #888;
+            text-align: center;
+            padding: 2rem;
+        }
+    </style>
+</body>
+</html>

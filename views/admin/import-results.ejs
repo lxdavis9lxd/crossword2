@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Results - Admin</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/admin-styles.css">
+</head>
+<body class="admin-body">
+    <header class="admin-header">
+        <h1>Import Results</h1>
+        <nav>
+            <ul>
+                <li><a href="/admin">Dashboard</a></li>
+                <li><a href="/admin/users">Users</a></li>
+                <li><a href="/admin/puzzles">Puzzles</a></li>
+                <li><a href="/admin/import-puzzles" class="active">Import Puzzles</a></li>
+                <li><a href="/game/dashboard">Game Dashboard</a></li>
+                <li><a href="/auth/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main class="admin-main">
+        <section class="admin-controls">
+            <div class="controls-left">
+                <h2>Excel Import Results</h2>
+            </div>
+            <div class="controls-right">
+                <a href="/admin/puzzles" class="admin-button primary">View All Puzzles</a>
+                <a href="/admin/import-puzzles" class="admin-button secondary">Import More</a>
+            </div>
+        </section>
+        
+        <section class="admin-content">
+            <div class="import-results-summary">
+                <h3>Summary</h3>
+                <div class="results-stats">
+                    <div class="result-stat">
+                        <span class="stat-label">Total Processed:</span>
+                        <span class="stat-value"><%= results.success + results.failed %></span>
+                    </div>
+                    <div class="result-stat">
+                        <span class="stat-label results-success">Successfully Imported:</span>
+                        <span class="stat-value results-success"><%= results.success %></span>
+                    </div>
+                    <div class="result-stat">
+                        <span class="stat-label results-failed">Failed:</span>
+                        <span class="stat-value results-failed"><%= results.failed %></span>
+                    </div>
+                </div>
+            </div>
+            
+            <% if (results.success > 0) { %>
+                <div class="import-success">
+                    <h3>Successfully Imported Puzzles</h3>
+                    <p><%= results.success %> puzzles were successfully imported into the database.</p>
+                    <a href="/admin/puzzles" class="action-link view">View All Puzzles</a>
+                </div>
+            <% } %>
+            
+            <% if (results.failed > 0 && results.errors && results.errors.length > 0) { %>
+                <div class="import-errors">
+                    <h3>Import Errors</h3>
+                    <p>The following errors occurred during import:</p>
+                    
+                    <div class="error-list">
+                        <% results.errors.forEach((error, index) => { %>
+                            <div class="error-item">
+                                <strong>Error <%= index + 1 %>:</strong> <%= error %>
+                            </div>
+                        <% }); %>
+                    </div>
+                </div>
+            <% } %>
+            
+            <div class="import-actions">
+                <a href="/admin/import-puzzles" class="admin-button primary">Import More Puzzles</a>
+                <a href="/admin" class="admin-button secondary">Back to Dashboard</a>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="admin-footer">
+        <p>&copy; <%= new Date().getFullYear() %> Crossword Game Administration</p>
+    </footer>
+    
+    <style>
+        .import-results-summary {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        
+        .results-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .result-stat {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .stat-label {
+            font-weight: bold;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .results-success {
+            color: #2E7D32;
+        }
+        
+        .results-failed {
+            color: #C62828;
+        }
+        
+        .import-success {
+            background-color: #E8F5E9;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border-left: 4px solid #2E7D32;
+        }
+        
+        .import-errors {
+            background-color: #FFEBEE;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border-left: 4px solid #C62828;
+        }
+        
+        .error-list {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+        }
+        
+        .error-item {
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .error-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .import-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            justify-content: center;
+        }
+    </style>
+</body>
+</html>
