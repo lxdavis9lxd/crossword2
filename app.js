@@ -29,15 +29,17 @@ const sequelize = new Sequelize({
 });
 
 // Import models
-const User = require('./models/user');
-const Puzzle = require('./models/puzzle');
-
-// Sync models
-sequelize.sync();
+const db = require('./models');
 
 // Set up routes
 const authRoutes = require('./routes/auth');
 const gameRoutes = require('./routes/game');
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Error occurred:', err);
+  res.status(500).send('Server error: ' + err.message);
+});
 
 app.use('/auth', authRoutes);
 app.use('/game', gameRoutes);
