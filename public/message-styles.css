@@ -1,0 +1,87 @@
+/* Status message styling */
+#status-message {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  padding: 12px 20px;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: none;
+  font-size: 14px;
+  max-width: 80%;
+  opacity: 0.95;
+  transition: all 0.3s ease;
+}
+
+#status-message.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+#status-message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+#status-message.info {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
+/* Improved saved games styling */
+.saved-game-item {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 12px 15px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  list-style-type: none;
+  border-bottom: none !important;
+}
+
+.saved-game-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.saved-game-info h4 {
+  margin: 0 0 5px 0;
+  color: #2E7D32;
+}
+
+.saved-game-info p {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.load-saved-game-btn {
+  background-color: #4CAF50 !important;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s;
+}
+
+.load-saved-game-btn:hover {
+  background-color: #45a049 !important;
+}
+
+.no-saved-games {
+  color: #666;
+  font-style: italic;
+  padding: 10px;
+  text-align: center;
+  list-style-type: none;
+}

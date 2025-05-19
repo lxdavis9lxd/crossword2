@@ -12,7 +12,12 @@ app.use(bodyParser.json());
 app.use(session({
   secret: 'secret-key',
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: true,
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production', // only set secure in production
+    maxAge: 1000 * 60 * 60 * 24 // 24 hours
+  }
 }));
 
 // Serve static files from the public directory
@@ -37,8 +42,33 @@ const gameRoutes = require('./routes/game');
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error('Error occurred:', err);
-  res.status(500).send('Server error: ' + err.message);
+  console.error('Global error handler:', err);
+  
+  // Handle different types of errors
+  if (err.name === 'SequelizeValidationError') {
+    return res.status(400).json({
+      error: 'Validation error',
+      details: err.errors.map(e => e.message)
+    });
+  }
+  
+  if (err.name === 'SequelizeUniqueConstraintError') {
+    return res.status(400).json({
+      error: 'Unique constraint error',
+      details: err.errors.map(e => e.message)
+    });
+  }
+  
+  // If this is an API request, return JSON error
+  if (req.path.startsWith('/api/') || req.accepts('json')) {
+    return res.status(err.status || 500).json({
+      error: 'Server error',
+      message: err.message || 'Something went wrong'
+    });
+  }
+  
+  // For regular requests, show an error page or redirect
+  res.status(err.status || 500).send('Server error: ' + (err.message || 'Something went wrong'));
 });
 
 app.use('/auth', authRoutes);

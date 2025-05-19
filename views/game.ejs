@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crossword Puzzle</title>
     <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/message-styles.css">
+    <% if (typeof user !== 'undefined' && user) { %>
+    <meta name="user-id" content="<%= user.id %>">
+    <% } %>
     <style>
         .crossword-container {
             margin: 20px auto;
@@ -79,6 +83,27 @@
             justify-content: center;
             gap: 10px;
         }
+        
+        .puzzle-metadata {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .puzzle-metadata p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .puzzle-metadata span {
+            font-weight: bold;
+            color: #4CAF50;
+        }
     </style>
 </head>
 <body>
@@ -95,6 +120,14 @@
     <main class="crossword-container">
         <div id="puzzle-info">
             <h2>Loading puzzle...</h2>
+            <% if (typeof puzzleId !== 'undefined') { %>
+            <div class="puzzle-metadata">
+                <p>Puzzle ID: <span id="current-puzzle-id"><%= puzzleId %></span></p>
+                <% if (typeof level !== 'undefined') { %>
+                <p>Difficulty: <span id="current-puzzle-level"><%= level %></span></p>
+                <% } %>
+            </div>
+            <% } %>
         </div>
         
         <div id="crossword-grid" class="crossword-grid">
@@ -155,6 +188,9 @@
                 
                 // Generate clues
                 generateClues(puzzle.clues);
+                
+                // Check for saved progress and load it
+                await loadSavedProgress(puzzleId);
                 
                 // Add event listeners
                 document.getElementById('check-button').addEventListener('click', () => checkAnswers(puzzle.grid));
@@ -304,11 +340,52 @@
             const messageElement = document.getElementById('message');
             messageElement.textContent = message;
             messageElement.className = type;
-            messageElement.style.display = 'block';
-            
-            setTimeout(() => {
+            messageElement.style.display = 'block';                setTimeout(() => {
                 messageElement.style.display = 'none';
             }, 5000);
+        }
+        
+        async function loadSavedProgress(puzzleId) {
+            try {
+                // Get the current user ID from meta tag or session
+                const userId = document.querySelector('meta[name="user-id"]')?.content;
+                if (!userId) {
+                    console.log('No user ID found, cannot load saved progress');
+                    return;
+                }
+                
+                // Fetch the user's progress
+                const response = await fetch(`/game/progress/${userId}`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch saved progress: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                const progress = data.progress || {};
+                
+                // Check if the user has saved progress for this puzzle
+                if (!progress[puzzleId]) {
+                    console.log('No saved progress found for this puzzle');
+                    return;
+                }
+                
+                // Parse the saved progress
+                const savedProgress = JSON.parse(progress[puzzleId]);
+                
+                // Apply the saved progress to the grid
+                const inputs = document.querySelectorAll('.crossword-cell input');
+                inputs.forEach(input => {
+                    const index = input.dataset.index;
+                    if (savedProgress[index]) {
+                        input.value = savedProgress[index];
+                    }
+                });
+                
+                showMessage('Saved progress loaded!', 'success');
+            } catch (error) {
+                console.error('Error loading saved progress:', error);
+                showMessage('Failed to load saved progress', 'error');
+            }
         }
     </script>
 </body>

@@ -41,27 +41,38 @@ router.get('/puzzles/details/:id', async (req, res) => {
 
 // Dashboard route
 router.get('/dashboard', (req, res) => {
-  res.render('dashboard', { user: req.session.user });
+  // The user is already available in res.locals.user thanks to the middleware
+  // but we'll pass it explicitly for clarity as well
+  res.render('dashboard', { 
+    user: req.session.user,
+    pageTitle: 'Crossword Game Dashboard'
+  });
 });
 
 // Save game progress
 router.post('/save', async (req, res) => {
   if (!req.session.user) {
-    return res.status(401).send('Unauthorized');
+    return res.status(401).json({ error: 'Unauthorized' });
   }
 
   const { puzzleId, progress } = req.body;
+  
+  // Validate input
+  if (!puzzleId || !progress) {
+    return res.status(400).json({ error: 'Missing required parameters' });
+  }
+  
   const userId = req.session.user.id;
 
   try {
     const user = await User.findByPk(userId);
     if (!user) {
-      return res.status(404).send('User not found');
+      return res.status(404).json({ error: 'User not found' });
     }
 
     const puzzle = await Puzzle.findByPk(puzzleId);
     if (!puzzle) {
-      return res.status(404).send('Puzzle not found');
+      return res.status(404).json({ error: 'Puzzle not found' });
     }
 
     // For simplicity, we're saving progress in the user model
@@ -77,29 +88,48 @@ router.post('/save', async (req, res) => {
       fields: ['progress']
     });
 
-    res.status(200).send('Game progress saved');
+    res.status(200).json({ success: true, message: 'Game progress saved' });
   } catch (error) {
     console.error('Error saving game progress:', error);
-    res.status(500).send('Server error');
+    res.status(500).json({ error: 'Server error', details: error.message });
   }
 });
 
 // Retrieve saved game progress
 router.get('/progress/:userId', async (req, res) => {
   const { userId } = req.params;
+  
+  // Validate user authorization - users can only access their own progress
+  if (!req.session.user || req.session.user.id !== parseInt(userId)) {
+    return res.status(403).json({ error: 'Forbidden: You can only access your own progress' });
+  }
 
   try {
     const user = await User.findByPk(userId);
     if (!user) {
-      return res.status(404).send('User not found');
+      return res.status(404).json({ error: 'User not found' });
     }
 
-    // Retrieve game progress (this is a placeholder, implement actual retrieval logic)
+    // Retrieve game progress
     const progress = user.progress;
+    
+    // Format the response data with additional metadata
+    const formattedProgress = {};
+    
+    // If there's no progress, return an empty object
+    if (!progress || Object.keys(progress).length === 0) {
+      return res.json({ progress: {} });
+    }
+    
+    // For each saved game, add a timestamp
+    for (const puzzleId in progress) {
+      formattedProgress[puzzleId] = progress[puzzleId];
+    }
 
-    res.json({ progress });
+    res.json({ progress: formattedProgress });
   } catch (error) {
-    res.status(500).send('Server error');
+    console.error('Error retrieving game progress:', error);
+    res.status(500).json({ error: 'Server error', details: error.message });
   }
 });
 
@@ -122,8 +152,12 @@ router.get('/', async (req, res) => {
     // Store the current puzzle in the session
     req.session.currentPuzzle = puzzle.id;
     
-    // Pass the puzzle ID to the game page
-    res.render('game', { puzzleId: puzzle.id, level: puzzle.level });
+    // Pass the puzzle ID and user to the game page
+    res.render('game', { 
+      puzzleId: puzzle.id, 
+      level: puzzle.level,
+      user: req.session.user 
+    });
   } catch (error) {
     console.error('Error loading game:', error);
     res.status(500).send('Server error');

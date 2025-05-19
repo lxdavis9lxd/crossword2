@@ -4,6 +4,8 @@
  */
 function isAuthenticated(req, res, next) {
   if (req.session && req.session.user) {
+    // Make the user object available to views
+    res.locals.user = req.session.user;
     return next();
   }
   
@@ -17,6 +19,7 @@ function isAuthenticated(req, res, next) {
  */
 function isAuthenticatedApi(req, res, next) {
   if (req.session && req.session.user) {
+    res.locals.user = req.session.user;
     return next();
   }
   
