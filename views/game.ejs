@@ -243,7 +243,8 @@
                 document.querySelector('#puzzle-info .puzzle-description').textContent = description;
                 
                 // Generate grid
-                generateGrid(puzzle.grid, puzzle.cellNumbers);
+                // Handle puzzles that may not have cellNumbers property
+                generateGrid(puzzle.grid, puzzle.cellNumbers || {});
                 
                 // Generate clues
                 generateClues(puzzle.clues);
@@ -278,7 +279,7 @@
                 const cellElement = document.createElement('div');
                 cellElement.classList.add('crossword-cell');
                 
-                if (cell === '#') {
+                if (cell === '#' || cell === '.') {
                     cellElement.classList.add('blocked');
                 } else {
                     const input = document.createElement('input');
@@ -293,8 +294,8 @@
                     input.style.textTransform = 'uppercase';
                     cellElement.appendChild(input);
                     
-                    // Add cell number if exists
-                    if (cellNumbers[index]) {
+                    // Add cell number if cellNumbers exists and has a value for this index
+                    if (cellNumbers && cellNumbers[index]) {
                         const numberElement = document.createElement('span');
                         numberElement.classList.add('cell-number');
                         numberElement.textContent = cellNumbers[index];
