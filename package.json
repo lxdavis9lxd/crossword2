@@ -12,7 +12,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios-cookiejar-support": "^6.0.2",
     "bcrypt": "^6.0.0",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
@@ -23,12 +22,13 @@
     "querystring": "^0.2.1",
     "sequelize": "^6.37.7",
     "sqlite3": "^5.1.7",
-    "tough-cookie": "^5.1.2",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "axios": "^1.9.0",
+    "axios-cookiejar-support": "^6.0.2",
     "cheerio": "^1.0.0",
-    "puppeteer": "^24.8.2"
+    "puppeteer": "^24.8.2",
+    "tough-cookie": "^5.1.2"
   }
 }

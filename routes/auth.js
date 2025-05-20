@@ -57,7 +57,11 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   const { emailOrUsername, password } = req.body;
 
-  console.log('Login attempt:', { emailOrUsername });
+  // Debug logging - show exactly what was received
+  console.log('Login attempt with exactly these values:');
+  console.log('- emailOrUsername:', JSON.stringify(emailOrUsername));
+  console.log('- password:', password ? '[PROVIDED]' : '[MISSING]');
+  console.log('- Full request body:', JSON.stringify(req.body));
 
   // Validate form data
   if (!emailOrUsername || !password) {

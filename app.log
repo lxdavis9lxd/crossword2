@@ -318,3 +318,88 @@ Executing (default): SELECT count(*) AS `count` FROM `Puzzles` AS `Puzzle` WHERE
 Executing (default): SELECT count(*) AS `count` FROM `Puzzles` AS `Puzzle` WHERE `Puzzle`.`level` = 'advanced';
 Executing (default): SELECT `id`, `title`, `level`, `difficultyRating`, `createdAt` FROM `Puzzles` AS `Puzzle`;
 Executing (default): SELECT `id`, `level`, `title`, `description`, `difficultyRating`, `puzzleData`, `createdAt`, `updatedAt` FROM `Puzzles` AS `Puzzle` WHERE `Puzzle`.`id` = 'create';
+Executing (default): SELECT `id`, `level`, `title`, `description`, `difficultyRating`, `puzzleData`, `createdAt`, `updatedAt` FROM `Puzzles` AS `Puzzle` WHERE `Puzzle`.`id` = 'create';
+Executing (default): SELECT `id`, `username`, `email`, `password`, `role`, `isActive`, `progress`, `completedPuzzles`, `createdAt`, `updatedAt` FROM `Users` AS `User` WHERE `User`.`id` = '13';
+Raw progress from user model: {}
+User ID: 13
+Progress type: object
+Login attempt: { emailOrUsername: 'admin' }
+Looking for user with email/username: admin
+Executing (default): SELECT `id`, `username`, `email`, `password`, `role`, `isActive`, `progress`, `completedPuzzles`, `createdAt`, `updatedAt` FROM `Users` AS `User` WHERE (`User`.`email` = 'admin' OR `User`.`username` = 'admin') LIMIT 1;
+User found: { id: 13, username: 'admin', role: 'admin' }
+Comparing passwords...
+Password match: true
+Setting user session...
+Session set: {
+  id: 13,
+  username: 'admin',
+  email: 'admin@example.com',
+  role: 'admin'
+}
+Redirecting to dashboard...
+Executing (default): SELECT `id`, `username`, `email`, `password`, `role`, `isActive`, `progress`, `completedPuzzles`, `createdAt`, `updatedAt` FROM `Users` AS `User` WHERE `User`.`id` = '13';
+Raw progress from user model: {}
+User ID: 13
+Progress type: object
+Executing (default): SELECT count(*) AS `count` FROM `Users` AS `User`;
+Executing (default): SELECT count(*) AS `count` FROM `Puzzles` AS `Puzzle`;
+Executing (default): SELECT count(*) AS `count` FROM `Users` AS `User` WHERE `User`.`role` = 'admin';
+Executing (default): SELECT count(*) AS `count` FROM `Puzzles` AS `Puzzle` WHERE `Puzzle`.`level` = 'easy';
+Executing (default): SELECT count(*) AS `count` FROM `Puzzles` AS `Puzzle` WHERE `Puzzle`.`level` = 'intermediate';
+Executing (default): SELECT count(*) AS `count` FROM `Puzzles` AS `Puzzle` WHERE `Puzzle`.`level` = 'advanced';
+Executing (default): SELECT `id`, `title`, `level`, `difficultyRating`, `createdAt` FROM `Puzzles` AS `Puzzle`;
+Executing (default): SELECT `id`, `level`, `title`, `description`, `difficultyRating`, `puzzleData`, `createdAt`, `updatedAt` FROM `Puzzles` AS `Puzzle` WHERE `Puzzle`.`id` = 'create';
+Login attempt: { emailOrUsername: undefined }
+Missing fields: { emailOrUsername: false, password: true }
+Login attempt: { emailOrUsername: undefined }
+Missing fields: { emailOrUsername: false, password: true }
+Login attempt: { emailOrUsername: undefined }
+Missing fields: { emailOrUsername: false, password: true }
+Login attempt: { emailOrUsername: undefined }
+Missing fields: { emailOrUsername: false, password: true }
+Login attempt: { emailOrUsername: undefined }
+Missing fields: { emailOrUsername: false, password: true }
+Login attempt: { emailOrUsername: undefined }
+Missing fields: { emailOrUsername: false, password: true }
+Login attempt: { emailOrUsername: 'admin@example.com' }
+Looking for user with email/username: admin@example.com
+Executing (default): SELECT `id`, `username`, `email`, `password`, `role`, `isActive`, `progress`, `completedPuzzles`, `createdAt`, `updatedAt` FROM `Users` AS `User` WHERE (`User`.`email` = 'admin@example.com' OR `User`.`username` = 'admin@example.com') LIMIT 1;
+User found: { id: 13, username: 'admin', role: 'admin' }
+Comparing passwords...
+Password match: true
+Setting user session...
+Session set: {
+  id: 13,
+  username: 'admin',
+  email: 'admin@example.com',
+  role: 'admin'
+}
+Redirecting to dashboard...
+Login attempt: { emailOrUsername: 'admin@example.com' }
+Looking for user with email/username: admin@example.com
+Executing (default): SELECT `id`, `username`, `email`, `password`, `role`, `isActive`, `progress`, `completedPuzzles`, `createdAt`, `updatedAt` FROM `Users` AS `User` WHERE (`User`.`email` = 'admin@example.com' OR `User`.`username` = 'admin@example.com') LIMIT 1;
+User found: { id: 13, username: 'admin', role: 'admin' }
+Comparing passwords...
+Password match: true
+Setting user session...
+Session set: {
+  id: 13,
+  username: 'admin',
+  email: 'admin@example.com',
+  role: 'admin'
+}
+Redirecting to dashboard...
+Login attempt: { emailOrUsername: 'admin@example.com' }
+Looking for user with email/username: admin@example.com
+Executing (default): SELECT `id`, `username`, `email`, `password`, `role`, `isActive`, `progress`, `completedPuzzles`, `createdAt`, `updatedAt` FROM `Users` AS `User` WHERE (`User`.`email` = 'admin@example.com' OR `User`.`username` = 'admin@example.com') LIMIT 1;
+User found: { id: 13, username: 'admin', role: 'admin' }
+Comparing passwords...
+Password match: true
+Setting user session...
+Session set: {
+  id: 13,
+  username: 'admin',
+  email: 'admin@example.com',
+  role: 'admin'
+}
+Redirecting to dashboard...
