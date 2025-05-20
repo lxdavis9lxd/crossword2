@@ -250,59 +250,56 @@
                 createGrid(gridSize);
             });
             
-            // Event listener for form submission
+            // Add form submit handler to ensure data is prepared correctly
             document.getElementById('createPuzzleForm').addEventListener('submit', function(e) {
-                // Gather grid data
-                const gridData = [];
-                const cells = document.querySelectorAll('.grid-cell');
-                cells.forEach(cell => {
-                    if (cell.classList.contains('black')) {
-                        gridData.push('.');
-                    } else {
-                        const input = cell.querySelector('input');
-                        gridData.push(input.value.toUpperCase() || ' ');
-                    }
-                });
+                e.preventDefault();
                 
-                // Gather clues data
-                const acrossCluesData = {};
-                const acrossInputs = document.querySelectorAll('.across-clue');
-                acrossInputs.forEach(input => {
-                    const number = input.dataset.number;
-                    const text = input.value.trim();
-                    if (text) {
-                        acrossCluesData[number] = text;
+                // Prepare grid data
+                const gridArray = [];
+                for (let row = 0; row < gridSize; row++) {
+                    for (let col = 0; col < gridSize; col++) {
+                        const index = row * gridSize + col;
+                        const cell = grid[index];
+                        
+                        if (cell.classList.contains('black')) {
+                            gridArray.push('.');
+                        } else {
+                            const input = cell.querySelector('input');
+                            gridArray.push(input ? input.value.toUpperCase() || ' ' : ' ');
+                        }
                     }
-                });
+                }
                 
-                const downCluesData = {};
-                const downInputs = document.querySelectorAll('.down-clue');
-                downInputs.forEach(input => {
-                    const number = input.dataset.number;
-                    const text = input.value.trim();
-                    if (text) {
-                        downCluesData[number] = text;
-                    }
-                });
+                // Convert acrossClues and downClues objects to arrays with number and clue properties
+                const acrossCluesArray = Object.keys(acrossClues).map(number => ({
+                    number: parseInt(number),
+                    clue: acrossClues[number] || ''
+                }));
                 
-                // Set the hidden fields
-                document.getElementById('gridData').value = JSON.stringify(gridData);
-                document.getElementById('acrossClues').value = JSON.stringify(acrossCluesData);
-                document.getElementById('downClues').value = JSON.stringify(downCluesData);
+                const downCluesArray = Object.keys(downClues).map(number => ({
+                    number: parseInt(number),
+                    clue: downClues[number] || ''
+                }));
+                
+                // Update hidden inputs
+                document.getElementById('gridData').value = JSON.stringify(gridArray);
+                document.getElementById('acrossClues').value = JSON.stringify(acrossCluesArray);
+                document.getElementById('downClues').value = JSON.stringify(downCluesArray);
                 
                 // Validate that the grid has letters
-                if (gridData.every(cell => cell === ' ' || cell === '.')) {
+                if (gridArray.every(cell => cell === ' ' || cell === '.')) {
                     alert('The grid must have at least one letter');
-                    e.preventDefault();
                     return false;
                 }
                 
                 // Validate that there are clues
-                if (Object.keys(acrossCluesData).length === 0 || Object.keys(downCluesData).length === 0) {
+                if (acrossCluesArray.length === 0 || downCluesArray.length === 0) {
                     alert('You must provide at least one across clue and one down clue');
-                    e.preventDefault();
                     return false;
                 }
+                
+                // Submit the form
+                this.submit();
             });
             
             // Function to create the grid
@@ -453,6 +450,12 @@
                     clueInput.dataset.number = number;
                     clueInput.value = acrossClues[number] || '';
                     
+                    // Add event listener for clue updates
+                    clueInput.addEventListener('input', function() {
+                        acrossClues[this.dataset.number] = this.value;
+                        updateHiddenInputs();
+                    });
+                    
                     clueItem.appendChild(clueNumber);
                     clueItem.appendChild(clueInput);
                     acrossContainer.appendChild(clueItem);
@@ -474,10 +477,35 @@
                     clueInput.dataset.number = number;
                     clueInput.value = downClues[number] || '';
                     
+                    // Add event listener for clue updates
+                    clueInput.addEventListener('input', function() {
+                        downClues[this.dataset.number] = this.value;
+                        updateHiddenInputs();
+                    });
+                    
                     clueItem.appendChild(clueNumber);
                     clueItem.appendChild(clueInput);
                     downContainer.appendChild(clueItem);
                 }
+                
+                // Update hidden inputs with current clue data
+                updateHiddenInputs();
+            }
+            
+            // Function to update hidden form inputs with current clue data
+            function updateHiddenInputs() {
+                const acrossCluesArray = Object.keys(acrossClues).map(number => ({
+                    number: parseInt(number),
+                    clue: acrossClues[number] || ''
+                }));
+                
+                const downCluesArray = Object.keys(downClues).map(number => ({
+                    number: parseInt(number),
+                    clue: downClues[number] || ''
+                }));
+                
+                document.getElementById('acrossClues').value = JSON.stringify(acrossCluesArray);
+                document.getElementById('downClues').value = JSON.stringify(downCluesArray);
             }
         });
     </script>

@@ -208,8 +208,31 @@ router.get('/', async (req, res) => {
     // Parse the puzzle data to get theme and description
     const puzzleData = JSON.parse(puzzle.puzzleData);
     const title = puzzleData.title || `Puzzle #${puzzle.id}`;
+    
+    // Handle both array and object formats for clues
+    let acrossCluesCount = 0;
+    let downCluesCount = 0;
+    
+    if (puzzleData.clues) {
+      if (puzzleData.clues.across) {
+        if (Array.isArray(puzzleData.clues.across)) {
+          acrossCluesCount = puzzleData.clues.across.length;
+        } else if (typeof puzzleData.clues.across === 'object') {
+          acrossCluesCount = Object.keys(puzzleData.clues.across).length;
+        }
+      }
+      
+      if (puzzleData.clues.down) {
+        if (Array.isArray(puzzleData.clues.down)) {
+          downCluesCount = puzzleData.clues.down.length;
+        } else if (typeof puzzleData.clues.down === 'object') {
+          downCluesCount = Object.keys(puzzleData.clues.down).length;
+        }
+      }
+    }
+    
     const description = puzzleData.description || 
-      `A ${puzzle.level} level crossword puzzle with ${puzzleData.clues.across.length} across and ${puzzleData.clues.down.length} down clues.`;
+      `A ${puzzle.level} level crossword puzzle with ${acrossCluesCount} across and ${downCluesCount} down clues.`;
     
     // Store the current puzzle in the session
     req.session.currentPuzzle = puzzle.id;

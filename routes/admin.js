@@ -305,15 +305,15 @@ router.post('/puzzles/create', async (req, res) => {
     const gridArray = JSON.parse(gridData);
     
     // Parse clues
-    const acrossCluesObj = JSON.parse(acrossClues);
-    const downCluesObj = JSON.parse(downClues);
+    const acrossCluesArray = JSON.parse(acrossClues);
+    const downCluesArray = JSON.parse(downClues);
     
     // Construct puzzle data
     const puzzleData = {
       grid: gridArray,
       clues: {
-        across: acrossCluesObj,
-        down: downCluesObj
+        across: acrossCluesArray,
+        down: downCluesArray
       }
     };
     

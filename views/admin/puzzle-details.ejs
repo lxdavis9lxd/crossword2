@@ -83,13 +83,31 @@
                 <div class="clues-section">
                     <h3>Across Clues</h3>
                     <ul class="clue-list">
-                        <% if (puzzleData.clues && puzzleData.clues.across && puzzleData.clues.across.length > 0) { %>
-                            <% puzzleData.clues.across.sort((a, b) => a.number - b.number).forEach(clue => { %>
-                                <li class="clue-item">
-                                    <span class="clue-number"><%= clue.number %>.</span>
-                                    <span class="clue-text"><%= clue.clue %></span>
-                                </li>
-                            <% }); %>
+                        <% if (puzzleData.clues && puzzleData.clues.across) { %>
+                            <% 
+                            // Handle both array format and object format for clues
+                            let acrossClues = [];
+                            if (Array.isArray(puzzleData.clues.across)) {
+                                acrossClues = puzzleData.clues.across.sort((a, b) => a.number - b.number);
+                            } else {
+                                // Convert object format to array format
+                                acrossClues = Object.keys(puzzleData.clues.across).map(key => ({
+                                    number: parseInt(key),
+                                    clue: puzzleData.clues.across[key]
+                                })).sort((a, b) => a.number - b.number);
+                            }
+                            %>
+                            
+                            <% if (acrossClues.length > 0) { %>
+                                <% acrossClues.forEach(clue => { %>
+                                    <li class="clue-item">
+                                        <span class="clue-number"><%= clue.number %>.</span>
+                                        <span class="clue-text"><%= clue.clue %></span>
+                                    </li>
+                                <% }); %>
+                            <% } else { %>
+                                <li class="no-clues">No across clues available.</li>
+                            <% } %>
                         <% } else { %>
                             <li class="no-clues">No across clues available.</li>
                         <% } %>
@@ -99,13 +117,31 @@
                 <div class="clues-section">
                     <h3>Down Clues</h3>
                     <ul class="clue-list">
-                        <% if (puzzleData.clues && puzzleData.clues.down && puzzleData.clues.down.length > 0) { %>
-                            <% puzzleData.clues.down.sort((a, b) => a.number - b.number).forEach(clue => { %>
-                                <li class="clue-item">
-                                    <span class="clue-number"><%= clue.number %>.</span>
-                                    <span class="clue-text"><%= clue.clue %></span>
-                                </li>
-                            <% }); %>
+                        <% if (puzzleData.clues && puzzleData.clues.down) { %>
+                            <% 
+                            // Handle both array format and object format for clues
+                            let downClues = [];
+                            if (Array.isArray(puzzleData.clues.down)) {
+                                downClues = puzzleData.clues.down.sort((a, b) => a.number - b.number);
+                            } else {
+                                // Convert object format to array format
+                                downClues = Object.keys(puzzleData.clues.down).map(key => ({
+                                    number: parseInt(key),
+                                    clue: puzzleData.clues.down[key]
+                                })).sort((a, b) => a.number - b.number);
+                            }
+                            %>
+                            
+                            <% if (downClues.length > 0) { %>
+                                <% downClues.forEach(clue => { %>
+                                    <li class="clue-item">
+                                        <span class="clue-number"><%= clue.number %>.</span>
+                                        <span class="clue-text"><%= clue.clue %></span>
+                                    </li>
+                                <% }); %>
+                            <% } else { %>
+                                <li class="no-clues">No down clues available.</li>
+                            <% } %>
                         <% } else { %>
                             <li class="no-clues">No down clues available.</li>
                         <% } %>
@@ -307,16 +343,36 @@
             
             // Determine cell numbers based on across and down clues
             if (puzzleData.clues) {
+                // Handle across clues
                 if (puzzleData.clues.across) {
-                    puzzleData.clues.across.forEach(clue => {
-                        cellNumbers[clue.number] = true;
-                    });
+                    // Handle both array and object formats
+                    if (Array.isArray(puzzleData.clues.across)) {
+                        // Array format
+                        puzzleData.clues.across.forEach(clue => {
+                            cellNumbers[clue.number] = true;
+                        });
+                    } else {
+                        // Object format
+                        Object.keys(puzzleData.clues.across).forEach(number => {
+                            cellNumbers[parseInt(number)] = true;
+                        });
+                    }
                 }
                 
+                // Handle down clues
                 if (puzzleData.clues.down) {
-                    puzzleData.clues.down.forEach(clue => {
-                        cellNumbers[clue.number] = true;
-                    });
+                    // Handle both array and object formats
+                    if (Array.isArray(puzzleData.clues.down)) {
+                        // Array format
+                        puzzleData.clues.down.forEach(clue => {
+                            cellNumbers[clue.number] = true;
+                        });
+                    } else {
+                        // Object format
+                        Object.keys(puzzleData.clues.down).forEach(number => {
+                            cellNumbers[parseInt(number)] = true;
+                        });
+                    }
                 }
             }
             

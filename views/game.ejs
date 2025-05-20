@@ -313,17 +313,39 @@
             acrossContainer.innerHTML = '';
             downContainer.innerHTML = '';
             
-            clues.across.forEach(clue => {
-                const clueElement = document.createElement('li');
-                clueElement.textContent = `${clue.number}. ${clue.clue}`;
-                acrossContainer.appendChild(clueElement);
-            });
+            // Handle across clues - supporting both array and object formats
+            if (Array.isArray(clues.across)) {
+                // Array format (newer format)
+                clues.across.forEach(clue => {
+                    const clueElement = document.createElement('li');
+                    clueElement.textContent = `${clue.number}. ${clue.clue}`;
+                    acrossContainer.appendChild(clueElement);
+                });
+            } else if (typeof clues.across === 'object') {
+                // Object format (older format)
+                Object.keys(clues.across).forEach(number => {
+                    const clueElement = document.createElement('li');
+                    clueElement.textContent = `${number}. ${clues.across[number]}`;
+                    acrossContainer.appendChild(clueElement);
+                });
+            }
             
-            clues.down.forEach(clue => {
-                const clueElement = document.createElement('li');
-                clueElement.textContent = `${clue.number}. ${clue.clue}`;
-                downContainer.appendChild(clueElement);
-            });
+            // Handle down clues - supporting both array and object formats
+            if (Array.isArray(clues.down)) {
+                // Array format (newer format)
+                clues.down.forEach(clue => {
+                    const clueElement = document.createElement('li');
+                    clueElement.textContent = `${clue.number}. ${clue.clue}`;
+                    downContainer.appendChild(clueElement);
+                });
+            } else if (typeof clues.down === 'object') {
+                // Object format (older format)
+                Object.keys(clues.down).forEach(number => {
+                    const clueElement = document.createElement('li');
+                    clueElement.textContent = `${number}. ${clues.down[number]}`;
+                    downContainer.appendChild(clueElement);
+                });
+            }
         }
         
         function checkAnswers(grid) {
