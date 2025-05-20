@@ -37,6 +37,7 @@
    - Viewing puzzle list
    - Puzzle details
    - Create/edit puzzles
+   - Interactive puzzle creation with grid editor and clues management
 
 4. **Import/Export Functionality**
    - Import puzzles from Excel files (.xlsx and .xls formats)

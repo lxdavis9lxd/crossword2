@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Puzzle - Admin</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/admin-styles.css">
+    <style>
+        .grid-editor {
+            margin: 20px 0;
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        
+        .grid-container {
+            display: grid;
+            gap: 2px;
+            margin: 20px 0;
+            width: fit-content;
+        }
+        
+        .grid-cell {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            text-transform: uppercase;
+            background-color: white;
+            border: 1px solid #ddd;
+            position: relative;
+        }
+        
+        .grid-cell.black {
+            background-color: #333;
+        }
+        
+        .grid-cell .number {
+            position: absolute;
+            top: 1px;
+            left: 2px;
+            font-size: 10px;
+            font-weight: normal;
+            color: #666;
+        }
+        
+        .cell-input {
+            width: 25px;
+            height: 25px;
+            text-align: center;
+            font-size: 18px;
+            border: none;
+            text-transform: uppercase;
+            background: transparent;
+        }
+        
+        .black-cell {
+            background-color: #333;
+            pointer-events: none;
+        }
+        
+        .clues-editor {
+            margin: 20px 0;
+            display: flex;
+            gap: 20px;
+        }
+        
+        .clues-list {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .clue-item {
+            margin-bottom: 10px;
+            display: flex;
+        }
+        
+        .clue-number {
+            width: 40px;
+            font-weight: bold;
+        }
+        
+        .clue-text {
+            flex: 1;
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        
+        .grid-controls {
+            margin-bottom: 20px;
+        }
+        
+        .grid-controls button {
+            margin-right: 10px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="admin-body">
+    <header class="admin-header">
+        <h1>Create New Puzzle</h1>
+        <nav>
+            <ul>
+                <li><a href="/admin">Dashboard</a></li>
+                <li><a href="/admin/users">Users</a></li>
+                <li><a href="/admin/puzzles" class="active">Puzzles</a></li>
+                <li><a href="/admin/import-puzzles">Import Puzzles</a></li>
+                <li><a href="/game/dashboard">Game Dashboard</a></li>
+                <li><a href="/auth/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main class="admin-main">
+        <section class="admin-content">
+            <div class="breadcrumb">
+                <a href="/admin/puzzles">Puzzles</a> &raquo; Create New Puzzle
+            </div>
+            
+            <% if (typeof error !== 'undefined') { %>
+                <div class="message error">
+                    <%= error %>
+                </div>
+            <% } %>
+            
+            <form action="/admin/puzzles/create" method="POST" id="createPuzzleForm">
+                <div class="form-group">
+                    <label for="title">Puzzle Title</label>
+                    <input type="text" id="title" name="title" class="form-control" placeholder="Enter a title for this puzzle" value="<%= typeof formData !== 'undefined' ? formData.title || '' : '' %>">
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" class="form-control" placeholder="Enter a description for this puzzle"><%= typeof formData !== 'undefined' ? formData.description || '' : '' %></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="level">Difficulty Level <span class="required">*</span></label>
+                        <select id="level" name="level" class="form-control" required>
+                            <option value="">Select Level</option>
+                            <option value="easy" <%= typeof formData !== 'undefined' && formData.level === 'easy' ? 'selected' : '' %>>Easy</option>
+                            <option value="intermediate" <%= typeof formData !== 'undefined' && formData.level === 'intermediate' ? 'selected' : '' %>>Intermediate</option>
+                            <option value="advanced" <%= typeof formData !== 'undefined' && formData.level === 'advanced' ? 'selected' : '' %>>Advanced</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group half">
+                        <label for="difficultyRating">Difficulty Rating (1-5)</label>
+                        <input type="number" id="difficultyRating" name="difficultyRating" class="form-control" min="1" max="5" value="<%= typeof formData !== 'undefined' ? formData.difficultyRating || '3' : '3' %>">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="gridSize">Grid Size <span class="required">*</span></label>
+                    <select id="gridSize" name="gridSize" class="form-control" required>
+                        <option value="4" <%= typeof formData !== 'undefined' && formData.gridSize === '4' ? 'selected' : '' %>>4×4</option>
+                        <option value="5" <%= typeof formData !== 'undefined' && formData.gridSize === '5' ? 'selected' : '' %>>5×5</option>
+                        <option value="6" <%= typeof formData !== 'undefined' && formData.gridSize === '6' ? 'selected' : '' %>>6×6</option>
+                        <option value="7" <%= typeof formData !== 'undefined' && formData.gridSize === '7' ? 'selected' : '' %>>7×7</option>
+                        <option value="8" <%= typeof formData !== 'undefined' && formData.gridSize === '8' ? 'selected' : '' %>>8×8</option>
+                        <option value="9" <%= typeof formData !== 'undefined' && formData.gridSize === '9' ? 'selected' : '' %>>9×9</option>
+                        <option value="10" <%= typeof formData !== 'undefined' && formData.gridSize === '10' ? 'selected' : '' %>>10×10</option>
+                        <option value="11" <%= typeof formData !== 'undefined' && formData.gridSize === '11' ? 'selected' : '' %>>11×11</option>
+                        <option value="12" <%= typeof formData !== 'undefined' && formData.gridSize === '12' ? 'selected' : '' %>>12×12</option>
+                        <option value="13" <%= typeof formData !== 'undefined' && formData.gridSize === '13' ? 'selected' : '' %>>13×13</option>
+                        <option value="14" <%= typeof formData !== 'undefined' && formData.gridSize === '14' ? 'selected' : '' %>>14×14</option>
+                        <option value="15" <%= typeof formData !== 'undefined' && formData.gridSize === '15' ? 'selected' : '' %>>15×15</option>
+                    </select>
+                </div>
+                
+                <div class="grid-editor">
+                    <h3>Grid Editor</h3>
+                    <p>Left-click a cell to type a letter. Right-click to toggle a black square.</p>
+                    
+                    <div class="grid-controls">
+                        <button type="button" id="autoNumber" class="admin-button secondary">Auto-Number Grid</button>
+                        <button type="button" id="clearGrid" class="admin-button secondary">Clear Grid</button>
+                    </div>
+                    
+                    <div id="gridContainer" class="grid-container"></div>
+                    
+                    <!-- Hidden field to store grid data -->
+                    <input type="hidden" id="gridData" name="gridData" required>
+                </div>
+                
+                <div class="clues-editor">
+                    <div class="clues-list">
+                        <h3>Across Clues</h3>
+                        <div id="acrossCluesContainer"></div>
+                        <!-- Hidden field to store across clues -->
+                        <input type="hidden" id="acrossClues" name="acrossClues" required>
+                    </div>
+                    
+                    <div class="clues-list">
+                        <h3>Down Clues</h3>
+                        <div id="downCluesContainer"></div>
+                        <!-- Hidden field to store down clues -->
+                        <input type="hidden" id="downClues" name="downClues" required>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <a href="/admin/puzzles" class="admin-button secondary">Cancel</a>
+                    <button type="submit" class="admin-button primary">Create Puzzle</button>
+                </div>
+            </form>
+        </section>
+    </main>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize variables
+            let gridSize = parseInt(document.getElementById('gridSize').value);
+            let grid = [];
+            let cellNumbers = {};
+            let acrossClues = {};
+            let downClues = {};
+            
+            // Create initial grid
+            createGrid(gridSize);
+            
+            // Event listener for grid size change
+            document.getElementById('gridSize').addEventListener('change', function() {
+                gridSize = parseInt(this.value);
+                createGrid(gridSize);
+            });
+            
+            // Event listener for auto-numbering
+            document.getElementById('autoNumber').addEventListener('click', function() {
+                autoNumberGrid();
+                updateCluesForm();
+            });
+            
+            // Event listener for clearing grid
+            document.getElementById('clearGrid').addEventListener('click', function() {
+                createGrid(gridSize);
+            });
+            
+            // Event listener for form submission
+            document.getElementById('createPuzzleForm').addEventListener('submit', function(e) {
+                // Gather grid data
+                const gridData = [];
+                const cells = document.querySelectorAll('.grid-cell');
+                cells.forEach(cell => {
+                    if (cell.classList.contains('black')) {
+                        gridData.push('.');
+                    } else {
+                        const input = cell.querySelector('input');
+                        gridData.push(input.value.toUpperCase() || ' ');
+                    }
+                });
+                
+                // Gather clues data
+                const acrossCluesData = {};
+                const acrossInputs = document.querySelectorAll('.across-clue');
+                acrossInputs.forEach(input => {
+                    const number = input.dataset.number;
+                    const text = input.value.trim();
+                    if (text) {
+                        acrossCluesData[number] = text;
+                    }
+                });
+                
+                const downCluesData = {};
+                const downInputs = document.querySelectorAll('.down-clue');
+                downInputs.forEach(input => {
+                    const number = input.dataset.number;
+                    const text = input.value.trim();
+                    if (text) {
+                        downCluesData[number] = text;
+                    }
+                });
+                
+                // Set the hidden fields
+                document.getElementById('gridData').value = JSON.stringify(gridData);
+                document.getElementById('acrossClues').value = JSON.stringify(acrossCluesData);
+                document.getElementById('downClues').value = JSON.stringify(downCluesData);
+                
+                // Validate that the grid has letters
+                if (gridData.every(cell => cell === ' ' || cell === '.')) {
+                    alert('The grid must have at least one letter');
+                    e.preventDefault();
+                    return false;
+                }
+                
+                // Validate that there are clues
+                if (Object.keys(acrossCluesData).length === 0 || Object.keys(downCluesData).length === 0) {
+                    alert('You must provide at least one across clue and one down clue');
+                    e.preventDefault();
+                    return false;
+                }
+            });
+            
+            // Function to create the grid
+            function createGrid(size) {
+                const container = document.getElementById('gridContainer');
+                container.innerHTML = '';
+                container.style.gridTemplateColumns = `repeat(${size}, 40px)`;
+                
+                grid = [];
+                cellNumbers = {};
+                acrossClues = {};
+                downClues = {};
+                
+                for (let row = 0; row < size; row++) {
+                    for (let col = 0; col < size; col++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'grid-cell';
+                        cell.dataset.row = row;
+                        cell.dataset.col = col;
+                        
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.className = 'cell-input';
+                        input.maxLength = 1;
+                        input.dataset.row = row;
+                        input.dataset.col = col;
+                        
+                        input.addEventListener('input', function() {
+                            this.value = this.value.toUpperCase();
+                        });
+                        
+                        cell.appendChild(input);
+                        
+                        // Right-click to toggle black square
+                        cell.addEventListener('contextmenu', function(e) {
+                            e.preventDefault();
+                            this.classList.toggle('black');
+                            const input = this.querySelector('input');
+                            if (this.classList.contains('black')) {
+                                input.disabled = true;
+                                input.value = '';
+                            } else {
+                                input.disabled = false;
+                            }
+                            
+                            // Re-number the grid
+                            autoNumberGrid();
+                            updateCluesForm();
+                        });
+                        
+                        container.appendChild(cell);
+                        grid.push(cell);
+                    }
+                }
+            }
+            
+            // Function to auto-number the grid
+            function autoNumberGrid() {
+                // Clear existing numbers
+                const numElements = document.querySelectorAll('.number');
+                numElements.forEach(el => el.remove());
+                
+                cellNumbers = {};
+                acrossClues = {};
+                downClues = {};
+                
+                let number = 1;
+                
+                for (let row = 0; row < gridSize; row++) {
+                    for (let col = 0; col < gridSize; col++) {
+                        const index = row * gridSize + col;
+                        const cell = grid[index];
+                        
+                        // Skip black cells
+                        if (cell.classList.contains('black')) {
+                            continue;
+                        }
+                        
+                        let isAcrossStart = false;
+                        let isDownStart = false;
+                        
+                        // Check if this is the start of an across word
+                        if (col === 0 || isBlackCell(row, col - 1)) {
+                            // Make sure there's at least one cell to the right
+                            if (col < gridSize - 1 && !isBlackCell(row, col + 1)) {
+                                isAcrossStart = true;
+                                acrossClues[number] = '';
+                            }
+                        }
+                        
+                        // Check if this is the start of a down word
+                        if (row === 0 || isBlackCell(row - 1, col)) {
+                            // Make sure there's at least one cell below
+                            if (row < gridSize - 1 && !isBlackCell(row + 1, col)) {
+                                isDownStart = true;
+                                downClues[number] = '';
+                            }
+                        }
+                        
+                        // If this is a start of a word, add the number
+                        if (isAcrossStart || isDownStart) {
+                            cellNumbers[`${row},${col}`] = number;
+                            
+                            const numberElement = document.createElement('div');
+                            numberElement.className = 'number';
+                            numberElement.textContent = number;
+                            cell.appendChild(numberElement);
+                            
+                            number++;
+                        }
+                    }
+                }
+                
+                updateCluesForm();
+            }
+            
+            // Helper function to check if a cell is black
+            function isBlackCell(row, col) {
+                if (row < 0 || row >= gridSize || col < 0 || col >= gridSize) {
+                    return true; // Treat out-of-bounds as black
+                }
+                
+                const index = row * gridSize + col;
+                return grid[index].classList.contains('black');
+            }
+            
+            // Function to update the clues form
+            function updateCluesForm() {
+                const acrossContainer = document.getElementById('acrossCluesContainer');
+                const downContainer = document.getElementById('downCluesContainer');
+                
+                acrossContainer.innerHTML = '';
+                downContainer.innerHTML = '';
+                
+                // Add across clues
+                for (const number in acrossClues) {
+                    const clueItem = document.createElement('div');
+                    clueItem.className = 'clue-item';
+                    
+                    const clueNumber = document.createElement('div');
+                    clueNumber.className = 'clue-number';
+                    clueNumber.textContent = number + '.';
+                    
+                    const clueInput = document.createElement('input');
+                    clueInput.type = 'text';
+                    clueInput.className = 'clue-text across-clue';
+                    clueInput.placeholder = `Clue for ${number} Across`;
+                    clueInput.dataset.number = number;
+                    clueInput.value = acrossClues[number] || '';
+                    
+                    clueItem.appendChild(clueNumber);
+                    clueItem.appendChild(clueInput);
+                    acrossContainer.appendChild(clueItem);
+                }
+                
+                // Add down clues
+                for (const number in downClues) {
+                    const clueItem = document.createElement('div');
+                    clueItem.className = 'clue-item';
+                    
+                    const clueNumber = document.createElement('div');
+                    clueNumber.className = 'clue-number';
+                    clueNumber.textContent = number + '.';
+                    
+                    const clueInput = document.createElement('input');
+                    clueInput.type = 'text';
+                    clueInput.className = 'clue-text down-clue';
+                    clueInput.placeholder = `Clue for ${number} Down`;
+                    clueInput.dataset.number = number;
+                    clueInput.value = downClues[number] || '';
+                    
+                    clueItem.appendChild(clueNumber);
+                    clueItem.appendChild(clueInput);
+                    downContainer.appendChild(clueItem);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

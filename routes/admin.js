@@ -260,4 +260,61 @@ router.get('/puzzle-template', (req, res) => {
   });
 });
 
+// Create new puzzle form
+router.get('/puzzles/create', (req, res) => {
+  res.render('admin/create-puzzle', {
+    pageTitle: 'Create New Puzzle'
+  });
+});
+
+// Save new puzzle
+router.post('/puzzles/create', async (req, res) => {
+  try {
+    const { title, description, level, difficultyRating, gridSize, gridData, acrossClues, downClues } = req.body;
+    
+    // Validate input
+    if (!level || !gridData || !acrossClues || !downClues) {
+      return res.status(400).render('admin/create-puzzle', {
+        pageTitle: 'Create New Puzzle',
+        error: 'All required fields must be filled out',
+        formData: req.body
+      });
+    }
+    
+    // Parse grid data from the form
+    const gridArray = JSON.parse(gridData);
+    
+    // Parse clues
+    const acrossCluesObj = JSON.parse(acrossClues);
+    const downCluesObj = JSON.parse(downClues);
+    
+    // Construct puzzle data
+    const puzzleData = {
+      grid: gridArray,
+      clues: {
+        across: acrossCluesObj,
+        down: downCluesObj
+      }
+    };
+    
+    // Create the puzzle in the database
+    await Puzzle.create({
+      title: title || `Puzzle #${Date.now()}`,
+      description: description || `A ${level} level crossword puzzle`,
+      level,
+      difficultyRating: difficultyRating || 3,
+      puzzleData: JSON.stringify(puzzleData)
+    });
+    
+    res.redirect('/admin/puzzles');
+  } catch (error) {
+    console.error('Error creating puzzle:', error);
+    res.status(500).render('admin/create-puzzle', {
+      pageTitle: 'Create New Puzzle',
+      error: 'Failed to create puzzle: ' + error.message,
+      formData: req.body
+    });
+  }
+});
+
 module.exports = router;
