@@ -39,7 +39,9 @@
    - Create/edit puzzles
 
 4. **Import/Export Functionality**
-   - Import puzzles from Excel files
+   - Import puzzles from Excel files (.xlsx and .xls formats)
+   - Enhanced validation for Excel file uploads
+   - Improved error handling for file format issues
    - Template downloads
 
 ### Remaining Considerations for Future Improvements

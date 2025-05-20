@@ -30,11 +30,21 @@ const upload = multer({
     // Accept only Excel files
     const filetypes = /xlsx|xls/;
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = filetypes.test(file.mimetype);
     
-    if (mimetype && extname) {
+    // Excel files can have various MIME types
+    const validMimeTypes = [
+      'application/vnd.ms-excel', // .xls
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+      'application/vnd.ms-excel.sheet.macroEnabled.12', // .xlsm
+      'application/vnd.ms-excel.sheet.binary.macroEnabled.12', // .xlsb
+      'application/vnd.oasis.opendocument.spreadsheet', // .ods
+      'application/octet-stream' // Some systems use this generic type
+    ];
+    
+    if ((validMimeTypes.includes(file.mimetype) || file.mimetype.includes('excel')) && extname) {
       return cb(null, true);
     } else {
+      console.log('File upload rejected:', file.originalname, 'with mimetype:', file.mimetype);
       cb(new Error('Only Excel files are allowed'));
     }
   }
@@ -445,6 +455,8 @@ router.post('/import-puzzles', upload.single('puzzleFile'), async (req, res) => 
       });
     }
     
+    console.log('File uploaded successfully:', req.file.originalname, 'with mimetype:', req.file.mimetype);
+    
     // Read the Excel file
     const workbook = xlsx.readFile(req.file.path);
     const sheetName = workbook.SheetNames[0];
@@ -534,14 +546,28 @@ router.post('/import-puzzles', upload.single('puzzleFile'), async (req, res) => 
     
   } catch (error) {
     console.error('Error importing puzzles:', error);
+    
     // Clean up the uploaded file if it exists
     if (req.file && fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
     }
     
+    // Check for xlsx.readFile errors which might indicate format issues
+    const errorMessage = error.message || 'Failed to import puzzles from Excel';
+    const isFormatError = errorMessage.includes('format') || 
+                         errorMessage.includes('CFB') || 
+                         errorMessage.includes('read');
+    
+    if (isFormatError) {
+      return res.status(400).render('admin/import-puzzles', {
+        pageTitle: 'Import Puzzles from Excel',
+        error: 'The file format is not supported. Please use a valid Excel file (.xlsx or .xls)'
+      });
+    }
+    
     res.status(500).render('error', { 
       message: 'Server Error', 
-      details: 'Failed to import puzzles from Excel' 
+      details: 'Failed to import puzzles from Excel: ' + errorMessage
     });
   }
 });
