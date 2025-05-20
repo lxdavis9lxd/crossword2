@@ -172,6 +172,41 @@ async function runTests() {
     logError('Puzzle template download failed', error);
   }
   
+  // Test 8: Check for admin UI elements on normal pages
+  log('\nTesting admin UI elements on user-facing pages...');
+  const uiTests = [
+    { route: '/game/dashboard', name: 'Dashboard Page' },
+    { route: '/achievements', name: 'Achievements Page' },
+    { route: '/game/1', name: 'Game Page' }
+  ];
+  
+  const uiTestResults = {};
+  
+  for (const test of uiTests) {
+    log(`Checking admin UI elements on ${test.name}...`);
+    try {
+      const response = await axios({
+        method: 'get',
+        url: `${BASE_URL}${test.route}`,
+        headers: {
+          Cookie: sessionCookie
+        },
+        maxRedirects: 5,
+        validateStatus: (status) => status >= 200 && status < 400
+      });
+      
+      // Check if admin button is present in the HTML response
+      const hasAdminButton = response.data.includes('admin-button') && 
+                            response.data.includes('Admin Dashboard');
+      
+      uiTestResults[test.name] = hasAdminButton;
+      log(`${test.name} admin UI test: ${hasAdminButton ? '✅ PASS' : '❌ FAIL'}`);
+    } catch (error) {
+      logError(`Admin UI test for ${test.name} failed`, error);
+      uiTestResults[test.name] = false;
+    }
+  }
+  
   // Print results
   log('\n=========================================');
   log('  TEST RESULTS');
@@ -184,9 +219,15 @@ async function runTests() {
   log(`Import Page: ${importPageSuccessful ? '✅ PASS' : '❌ FAIL'}`);
   log(`Template Download: ${templateSuccessful ? '✅ PASS' : '❌ FAIL'}`);
   
+  log('\nAdmin UI Elements:');
+  Object.keys(uiTestResults).forEach(page => {
+    log(`${page}: ${uiTestResults[page] ? '✅ PASS' : '❌ FAIL'}`);
+  });
+  
   const overallSuccess = loginSuccessful && dashboardSuccessful && 
                          userManagementSuccessful && puzzleManagementSuccessful && 
-                         importPageSuccessful && templateSuccessful;
+                         importPageSuccessful && templateSuccessful &&
+                         Object.values(uiTestResults).every(result => result);
   
   log(`\nOverall Test Result: ${overallSuccess ? '✅ PASS' : '❌ FAIL'}`);
   log(`\nDetailed logs available at: ${logFile}`);

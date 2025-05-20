@@ -85,6 +85,9 @@
             <ul>
                 <li><a href="/game/dashboard">Dashboard</a></li>
                 <li><a href="/achievements" class="active">Achievements</a></li>
+                <% if (typeof user !== 'undefined' && user && user.role === 'admin') { %>
+                <li><a href="/admin" class="admin-button">👑 Admin Dashboard</a></li>
+                <% } %>
                 <li><a href="/auth/logout">Logout</a></li>
             </ul>
         </nav>

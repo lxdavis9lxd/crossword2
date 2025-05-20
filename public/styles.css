@@ -40,6 +40,16 @@ nav a {
     transition: background-color 0.3s;
 }
 
+nav a.admin-button {
+    background-color: #ff9800;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+nav a.admin-button:hover {
+    background-color: #f57c00;
+}
+
 nav a:hover {
     background-color: rgba(255, 255, 255, 0.2);
 }
