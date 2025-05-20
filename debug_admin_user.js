@@ -1,4 +1,5 @@
-const { User, sequelize } = require('./models');
+const db = require('./models');
+const { User, sequelize } = db;
 const bcrypt = require('bcrypt');
 
 async function debugAdminUser() {
@@ -8,11 +9,20 @@ async function debugAdminUser() {
     // Check if the admin user exists
     const adminUser = await User.findOne({ 
       where: { username: 'admin' },
-      attributes: ['id', 'username', 'email', 'role', 'isActive'] 
+      attributes: ['id', 'username', 'email', 'role', 'isActive', 'password'] 
     });
     
     if (adminUser) {
       console.log('Admin user exists:', adminUser.toJSON());
+      
+      // Reset the admin password
+      console.log('Resetting admin password...');
+      const hashedPassword = await bcrypt.hash('admin123', 10);
+      
+      adminUser.password = hashedPassword;
+      await adminUser.save();
+      
+      console.log('Admin password reset successfully.');
     } else {
       console.log('Admin user does not exist!');
       
@@ -63,4 +73,4 @@ async function debugAdminUser() {
 }
 
 // Run the debugging function
-debugAdminUser();
+debugAdminUser().catch(console.error);

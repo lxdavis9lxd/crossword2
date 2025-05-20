@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const router = express.Router();
 const { User } = require('../models');
-const { Sequelize } = require('sequelize');
+const { Op } = require('sequelize');
 const sequelize = require('../models').sequelize;
 
 // GET route for registration page
@@ -57,16 +57,20 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   const { emailOrUsername, password } = req.body;
 
+  console.log('Login attempt:', { emailOrUsername });
+
   // Validate form data
   if (!emailOrUsername || !password) {
+    console.log('Missing fields:', { emailOrUsername: !!emailOrUsername, password: !!password });
     return res.status(400).send('All fields are required');
   }
 
   try {
     // Find the user by email or username
+    console.log('Looking for user with email/username:', emailOrUsername);
     const user = await User.findOne({ 
       where: {
-        [sequelize.Op.or]: [
+        [Op.or]: [
           { email: emailOrUsername },
           { username: emailOrUsername }
         ]
@@ -74,31 +78,43 @@ router.post('/login', async (req, res) => {
     });
 
     if (!user) {
+      console.log('User not found');
       return res.status(400).send('Invalid email/username or password');
     }
 
+    console.log('User found:', { id: user.id, username: user.username, role: user.role });
+
     // Check if the user account is active
     if (!user.isActive) {
+      console.log('User account inactive');
       return res.status(400).send('This account has been deactivated. Please contact an administrator.');
     }
 
     // Compare the password
+    console.log('Comparing passwords...');
     const isMatch = await bcrypt.compare(password, user.password);
+    console.log('Password match:', isMatch);
+    
     if (!isMatch) {
+      console.log('Password mismatch');
       return res.status(400).send('Invalid email/username or password');
     }
 
     // Set user session with only necessary information
+    console.log('Setting user session...');
     req.session.user = {
       id: user.id,
       username: user.username,
       email: user.email,
       role: user.role
     };
+    console.log('Session set:', req.session.user);
 
     // Redirect to game dashboard
+    console.log('Redirecting to dashboard...');
     res.redirect('/game/dashboard');
   } catch (error) {
+    console.error('Server error during login:', error);
     res.status(500).send('Server error');
   }
 });

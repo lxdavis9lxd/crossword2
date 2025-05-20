@@ -1,7 +1,7 @@
-const { User } = require('./models');
+const db = require('./models');
+const { User } = db;
 const bcrypt = require('bcrypt');
-const { Sequelize } = require('sequelize');
-const sequelize = require('./models').sequelize;
+const { Op } = require('sequelize');
 
 async function testLogin() {
   try {
@@ -13,7 +13,7 @@ async function testLogin() {
     // Find the user by email or username
     const user = await User.findOne({ 
       where: {
-        [Sequelize.Op.or]: [
+        [Op.or]: [
           { email: emailOrUsername },
           { username: emailOrUsername }
         ]
@@ -55,8 +55,11 @@ async function testLogin() {
   } catch (error) {
     console.error('Error during login test:', error);
   } finally {
-    process.exit();
+    await db.sequelize.close();
+    console.log('Database connection closed.');
   }
 }
 
-testLogin();
+testLogin()
+  .then(() => console.log('Login test completed.'))
+  .catch(err => console.error('Unhandled error:', err));

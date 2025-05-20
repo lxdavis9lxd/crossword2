@@ -15,6 +15,10 @@ async function login(emailOrUsername, password) {
     }, {
       headers: {
         'Content-Type': 'application/json'
+      },
+      maxRedirects: 0,
+      validateStatus: function (status) {
+        return status >= 200 && status < 400; // Accept all 2xx and 3xx responses
       }
     });
     
@@ -38,6 +42,10 @@ async function getAdminDashboard() {
     const response = await axios.get(`${BASE_URL}/admin`, {
       headers: {
         Cookie: cookies
+      },
+      maxRedirects: 5,
+      validateStatus: function (status) {
+        return status >= 200 && status < 400;
       }
     });
     
@@ -55,6 +63,10 @@ async function getUsers() {
     const response = await axios.get(`${BASE_URL}/admin/users`, {
       headers: {
         Cookie: cookies
+      },
+      maxRedirects: 5,
+      validateStatus: function (status) {
+        return status >= 200 && status < 400;
       }
     });
     
@@ -72,6 +84,10 @@ async function getPuzzles() {
     const response = await axios.get(`${BASE_URL}/admin/puzzles`, {
       headers: {
         Cookie: cookies
+      },
+      maxRedirects: 5,
+      validateStatus: function (status) {
+        return status >= 200 && status < 400;
       }
     });
     
@@ -89,6 +105,10 @@ async function getImportPage() {
     const response = await axios.get(`${BASE_URL}/admin/import-puzzles`, {
       headers: {
         Cookie: cookies
+      },
+      maxRedirects: 5,
+      validateStatus: function (status) {
+        return status >= 200 && status < 400;
       }
     });
     
@@ -107,13 +127,24 @@ async function getPuzzleTemplate() {
       headers: {
         Cookie: cookies
       },
-      responseType: 'stream'
+      responseType: 'stream',
+      maxRedirects: 5,
+      validateStatus: function (status) {
+        return status >= 200 && status < 400;
+      }
     });
     
     if (response.status === 200) {
       console.log('Puzzle template download: Success');
+      
+      // Create temp directory if it doesn't exist
+      const tempDir = path.join(__dirname, 'temp');
+      if (!fs.existsSync(tempDir)) {
+        fs.mkdirSync(tempDir);
+      }
+      
       // Save the template to a file
-      const templatePath = path.join(__dirname, 'temp', 'test-template.xlsx');
+      const templatePath = path.join(tempDir, 'test-template.xlsx');
       const writer = fs.createWriteStream(templatePath);
       response.data.pipe(writer);
       
@@ -122,7 +153,10 @@ async function getPuzzleTemplate() {
           console.log(`Template saved to ${templatePath}`);
           resolve(true);
         });
-        writer.on('error', reject);
+        writer.on('error', (err) => {
+          console.error('Error saving template:', err);
+          reject(err);
+        });
       });
     } else {
       console.log('Puzzle template download: Failed');
