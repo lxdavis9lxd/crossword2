@@ -40,8 +40,10 @@
 
 4. **Import/Export Functionality**
    - Import puzzles from Excel files (.xlsx and .xls formats)
-   - Enhanced validation for Excel file uploads
-   - Improved error handling for file format issues
+   - Enhanced validation for Excel file uploads with debugging support
+   - Improved error handling for various file format issues
+   - Added troubleshooting guidance in the UI for users
+   - Fixed MIME type validation to support a broader range of Excel formats
    - Template downloads
 
 ### Remaining Considerations for Future Improvements

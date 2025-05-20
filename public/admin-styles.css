@@ -398,6 +398,34 @@
     font-weight: bold;
 }
 
+.file-format-hint {
+    margin-top: 0.75rem;
+    padding: 0.75rem;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    border-left: 4px solid #17a2b8;
+}
+
+.file-format-hint small {
+    display: block;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.file-format-hint .tip {
+    margin-top: 0.5rem;
+}
+
+.file-format-hint ul {
+    margin: 0.5rem 0 0 1.5rem;
+    padding: 0;
+}
+
+.file-format-hint li {
+    margin-bottom: 0.25rem;
+    font-size: 0.8rem;
+}
+
 .file-input-wrapper {
     position: relative;
 }

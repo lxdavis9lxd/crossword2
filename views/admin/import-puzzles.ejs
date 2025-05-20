@@ -65,15 +65,25 @@
             <div class="import-form">
                 <form action="/admin/import-puzzles" method="POST" enctype="multipart/form-data">
                     <div class="file-upload">
-                        <label for="puzzleFile">Select Excel File</label>
+                        <label for="puzzleFile">Select Excel File (.xlsx or .xls)</label>
                         <div class="file-input-wrapper">
                             <div class="file-input-button" id="fileInputButton">
                                 <i class="file-icon">📄</i>
-                                <span>Click to select a file or drag and drop</span>
+                                <span>Click to select an Excel file (.xlsx or .xls) or drag and drop</span>
                             </div>
                             <input type="file" id="puzzleFile" name="puzzleFile" class="file-input" accept=".xlsx,.xls" required>
                         </div>
                         <div class="selected-file" id="selectedFile"></div>
+                        <div class="file-format-hint">
+                            <small>Only Excel files (.xlsx or .xls) are supported</small>
+                            <small class="tip">Troubleshooting tips: 
+                                <ul>
+                                    <li>If upload fails, try saving as .xlsx instead of .xls or vice versa</li>
+                                    <li>Make sure your Excel file follows the required format shown in the examples below</li>
+                                    <li>You can download a template from the button at the bottom of this page</li>
+                                </ul>
+                            </small>
+                        </div>
                     </div>
                     
                     <div class="form-actions">
