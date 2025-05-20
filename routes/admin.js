@@ -260,6 +260,26 @@ router.get('/puzzle-template', (req, res) => {
   });
 });
 
+// List all puzzles
+router.get('/puzzles', async (req, res) => {
+  try {
+    const puzzles = await Puzzle.findAll({
+      attributes: ['id', 'title', 'level', 'difficultyRating', 'createdAt']
+    });
+    
+    res.render('admin/puzzles', {
+      puzzles,
+      pageTitle: 'Puzzle Management'
+    });
+  } catch (error) {
+    console.error('Error fetching puzzles:', error);
+    res.status(500).render('error', { 
+      message: 'Server Error', 
+      details: 'Failed to fetch puzzles'
+    });
+  }
+});
+
 // Create new puzzle form
 router.get('/puzzles/create', (req, res) => {
   res.render('admin/create-puzzle', {
@@ -313,6 +333,115 @@ router.post('/puzzles/create', async (req, res) => {
       pageTitle: 'Create New Puzzle',
       error: 'Failed to create puzzle: ' + error.message,
       formData: req.body
+    });
+  }
+});
+
+// Update puzzle
+router.post('/puzzles/:id', async (req, res) => {
+  try {
+    const { title, description, level, difficultyRating } = req.body;
+    const puzzle = await Puzzle.findByPk(req.params.id);
+    
+    if (!puzzle) {
+      return res.status(404).render('error', { 
+        message: 'Not Found', 
+        details: 'Puzzle not found' 
+      });
+    }
+    
+    // Update fields
+    puzzle.title = title;
+    puzzle.description = description;
+    puzzle.level = level;
+    puzzle.difficultyRating = difficultyRating;
+    
+    await puzzle.save();
+    
+    res.redirect('/admin/puzzles');
+  } catch (error) {
+    console.error('Error updating puzzle:', error);
+    res.status(500).render('error', { 
+      message: 'Server Error', 
+      details: 'Failed to update puzzle' 
+    });
+  }
+});
+
+// Delete puzzle
+router.post('/puzzles/:id/delete', async (req, res) => {
+  try {
+    const puzzle = await Puzzle.findByPk(req.params.id);
+    
+    if (!puzzle) {
+      return res.status(404).render('error', { 
+        message: 'Not Found', 
+        details: 'Puzzle not found' 
+      });
+    }
+    
+    await puzzle.destroy();
+    
+    res.redirect('/admin/puzzles');
+  } catch (error) {
+    console.error('Error deleting puzzle:', error);
+    res.status(500).render('error', { 
+      message: 'Server Error', 
+      details: 'Failed to delete puzzle' 
+    });
+  }
+});
+
+// Edit puzzle form
+router.get('/puzzles/:id/edit', async (req, res) => {
+  try {
+    const puzzle = await Puzzle.findByPk(req.params.id);
+    
+    if (!puzzle) {
+      return res.status(404).render('error', { 
+        message: 'Not Found', 
+        details: 'Puzzle not found' 
+      });
+    }
+    
+    res.render('admin/edit-puzzle', {
+      puzzle,
+      pageTitle: `Edit Puzzle: ${puzzle.title || 'Untitled'}`
+    });
+  } catch (error) {
+    console.error('Error editing puzzle:', error);
+    res.status(500).render('error', { 
+      message: 'Server Error', 
+      details: 'Failed to load puzzle for editing' 
+    });
+  }
+});
+
+// View puzzle details
+router.get('/puzzles/:id', async (req, res) => {
+  try {
+    const puzzle = await Puzzle.findByPk(req.params.id);
+    
+    if (!puzzle) {
+      return res.status(404).render('error', { 
+        message: 'Not Found', 
+        details: 'Puzzle not found' 
+      });
+    }
+    
+    // Parse puzzle data for display
+    const puzzleData = JSON.parse(puzzle.puzzleData);
+    
+    res.render('admin/puzzle-details', {
+      puzzle,
+      puzzleData,
+      pageTitle: `Puzzle: ${puzzle.title || 'Untitled'}`
+    });
+  } catch (error) {
+    console.error('Error fetching puzzle details:', error);
+    res.status(500).render('error', { 
+      message: 'Server Error', 
+      details: 'Failed to fetch puzzle details' 
     });
   }
 });
