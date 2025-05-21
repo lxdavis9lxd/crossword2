@@ -1,7 +1,10 @@
 # Excel File Upload Fix Summary
 
 ## Problem Statement
-Users were encountering errors when trying to upload Excel files, specifically seeing the error:
+Users were encountering two distinct issues with the Excel import functionality:
+
+1. The error "Cannot GET /admin/import-puzzles" when trying to access the import puzzles page
+2. Errors when uploading Excel files, specifically seeing:
 ```
 Error: Only Excel files are allowed
 ```

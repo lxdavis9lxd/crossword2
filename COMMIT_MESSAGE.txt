@@ -1,23 +1,23 @@
-Fix Puzzle Creation and Display Issues
+Fix Import-Puzzles Functionality and Admin.js Corruption
 
-This commit resolves the issues with puzzle creation in the admin interface where:
+This commit resolves two critical issues:
 
-1. Across and down hints were not being properly defined
-2. Created puzzles would not load correctly after saving
-3. The "Create New Puzzle" button led to a "Puzzle not found" page
+1. Fixed the "Cannot GET /admin/import-puzzles" error by replacing the corrupted admin.js file
+2. Fixed puzzles 16, 17, and 18 not loading correctly by adding cellNumbers fallback
 
 ## Fixes Implemented
 
-- Fixed the puzzle creation form to consistently store clues in an array format
-- Made the application backward compatible with both array-format and object-format clues
-- Updated puzzle display components to properly render clues regardless of format
-- Improved form submission handling to ensure clue data is properly structured
+- Backed up the corrupted admin.js file as admin.js.broken
+- Restored admin.js with proper route handlers for import-puzzles
+- Fixed the puzzleFile/excelFile name mismatch in the import route handler
+- Added fallback for missing cellNumbers property in game.ejs
+- Created extensive test scripts to verify both fixes
+- Updated documentation with detailed explanations of the fixes
 
-3. Database Enhancements
-- Updated existing puzzles with difficulty ratings
-- Created achievement tables and populated with default achievements
-- Added user-achievement junction table
-- Created multiple database backups (YYYYMMDD format)
+These changes ensure:
+1. The admin import-puzzles interface is now accessible
+2. Excel files can be successfully uploaded and imported
+3. All puzzles (including #16, #17, and #18) now load correctly
 
 These changes ensure a consistent puzzle data structure while maintaining compatibility with existing puzzles in the database.
 

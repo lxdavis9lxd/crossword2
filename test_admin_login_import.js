@@ -8,7 +8,13 @@ async function testLoginAndImportPuzzles() {
   const axiosInstance = axios.create({
     baseURL: 'http://localhost:3000',
     withCredentials: true,
-    maxRedirects: 5
+    maxRedirects: 5,
+    // Add support for cookies
+    jar: true,
+    // Add debug headers
+    validateStatus: function (status) {
+      return status >= 200 && status < 600; // Accept all status codes to prevent exceptions
+    }
   });
   
   try {

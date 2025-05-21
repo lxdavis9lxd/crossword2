@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Puzzles - Admin</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/admin-styles.css">
+</head>
+<body class="admin-body">
+    <header class="admin-header">
+        <h1>Import Puzzles</h1>
+        <nav>
+            <ul>
+                <li><a href="/admin">Dashboard</a></li>
+                <li><a href="/admin/users">Users</a></li>
+                <li><a href="/admin/puzzles">Puzzles</a></li>
+                <li><a href="/admin/import-puzzles" class="active">Import Puzzles</a></li>
+                <li><a href="/game/dashboard">Game Dashboard</a></li>
+                <li><a href="/auth/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main class="admin-main">
+        <section class="admin-controls">
+            <div class="controls-left">
+                <h2>Import Puzzles from Excel</h2>
+            </div>
+            <div class="controls-right">
+                <a href="/admin/puzzle-template" class="admin-button secondary">Download Template</a>
+            </div>
+        </section>
+        
+        <section class="admin-content">
+            <div class="import-instructions">
+                <h3>Instructions</h3>
+                <ol>
+                    <li>Download the Excel template using the button above.</li>
+                    <li>Fill in the template with your puzzle data. Required fields are:
+                        <ul>
+                            <li><strong>level</strong> - Must be one of: easy, intermediate, or advanced</li>
+                            <li><strong>grid</strong> - The puzzle grid as a JSON array</li>
+                            <li><strong>clues_across</strong> - The across clues as a JSON array of objects with number and clue properties</li>
+                            <li><strong>clues_down</strong> - The down clues as a JSON array of objects with number and clue properties</li>
+                        </ul>
+                    </li>
+                    <li>Optional fields include:
+                        <ul>
+                            <li><strong>title</strong> - The puzzle title</li>
+                            <li><strong>description</strong> - A description of the puzzle</li>
+                            <li><strong>difficulty_rating</strong> - A number from 1-5 indicating difficulty</li>
+                        </ul>
+                    </li>
+                    <li>Upload your completed Excel file using the form below.</li>
+                </ol>
+            </div>
+            
+            
+            
+            <div class="import-form">
+                <form action="/admin/import-puzzles" method="POST" enctype="multipart/form-data">
+                    <div class="file-upload">
+                        <label for="puzzleFile">Select Excel File (.xlsx or .xls)</label>
+                        <div class="file-input-wrapper">
+                            <div class="file-input-button" id="fileInputButton">
+                                <i class="file-icon">📄</i>
+                                <span>Click to select an Excel file (.xlsx or .xls) or drag and drop</span>
+                            </div>
+                            <input type="file" id="puzzleFile" name="puzzleFile" class="file-input" accept=".xlsx,.xls" required>
+                        </div>
+                        <div class="selected-file" id="selectedFile"></div>
+                        <div class="file-format-hint">
+                            <small>Only Excel files (.xlsx or .xls) are supported</small>
+                            <small class="tip">Troubleshooting tips: 
+                                <ul>
+                                    <li>If upload fails, try saving as .xlsx instead of .xls or vice versa</li>
+                                    <li>Make sure your Excel file follows the required format shown in the examples below</li>
+                                    <li>You can download a template from the button at the bottom of this page</li>
+                                </ul>
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <a href="/admin/puzzles" class="admin-button secondary">Cancel</a>
+                        <button type="submit" class="admin-button primary">Upload and Import</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="import-help">
+                <h3>JSON Format Examples</h3>
+                <div class="code-example">
+                    <h4>Grid Example</h4>
+                    <pre><code>["A","B","C","D",".","E","F","G","H","I",".","J","K","L","M","N"]</code></pre>
+                    <p>The grid is a flat array of letters or "." for black cells.</p>
+                </div>
+                
+                <div class="code-example">
+                    <h4>Clues Example</h4>
+                    <pre><code>[
+  {"number": 1, "clue": "Small battery"},
+  {"number": 3, "clue": "Mountain range"},
+  {"number": 7, "clue": "Writing implement"}
+]</code></pre>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="admin-footer">
+        <p>&copy; 2025 Crossword Game Administration</p>
+    </footer>
+    
+    <style>
+        .import-instructions {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        
+        .import-instructions ol {
+            padding-left: 1.5rem;
+        }
+        
+        .import-instructions li {
+            margin-bottom: 0.75rem;
+        }
+        
+        .import-instructions ul {
+            margin-top: 0.5rem;
+            padding-left: 1.5rem;
+        }
+        
+        .import-form {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border: 1px solid #eee;
+        }
+        
+        .file-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        .import-help {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+        
+        .code-example {
+            margin-bottom: 1.5rem;
+        }
+        
+        .code-example pre {
+            background-color: #f1f1f1;
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: monospace;
+            margin: 0.5rem 0;
+        }
+        
+        .code-example p {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+    </style>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('puzzleFile');
+            const fileInputButton = document.getElementById('fileInputButton');
+            const selectedFile = document.getElementById('selectedFile');
+            
+            // Handle file selection
+            fileInput.addEventListener('change', function(e) {
+                if (fileInput.files.length > 0) {
+                    selectedFile.textContent = `Selected file: ${fileInput.files[0].name}`;
+                    fileInputButton.classList.add('file-selected');
+                } else {
+                    selectedFile.textContent = '';
+                    fileInputButton.classList.remove('file-selected');
+                }
+            });
+            
+            // Handle drag and drop
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                fileInputButton.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                fileInputButton.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                fileInputButton.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight() {
+                fileInputButton.classList.add('highlight');
+            }
+            
+            function unhighlight() {
+                fileInputButton.classList.remove('highlight');
+            }
+            
+            fileInputButton.addEventListener('drop', handleDrop, false);
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                fileInput.files = files;
+                
+                // Trigger change event
+                const event = new Event('change');
+                fileInput.dispatchEvent(event);
+            }
+        });
+    </script>
+</body>
+</html>

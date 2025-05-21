@@ -121,7 +121,7 @@ router.get('/import-puzzles', (req, res) => {
 });
 
 // Handle Excel file upload and import
-router.post('/import-puzzles', upload.single('excelFile'), async (req, res) => {
+router.post('/import-puzzles', upload.single('puzzleFile'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).render('admin/import-puzzles', {
