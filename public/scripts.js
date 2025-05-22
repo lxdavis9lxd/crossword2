@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             puzzlesContainer.innerHTML = '<p>Loading puzzles...</p>';
             
-            const response = await fetch('/game/puzzles/' + level);
+            const response = await fetch('/v1/game/puzzles/' + level);
             if (!response.ok) {
                 throw new Error('Failed to fetch puzzles: ' + response.status);
             }
@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Loading puzzle ID:', puzzleId);
         
         try {
-            const response = await fetch('/game/puzzles/details/' + puzzleId);
+            const response = await fetch('/v1/game/puzzles/details/' + puzzleId);
             if (!response.ok) {
                 throw new Error('Failed to fetch puzzle details: ' + response.status);
             }
@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            const response = await fetch('/game/progress/' + userId);
+            const response = await fetch('/v1/game/progress/' + userId);
             if (!response.ok) {
                 throw new Error('Failed to fetch saved games: ' + response.status);
             }
@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Fetch puzzle details for each saved game
             for (const puzzleId in progress) {
                 try {
-                    const puzzleResponse = await fetch('/game/puzzles/details/' + puzzleId);
+                    const puzzleResponse = await fetch('/v1/game/puzzles/details/' + puzzleId);
                     if (!puzzleResponse.ok) continue;
                     
                     const puzzle = await puzzleResponse.json();
@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Add event listener to the button
                     const loadButton = savedGameItem.querySelector('.load-saved-game-btn');
                     loadButton.addEventListener('click', function() {
-                        window.location.href = '/game?puzzleId=' + puzzle.id;
+                        window.location.href = '/v1/game?puzzleId=' + puzzle.id;
                     });
                     
                     savedGamesList.appendChild(savedGameItem);
@@ -354,7 +354,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         try {
-            const response = await fetch('/game/save', {
+            const response = await fetch('/v1/game/save', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -377,7 +377,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Initialize the game if we're on the game page with a puzzleId
-    if (window.location.pathname === '/game') {
+    if (window.location.pathname === '/v1/game') {
         const urlParams = new URLSearchParams(window.location.search);
         const puzzleId = urlParams.get('puzzleId');
         if (puzzleId) {
