@@ -22,6 +22,8 @@ app.use(session({
 
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'public')));
+// Also serve static files with v1 prefix for compatibility
+app.use('/v1', express.static(path.join(__dirname, 'public')));
 
 // Configure EJS as the view engine
 app.set('view engine', 'ejs');
