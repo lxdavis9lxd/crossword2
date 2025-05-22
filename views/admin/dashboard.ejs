@@ -63,7 +63,7 @@
                 </div>
                 
                 <div class="puzzle-stat-item">
-                    <h3>Intermediate</h3>
+                    <h3>Medium</h3>
                     <div class="puzzle-stat-bar-container">
                         <div class="puzzle-stat-bar" style="width: <%= puzzleCount > 0 ? (puzzleStats.intermediate * 100 / puzzleCount) : 0 %>%"></div>
                     </div>
@@ -71,11 +71,19 @@
                 </div>
                 
                 <div class="puzzle-stat-item">
-                    <h3>Advanced</h3>
+                    <h3>Hard</h3>
                     <div class="puzzle-stat-bar-container">
                         <div class="puzzle-stat-bar" style="width: <%= puzzleCount > 0 ? (puzzleStats.advanced * 100 / puzzleCount) : 0 %>%"></div>
                     </div>
                     <p><%= puzzleStats.advanced %> puzzles</p>
+                </div>
+                
+                <div class="puzzle-stat-item">
+                    <h3>Expert</h3>
+                    <div class="puzzle-stat-bar-container">
+                        <div class="puzzle-stat-bar" style="width: <%= puzzleCount > 0 ? (puzzleStats.expert * 100 / puzzleCount) : 0 %>%"></div>
+                    </div>
+                    <p><%= puzzleStats.expert %> puzzles</p>
                 </div>
             </div>
         </section>

@@ -79,13 +79,34 @@ document.addEventListener('DOMContentLoaded', function() {
                     const puzzleData = JSON.parse(puzzle.puzzleData);
                     const gridSize = Math.sqrt(puzzleData.grid.length);
                     
+                    // Get clue counts, handling both array and object formats
+                    let acrossCount = 0;
+                    let downCount = 0;
+                    
+                    if (puzzleData.clues) {
+                        if (Array.isArray(puzzleData.clues.across)) {
+                            acrossCount = puzzleData.clues.across.length;
+                        } else if (typeof puzzleData.clues.across === 'object') {
+                            acrossCount = Object.keys(puzzleData.clues.across).length;
+                        }
+                        
+                        if (Array.isArray(puzzleData.clues.down)) {
+                            downCount = puzzleData.clues.down.length;
+                        } else if (typeof puzzleData.clues.down === 'object') {
+                            downCount = Object.keys(puzzleData.clues.down).length;
+                        }
+                    }
+                    
+                    // Add puzzle title if available
+                    const puzzleTitle = puzzleData.title ? puzzleData.title : 'Puzzle #' + puzzle.id;
+                    
                     puzzleCard.innerHTML = 
-                        '<h4>Puzzle #' + puzzle.id + '</h4>' + 
+                        '<h4>' + puzzleTitle + '</h4>' + 
                         '<div class="puzzle-preview">' +
                             '<div class="grid-size">' + gridSize + 'x' + gridSize + '</div>' +
                             '<div class="preview-info">' +
-                                '<p>' + puzzleData.clues.across.length + ' Across</p>' +
-                                '<p>' + puzzleData.clues.down.length + ' Down</p>' +
+                                '<p>' + acrossCount + ' Across</p>' +
+                                '<p>' + downCount + ' Down</p>' +
                             '</div>' +
                         '</div>';
                     

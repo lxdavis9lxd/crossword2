@@ -90,8 +90,9 @@ router.get('/', async (req, res) => {
     
     // Get puzzle counts by level
     const easyCount = await Puzzle.count({ where: { level: 'easy' } });
-    const intermediateCount = await Puzzle.count({ where: { level: 'intermediate' } });
-    const advancedCount = await Puzzle.count({ where: { level: 'advanced' } });
+    const mediumCount = await Puzzle.count({ where: { level: 'medium' } });
+    const hardCount = await Puzzle.count({ where: { level: 'hard' } });
+    const expertCount = await Puzzle.count({ where: { level: 'expert' } });
     
     res.render('admin/dashboard', {
       userCount,
@@ -99,8 +100,9 @@ router.get('/', async (req, res) => {
       adminCount,
       puzzleStats: {
         easy: easyCount,
-        intermediate: intermediateCount,
-        advanced: advancedCount
+        intermediate: mediumCount,
+        advanced: hardCount,
+        expert: expertCount
       },
       pageTitle: 'Admin Dashboard'
     });
