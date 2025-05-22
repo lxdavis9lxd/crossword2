@@ -4,137 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crossword Puzzle</title>
-    <link rel="stylesheet" href="/v1/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/v1/game-styles-modern.css">
     <link rel="stylesheet" href="/v1/message-styles.css">
     <% if (typeof user !== 'undefined' && user) { %>
     <meta name="user-id" content="<%= user.id %>">
     <% } %>
-    <style>
-        .crossword-container {
-            margin: 20px auto;
-            max-width: 600px;
-        }
-        
-        .crossword-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1px;
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-        
-        .crossword-cell {
-            position: relative;
-            border: 1px solid #333;
-            aspect-ratio: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.5rem;
-            text-transform: uppercase;
-            background-color: white;
-        }
-        
-        .crossword-cell.blocked {
-            background-color: #333;
-        }
-        
-        .cell-number {
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            font-size: 0.6rem;
-        }
-        
-        .clue-container {
-            margin-top: 20px;
-        }
-        
-        .clue-list {
-            margin-bottom: 20px;
-        }
-        
-        .clue-list h3 {
-            margin-bottom: 10px;
-        }
-        
-        #message {
-            margin-top: 20px;
-            padding: 10px;
-            display: none;
-        }
-        
-        #message.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        #message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .controls {
-            margin-top: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        .puzzle-metadata {
-            background-color: #f8f9fa;
-            padding: 10px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-        
-        .puzzle-metadata p {
-            margin: 0;
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
-        
-        .puzzle-metadata span {
-            font-weight: bold;
-            color: #4CAF50;
-        }
-
-        .saved-games-sidebar {
-            margin-top: 20px;
-            background-color: #f8f9fa;
-            padding: 10px;
-            border-radius: 4px;
-        }
-        
-        .saved-games-sidebar h3 {
-            margin-top: 0;
-            margin-bottom: 10px;
-        }
-        
-        .saved-games-sidebar ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .saved-games-sidebar li {
-            padding: 8px;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        .saved-games-sidebar li:last-child {
-            border-bottom: none;
-        }
-    </style>
 </head>
-<body>
-    <header>
+<body class="game-body">
+    <header class="game-header">
         <h1>Crossword Puzzle</h1>
         <nav>
             <ul>
@@ -147,66 +27,74 @@
         </nav>
     </header>
     
-    <main class="crossword-container">
-        <div id="puzzle-info">
-            <% if (typeof title !== 'undefined') { %>
-                <h2><%= title %></h2>
-            <% } else { %>
-                <h2>Loading puzzle...</h2>
-            <% } %>
-            
-            <% if (typeof description !== 'undefined') { %>
-                <div class="puzzle-description"><%= description %></div>
-            <% } else { %>
-                <div class="puzzle-description"></div>
-            <% } %>
-            
-            <% if (typeof puzzleId !== 'undefined') { %>
-            <div class="puzzle-metadata">
-                <p>Puzzle ID: <span id="current-puzzle-id"><%= puzzleId %></span></p>
-                <% if (typeof level !== 'undefined') { %>
-                <p>Difficulty: <span id="current-puzzle-level"><%= level %></span></p>
+    <main class="game-main">
+        <section class="game-section crossword-section">
+            <div id="puzzle-info" class="puzzle-header">
+                <% if (typeof title !== 'undefined') { %>
+                    <h2><%= title %></h2>
+                <% } else { %>
+                    <h2>Loading puzzle...</h2>
+                <% } %>
+                
+                <% if (typeof description !== 'undefined') { %>
+                    <div class="puzzle-description"><%= description %></div>
+                <% } else { %>
+                    <div class="puzzle-description"></div>
+                <% } %>
+                
+                <% if (typeof puzzleId !== 'undefined') { %>
+                <div class="puzzle-metadata">
+                    <p>Puzzle ID: <span id="current-puzzle-id"><%= puzzleId %></span></p>
+                    <% if (typeof level !== 'undefined') { %>
+                    <p>Difficulty: <span id="current-puzzle-level"><%= level %></span></p>
+                    <% } %>
+                </div>
                 <% } %>
             </div>
-            <% } %>
-        </div>
         
         <div id="crossword-grid" class="crossword-grid">
             <!-- Grid will be dynamically generated -->
         </div>
         
         <div class="clue-container">
-            <div class="clue-list">
-                <h3>Across</h3>
-                <ul id="across-clues">
+            <div class="clue-section">
+                <h4>Across</h4>
+                <ul id="across-clues" class="clue-list">
                     <!-- Across clues will be dynamically generated -->
                 </ul>
             </div>
             
-            <div class="clue-list">
-                <h3>Down</h3>
-                <ul id="down-clues">
+            <div class="clue-section">
+                <h4>Down</h4>
+                <ul id="down-clues" class="clue-list">
                     <!-- Down clues will be dynamically generated -->
                 </ul>
             </div>
         </div>
         
-        <div id="message"></div>
+        <div id="message" class="game-message"></div>
         
-        <div class="controls">
-            <button id="check-button">Check Answers</button>
-            <button id="save-button">Save Progress</button>
-            <button id="hint-button">Get Hint</button>
-            <button id="show-answers-button" class="show-answers-btn">Show Answers</button>
+        <div class="game-controls">
+            <button id="check-button" class="crossword-action action-check">Check Answers</button>
+            <button id="save-button" class="crossword-action action-save">Save Progress</button>
+            <button id="hint-button" class="crossword-action action-hint">Get Hint</button>
+            <button id="show-answers-button" class="crossword-action action-show">Show Answers</button>
         </div>
+        </section>
         
-        <div class="saved-games-sidebar">
-            <h3>Your Saved Games</h3>
-            <ul id="saved-games-sidebar-list">
-                <li class="loading-saved-games">Loading...</li>
-            </ul>
-        </div>
+        <section class="game-section">
+            <h2>Your Saved Games</h2>
+            <div class="saved-games-container">
+                <ul id="saved-games-sidebar-list" class="saved-games-list">
+                    <li class="loading-saved-games">Loading...</li>
+                </ul>
+            </div>
+        </section>
     </main>
+    
+    <footer class="game-footer">
+        <p>&copy; <%= new Date().getFullYear() %> Crossword Game. All rights reserved.</p>
+    </footer>
     
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
@@ -439,8 +327,9 @@
         function showMessage(message, type) {
             const messageElement = document.getElementById('message');
             messageElement.textContent = message;
-            messageElement.className = type;
-            messageElement.style.display = 'block';                setTimeout(() => {
+            messageElement.className = `game-message ${type}`;
+            messageElement.style.display = 'block';
+            setTimeout(() => {
                 messageElement.style.display = 'none';
             }, 5000);
         }
@@ -657,53 +546,35 @@
                     const achievementNames = data.newAchievements.map(a => a.name).join(', ');
                     showMessage('🏆 New achievement(s) unlocked: ' + achievementNames, 'success');
                     
-                    // Create modal to display achievements more prominently
-                    const modal = document.createElement('div');
-                    modal.style.position = 'fixed';
-                    modal.style.top = '0';
-                    modal.style.left = '0';
-                    modal.style.width = '100%';
-                    modal.style.height = '100%';
-                    modal.style.backgroundColor = 'rgba(0,0,0,0.7)';
-                    modal.style.display = 'flex';
-                    modal.style.justifyContent = 'center';
-                    modal.style.alignItems = 'center';
-                    modal.style.zIndex = '1000';
-                    
-                    const modalContent = document.createElement('div');
-                    modalContent.style.backgroundColor = '#fff';
-                    modalContent.style.padding = '20px';
-                    modalContent.style.borderRadius = '10px';
-                    modalContent.style.maxWidth = '500px';
-                    modalContent.style.textAlign = 'center';
-                    
-                    let achievementsHtml = '<h2>🏆 Achievement Unlocked!</h2>';
-                    
+                    // Create achievement popup in line with modern design
                     data.newAchievements.forEach(achievement => {
-                        achievementsHtml += `
-                            <div style="margin: 15px 0; padding: 10px; background-color: #f8f9fa; border-radius: 5px;">
-                                <h3 style="color: #ffa500;">${achievement.name}</h3>
-                                <p>${achievement.description}</p>
-                            </div>
+                        const popup = document.createElement('div');
+                        popup.className = 'achievement-popup';
+                        popup.innerHTML = `
+                            <h3 class="achievement-title"><span>🏆</span> ${achievement.name}</h3>
+                            <p class="achievement-desc">${achievement.description}</p>
                         `;
-                    });
-                    
-                    achievementsHtml += '<p>Check your achievements page to see all your badges!</p>';
-                    achievementsHtml += '<button id="close-achievement-modal" style="padding: 8px 16px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 15px;">Continue</button>';
-                    
-                    modalContent.innerHTML = achievementsHtml;
-                    modal.appendChild(modalContent);
-                    
-                    document.body.appendChild(modal);
-                    
-                    document.getElementById('close-achievement-modal').addEventListener('click', () => {
-                        document.body.removeChild(modal);
+                        
+                        document.body.appendChild(popup);
+                        
+                        // Show animation
+                        setTimeout(() => {
+                            popup.classList.add('show');
+                        }, 100);
+                        
+                        // Remove after display
+                        setTimeout(() => {
+                            popup.classList.remove('show');
+                            setTimeout(() => {
+                                document.body.removeChild(popup);
+                            }, 500);
+                        }, 5000);
                     });
                     
                     // Add link to achievements page
-                    const viewAchievementsLink = document.createElement('p');
-                    viewAchievementsLink.innerHTML = '<a href="/v1/achievements" style="display: block; margin-top: 20px; text-align: center;">View All Achievements</a>';
-                    document.querySelector('.controls').appendChild(viewAchievementsLink);
+                    const viewAchievementsLink = document.createElement('div');
+                    viewAchievementsLink.innerHTML = '<a href="/v1/achievements" class="achievement-link">View All Achievements</a>';
+                    document.querySelector('.game-controls').appendChild(viewAchievementsLink);
                 }
             } catch (error) {
                 console.error('Error checking achievements:', error);

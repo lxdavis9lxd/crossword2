@@ -1,0 +1,741 @@
+/* Modern Game Dashboard Styling */
+
+:root {
+  --primary-color: #38b000;
+  --primary-light: #e0f8e0;
+  --primary-dark: #2a8000;
+  --secondary-color: #ff9e00;
+  --success-color: #3a86ff;
+  --danger-color: #d00000;
+  --warning-color: #ffbd00;
+  --info-color: #3a86ff;
+  --light-bg: #f8f9fa;
+  --dark-bg: #212529;
+  --card-bg: #ffffff;
+  --border-radius: 10px;
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --transition: all 0.3s ease;
+  --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+}
+
+/* Base Styles */
+.game-body {
+  background-color: var(--light-bg);
+  font-family: var(--font-main);
+  color: #333;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.game-header {
+  background-color: var(--card-bg);
+  color: var(--dark-bg);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--box-shadow);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.game-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.game-header nav ul {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 0.5rem;
+}
+
+.game-header nav li {
+  margin: 0;
+}
+
+.game-header nav a {
+  color: #555;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+  font-weight: 500;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+}
+
+.game-header nav a:hover {
+  background-color: var(--primary-light);
+  color: var(--primary-color);
+}
+
+.game-header nav a.admin-button {
+  background-color: var(--secondary-color);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+}
+
+.game-header nav a.admin-button:hover {
+  background-color: #e08e00;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Main content area */
+.game-main {
+  max-width: 1200px;
+  width: 95%;
+  margin: 2rem auto;
+  flex: 1;
+}
+
+/* Section styling */
+.game-section {
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--box-shadow);
+}
+
+/* Section headers */
+.game-main h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1.25rem;
+  color: #333;
+  position: relative;
+  padding-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.game-main h2::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background-color: var(--primary-color);
+  border-radius: 3px;
+}
+
+/* Puzzle selection styling */
+.puzzle-selection {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.level-selection, .puzzle-list-container {
+  background-color: var(--light-bg);
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+}
+
+.level-selection h3, .puzzle-list-container h3 {
+  margin-top: 0;
+  color: var(--primary-color);
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+/* Form controls */
+select#level-select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius);
+  font-family: inherit;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  background-color: white;
+}
+
+select#level-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(56, 176, 0, 0.2);
+}
+
+.game-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: var(--transition);
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.game-button:hover {
+  background-color: var(--primary-dark);
+  box-shadow: 0 4px 8px rgba(56, 176, 0, 0.3);
+  transform: translateY(-2px);
+}
+
+.game-button:disabled {
+  background-color: #ccc;
+  color: #888;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Puzzle card grid */
+.puzzles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.puzzle-card {
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 1.25rem;
+  box-shadow: var(--box-shadow);
+  border: 1px solid rgba(0,0,0,0.05);
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.puzzle-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: var(--primary-color);
+}
+
+.puzzle-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+}
+
+.puzzle-card.selected {
+  border: 2px solid var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(56, 176, 0, 0.2);
+}
+
+.puzzle-card h4 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  color: var(--primary-color);
+}
+
+.puzzle-card p {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.puzzle-card .completion {
+  margin-top: 1rem;
+  font-weight: 500;
+  color: var(--success-color);
+}
+
+.no-puzzles-message {
+  text-align: center;
+  color: #888;
+  padding: 2rem;
+}
+
+/* Crossword game styling */
+.crossword-container {
+  margin: 2rem auto;
+  max-width: 800px;
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  box-shadow: var(--box-shadow);
+}
+
+.crossword-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.crossword-header h3 {
+  margin: 0;
+  color: var(--primary-color);
+}
+
+/* Crossword grid modern styling */
+.crossword-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(2rem, 1fr));
+  gap: 2px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto 2rem;
+  border: 2px solid #333;
+  border-radius: 4px;
+  background-color: #333;
+  padding: 2px;
+  box-shadow: var(--box-shadow);
+}
+
+.crossword-cell {
+  position: relative;
+  aspect-ratio: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  transition: background-color 0.2s ease;
+}
+
+.crossword-cell.blocked {
+  background-color: #222;
+}
+
+.crossword-cell input {
+  width: 85%;
+  height: 85%;
+  text-align: center;
+  font-size: 1.1rem;
+  border: none;
+  text-transform: uppercase;
+  background: transparent;
+  font-family: var(--font-main);
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+}
+
+.crossword-cell input:focus {
+  background-color: var(--primary-light);
+}
+
+.cell-number {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  font-size: 0.6rem;
+  color: #666;
+}
+
+.crossword-cell:focus {
+  background-color: var(--primary-light) !important;
+  outline: 2px solid var(--primary-color);
+}
+
+.crossword-cell.correct {
+  background-color: var(--primary-light);
+  color: var(--primary-dark);
+}
+
+.clue-container {
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.clue-section {
+  background-color: var(--light-bg);
+  padding: 1.25rem;
+  border-radius: var(--border-radius);
+}
+
+.clue-section h4 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--primary-color);
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--primary-light);
+}
+
+.clue-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.clue-item {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.clue-item:last-child {
+  border-bottom: none;
+}
+
+.clue-item:hover {
+  background-color: rgba(56, 176, 0, 0.05);
+}
+
+.clue-item.current {
+  background-color: var(--primary-light);
+  color: var(--primary-dark);
+  font-weight: 500;
+  border-radius: 4px;
+  padding: 0.5rem;
+}
+
+.game-controls {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.crossword-action {
+  padding: 0.75rem 1.5rem;
+  border-radius: 30px;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.action-save {
+  background-color: var(--primary-light);
+  color: var(--primary-color);
+}
+
+.action-save:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.action-check {
+  background-color: var(--info-color);
+  color: white;
+}
+
+.action-check:hover {
+  background-color: #2a75e6;
+}
+
+.action-solve {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+.action-solve:hover {
+  background-color: #e08e00;
+}
+
+.action-reset {
+  background-color: #f8d7da;
+  color: var(--danger-color);
+}
+
+.action-reset:hover {
+  background-color: var(--danger-color);
+  color: white;
+}
+
+.action-hint {
+  background-color: var(--warning-color);
+  color: #333;
+}
+
+.action-hint:hover {
+  background-color: #e6ab00;
+  transform: translateY(-2px);
+}
+
+.action-show {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+.action-show:hover {
+  background-color: #e08e00;
+  transform: translateY(-2px);
+}
+
+.game-message {
+  margin: 1.5rem auto;
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  max-width: 600px;
+  display: none;
+  text-align: center;
+  font-weight: 500;
+}
+
+.game-message.success {
+  background-color: rgba(56, 176, 0, 0.1);
+  color: var(--primary-dark);
+  border: 1px solid rgba(56, 176, 0, 0.3);
+}
+
+.game-message.error {
+  background-color: rgba(208, 0, 0, 0.1);
+  color: var(--danger-color);
+  border: 1px solid rgba(208, 0, 0, 0.3);
+}
+
+/* Game specific stylings */
+.crossword-section {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.puzzle-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.puzzle-description {
+  color: #666;
+  margin-bottom: 1rem;
+  max-width: 600px;
+  margin: 0 auto 1.5rem;
+  line-height: 1.6;
+}
+
+.puzzle-metadata {
+  background-color: var(--light-bg);
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.puzzle-metadata p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.puzzle-metadata span {
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+/* Saved games list styling */
+.saved-games-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.saved-games-list li {
+  background-color: var(--light-bg);
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+  cursor: pointer;
+  border-left: 3px solid var(--primary-color);
+}
+
+.saved-games-list li:hover {
+  background-color: var(--primary-light);
+  transform: translateY(-2px);
+  box-shadow: var(--box-shadow);
+}
+
+.loading-saved-games {
+  color: #666;
+  font-style: italic;
+  text-align: center;
+  grid-column: 1 / -1;
+}
+
+/* Sidebar saved games styling */
+.saved-game-sidebar-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.saved-game-sidebar-info {
+  flex: 1;
+}
+
+.saved-game-sidebar-info h4 {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.95rem;
+  color: var(--primary-color);
+}
+
+.saved-game-sidebar-info p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.load-saved-game-sidebar-btn {
+  padding: 0.4rem 0.8rem;
+  background-color: var(--primary-light);
+  color: var(--primary-color);
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.load-saved-game-sidebar-btn:hover {
+  background-color: var(--primary-color);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.view-all-saved-games {
+  text-align: center;
+  margin-top: 1rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.view-all-link {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+}
+
+.view-all-link:hover {
+  background-color: var(--primary-light);
+  transform: translateY(-2px);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .game-header {
+    flex-direction: column;
+    padding: 1rem;
+  }
+  
+  .game-header h1 {
+    margin-bottom: 1rem;
+  }
+  
+  .game-header nav ul {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .game-section {
+    padding: 1.25rem;
+  }
+  
+  .puzzle-selection {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .clue-container {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .crossword-grid {
+    max-width: 100%;
+  }
+  
+  .crossword-cell {
+    font-size: 1rem;
+  }
+}
+
+/* Achievement/Completion Notification */
+.achievement-popup {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 1.25rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  z-index: 1100;
+  max-width: 350px;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.5s ease;
+  border-left: 4px solid var(--primary-color);
+}
+
+.achievement-popup.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.achievement-title {
+  color: var(--primary-color);
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.achievement-title span {
+  font-size: 1.5rem;
+}
+
+.achievement-desc {
+  margin: 0;
+  color: #555;
+}
+
+.achievement-link {
+  display: inline-block;
+  margin-top: 1.5rem;
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+  transition: var(--transition);
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  background-color: var(--primary-light);
+}
+
+.achievement-link:hover {
+  background-color: var(--primary-color);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: var(--box-shadow);
+}
