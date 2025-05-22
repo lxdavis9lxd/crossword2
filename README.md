@@ -29,6 +29,16 @@ This application uses API versioning with a `/v1` prefix on all routes. All API 
    npx sequelize-cli db:migrate
    ```
 
+## Codebase Maintenance
+
+### Test Files Cleanup
+
+On May 22, 2025, the codebase was cleaned to remove test files that were not part of the core application. This was done to make the repository leaner and more production-focused. 
+
+If you need test files for development purposes, a backup was created in the `/test_backup` directory. Additional test-related logs and temporary files were also moved to `/logs_backup` and `/temp_backup` respectively.
+
+For more information about this cleanup, please refer to the `TEST_FILES_CLEANUP.md` document.
+
 4. Start the server:
    ```
    npm start
