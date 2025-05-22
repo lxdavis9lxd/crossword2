@@ -12,43 +12,11 @@ Executing (default): PRAGMA INDEX_LIST(`UserAchievements`)
 Executing (default): PRAGMA INDEX_INFO(`sqlite_autoindex_UserAchievements_1`)
 Database synced successfully.
 Login attempt with exactly these values:
-- emailOrUsername: "pdavis"
-- password: [PROVIDED]
-- Full request body: {"emailOrUsername":"pdavis","password":"t123"}
-Looking for user with email/username: pdavis
-Executing (default): SELECT `id`, `username`, `email`, `password`, `role`, `isActive`, `progress`, `completedPuzzles`, `createdAt`, `updatedAt` FROM `Users` AS `User` WHERE (`User`.`email` = 'pdavis' OR `User`.`username` = 'pdavis') LIMIT 1;
-User found: { id: 2, username: 'pdavis', role: 'user' }
-Comparing passwords...
-Password match: true
-Setting user session...
-Session set: { id: 2, username: 'pdavis', email: 'pdavis@gmail.com', role: 'user' }
-Redirecting to dashboard...
-Login attempt with exactly these values:
 - emailOrUsername: "admin"
 - password: [PROVIDED]
-- Full request body: {"emailOrUsername":"admin","password":"t123"}
+- Full request body: {"emailOrUsername":"admin","password":"Admin123!"}
 Looking for user with email/username: admin
 Executing (default): SELECT `id`, `username`, `email`, `password`, `role`, `isActive`, `progress`, `completedPuzzles`, `createdAt`, `updatedAt` FROM `Users` AS `User` WHERE (`User`.`email` = 'admin' OR `User`.`username` = 'admin') LIMIT 1;
-User found: { id: 13, username: 'admin', role: 'admin' }
-Comparing passwords...
-Password match: false
-Password mismatch
-Login attempt with exactly these values:
-- emailOrUsername: "admin"
-- password: [PROVIDED]
-- Full request body: {"emailOrUsername":"admin","password":"admin123!"}
-Looking for user with email/username: admin
-Executing (default): SELECT `id`, `username`, `email`, `password`, `role`, `isActive`, `progress`, `completedPuzzles`, `createdAt`, `updatedAt` FROM `Users` AS `User` WHERE (`User`.`email` = 'admin' OR `User`.`username` = 'admin') LIMIT 1;
-User found: { id: 13, username: 'admin', role: 'admin' }
-Comparing passwords...
-Password match: false
-Password mismatch
-Login attempt with exactly these values:
-- emailOrUsername: "admin@example.com"
-- password: [PROVIDED]
-- Full request body: {"emailOrUsername":"admin@example.com","password":"Admin123!"}
-Looking for user with email/username: admin@example.com
-Executing (default): SELECT `id`, `username`, `email`, `password`, `role`, `isActive`, `progress`, `completedPuzzles`, `createdAt`, `updatedAt` FROM `Users` AS `User` WHERE (`User`.`email` = 'admin@example.com' OR `User`.`username` = 'admin@example.com') LIMIT 1;
 User found: { id: 13, username: 'admin', role: 'admin' }
 Comparing passwords...
 Password match: true
@@ -60,25 +28,20 @@ Session set: {
   role: 'admin'
 }
 Redirecting to dashboard...
-
---- FILE UPLOAD DEBUG INFO ---
-Filename: test-import-puzzle.xlsx
-Reported MIME type: application/octet-stream
-Field name: puzzleFile
-Extension: .xlsx
-Valid extension? true
-Valid MIME type? true
-✅ File accepted based on valid extension
-File uploaded successfully: /workspaces/crossword2/temp/puzzleFile-1747888279665-943886797.xlsx
-Found 1 puzzles in Excel file
-Executing (default): INSERT INTO `Puzzles` (`id`,`level`,`title`,`description`,`difficultyRating`,`puzzleData`,`createdAt`,`updatedAt`) VALUES (NULL,$1,$2,$3,$4,$5,$6,$7);
+Executing (default): SELECT count(*) AS `count` FROM `Users` AS `User`;
+Executing (default): SELECT count(*) AS `count` FROM `Puzzles` AS `Puzzle`;
+Executing (default): SELECT count(*) AS `count` FROM `Users` AS `User` WHERE `User`.`role` = 'admin';
+Executing (default): SELECT count(*) AS `count` FROM `Puzzles` AS `Puzzle` WHERE `Puzzle`.`level` = 'easy';
+Executing (default): SELECT count(*) AS `count` FROM `Puzzles` AS `Puzzle` WHERE `Puzzle`.`level` = 'intermediate';
+Executing (default): SELECT count(*) AS `count` FROM `Puzzles` AS `Puzzle` WHERE `Puzzle`.`level` = 'advanced';
+Executing (default): SELECT `id`, `username`, `email`, `role`, `isActive`, `createdAt` FROM `Users` AS `User`;
 Executing (default): SELECT `id`, `title`, `level`, `difficultyRating`, `createdAt` FROM `Puzzles` AS `Puzzle`;
 Login attempt with exactly these values:
-- emailOrUsername: "admin@example.com"
+- emailOrUsername: "admin"
 - password: [PROVIDED]
-- Full request body: {"emailOrUsername":"admin@example.com","password":"Admin123!"}
-Looking for user with email/username: admin@example.com
-Executing (default): SELECT `id`, `username`, `email`, `password`, `role`, `isActive`, `progress`, `completedPuzzles`, `createdAt`, `updatedAt` FROM `Users` AS `User` WHERE (`User`.`email` = 'admin@example.com' OR `User`.`username` = 'admin@example.com') LIMIT 1;
+- Full request body: {"emailOrUsername":"admin","password":"Admin123!"}
+Looking for user with email/username: admin
+Executing (default): SELECT `id`, `username`, `email`, `password`, `role`, `isActive`, `progress`, `completedPuzzles`, `createdAt`, `updatedAt` FROM `Users` AS `User` WHERE (`User`.`email` = 'admin' OR `User`.`username` = 'admin') LIMIT 1;
 User found: { id: 13, username: 'admin', role: 'admin' }
 Comparing passwords...
 Password match: true
@@ -90,16 +53,36 @@ Session set: {
   role: 'admin'
 }
 Redirecting to dashboard...
-
---- FILE UPLOAD DEBUG INFO ---
-Filename: test-import-puzzle.xlsx
-Reported MIME type: application/octet-stream
-Field name: puzzleFile
-Extension: .xlsx
-Valid extension? true
-Valid MIME type? true
-✅ File accepted based on valid extension
-File uploaded successfully: /workspaces/crossword2/temp/puzzleFile-1747888302162-644525744.xlsx
-Found 1 puzzles in Excel file
-Executing (default): INSERT INTO `Puzzles` (`id`,`level`,`title`,`description`,`difficultyRating`,`puzzleData`,`createdAt`,`updatedAt`) VALUES (NULL,$1,$2,$3,$4,$5,$6,$7);
+Executing (default): SELECT count(*) AS `count` FROM `Users` AS `User`;
+Executing (default): SELECT count(*) AS `count` FROM `Puzzles` AS `Puzzle`;
+Executing (default): SELECT count(*) AS `count` FROM `Users` AS `User` WHERE `User`.`role` = 'admin';
+Executing (default): SELECT count(*) AS `count` FROM `Puzzles` AS `Puzzle` WHERE `Puzzle`.`level` = 'easy';
+Executing (default): SELECT count(*) AS `count` FROM `Puzzles` AS `Puzzle` WHERE `Puzzle`.`level` = 'intermediate';
+Executing (default): SELECT count(*) AS `count` FROM `Puzzles` AS `Puzzle` WHERE `Puzzle`.`level` = 'advanced';
+Executing (default): SELECT `id`, `username`, `email`, `role`, `isActive`, `createdAt` FROM `Users` AS `User`;
+Executing (default): SELECT `id`, `title`, `level`, `difficultyRating`, `createdAt` FROM `Puzzles` AS `Puzzle`;
+Login attempt with exactly these values:
+- emailOrUsername: "admin"
+- password: [PROVIDED]
+- Full request body: {"emailOrUsername":"admin","password":"Admin123!"}
+Looking for user with email/username: admin
+Executing (default): SELECT `id`, `username`, `email`, `password`, `role`, `isActive`, `progress`, `completedPuzzles`, `createdAt`, `updatedAt` FROM `Users` AS `User` WHERE (`User`.`email` = 'admin' OR `User`.`username` = 'admin') LIMIT 1;
+User found: { id: 13, username: 'admin', role: 'admin' }
+Comparing passwords...
+Password match: true
+Setting user session...
+Session set: {
+  id: 13,
+  username: 'admin',
+  email: 'admin@example.com',
+  role: 'admin'
+}
+Redirecting to dashboard...
+Executing (default): SELECT count(*) AS `count` FROM `Users` AS `User`;
+Executing (default): SELECT count(*) AS `count` FROM `Puzzles` AS `Puzzle`;
+Executing (default): SELECT count(*) AS `count` FROM `Users` AS `User` WHERE `User`.`role` = 'admin';
+Executing (default): SELECT count(*) AS `count` FROM `Puzzles` AS `Puzzle` WHERE `Puzzle`.`level` = 'easy';
+Executing (default): SELECT count(*) AS `count` FROM `Puzzles` AS `Puzzle` WHERE `Puzzle`.`level` = 'intermediate';
+Executing (default): SELECT count(*) AS `count` FROM `Puzzles` AS `Puzzle` WHERE `Puzzle`.`level` = 'advanced';
+Executing (default): SELECT `id`, `username`, `email`, `role`, `isActive`, `createdAt` FROM `Users` AS `User`;
 Executing (default): SELECT `id`, `title`, `level`, `difficultyRating`, `createdAt` FROM `Puzzles` AS `Puzzle`;

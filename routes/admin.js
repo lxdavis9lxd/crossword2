@@ -113,6 +113,174 @@ router.get('/', async (req, res) => {
   }
 });
 
+// ===============================
+// User Management Routes
+// ===============================
+
+// List all users
+router.get('/users', async (req, res) => {
+  try {
+    const users = await User.findAll({
+      attributes: ['id', 'username', 'email', 'role', 'isActive', 'createdAt']
+    });
+    
+    res.render('admin/users', {
+      users,
+      pageTitle: 'User Management'
+    });
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).render('error', { 
+      message: 'Server Error', 
+      details: 'Failed to fetch users' 
+    });
+  }
+});
+
+// View user details
+router.get('/users/:id', async (req, res) => {
+  try {
+    const user = await User.findByPk(req.params.id, {
+      attributes: ['id', 'username', 'email', 'role', 'isActive', 'createdAt', 'completedPuzzles']
+    });
+    
+    if (!user) {
+      return res.status(404).render('error', { 
+        message: 'Not Found', 
+        details: 'User not found' 
+      });
+    }
+    
+    res.render('admin/user-details', {
+      user,
+      pageTitle: `User: ${user.username}`
+    });
+  } catch (error) {
+    console.error('Error fetching user details:', error);
+    res.status(500).render('error', { 
+      message: 'Server Error', 
+      details: 'Failed to fetch user details' 
+    });
+  }
+});
+
+// Create user form
+router.get('/create-user', (req, res) => {
+  res.render('admin/new-user', {
+    pageTitle: 'Create New User'
+  });
+});
+
+// Create user action
+router.post('/create-user', async (req, res) => {
+  try {
+    const { username, email, password, role, isActive } = req.body;
+    
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    // Create the user
+    await User.create({
+      username,
+      email,
+      password: hashedPassword,
+      role: role || 'user',
+      isActive: isActive === 'on' ? true : false
+    });
+    
+    res.redirect('/v1/admin/users');
+  } catch (error) {
+    console.error('Error creating user:', error);
+    
+    // Check for validation errors
+    if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
+      return res.status(400).render('admin/new-user', {
+        pageTitle: 'Create New User',
+        error: error.errors.map(e => e.message).join(', '),
+        formData: req.body
+      });
+    }
+    
+    res.status(500).render('error', { 
+      message: 'Server Error', 
+      details: 'Failed to create user' 
+    });
+  }
+});
+
+// Edit user form
+router.get('/users/:id/edit', async (req, res) => {
+  try {
+    const user = await User.findByPk(req.params.id, {
+      attributes: ['id', 'username', 'email', 'role', 'isActive']
+    });
+    
+    if (!user) {
+      return res.status(404).render('error', { 
+        message: 'Not Found', 
+        details: 'User not found' 
+      });
+    }
+    
+    res.render('admin/edit-user', {
+      user,
+      pageTitle: `Edit User: ${user.username}`
+    });
+  } catch (error) {
+    console.error('Error preparing user edit form:', error);
+    res.status(500).render('error', { 
+      message: 'Server Error', 
+      details: 'Failed to prepare edit form' 
+    });
+  }
+});
+
+// Update user
+router.post('/users/:id', async (req, res) => {
+  try {
+    const { username, email, role, isActive, password } = req.body;
+    const user = await User.findByPk(req.params.id);
+    
+    if (!user) {
+      return res.status(404).render('error', { 
+        message: 'Not Found', 
+        details: 'User not found' 
+      });
+    }
+    
+    // Update user data
+    user.username = username;
+    user.email = email;
+    user.role = role;
+    user.isActive = isActive === 'on' ? true : false;
+    
+    // Update password if provided
+    if (password && password.trim() !== '') {
+      user.password = await bcrypt.hash(password, 10);
+    }
+    
+    await user.save();
+    
+    res.redirect('/v1/admin/users');
+  } catch (error) {
+    console.error('Error updating user:', error);
+    
+    // Check for validation errors
+    if (error.name === 'SequelizeValidationError' || error.name === 'SequelizeUniqueConstraintError') {
+      return res.status(400).render('admin/edit-user', {
+        pageTitle: 'Edit User',
+        error: error.errors.map(e => e.message).join(', '),
+        user: { ...req.body, id: req.params.id }
+      });
+    }
+    
+    res.status(500).render('error', { 
+      message: 'Server Error', 
+      details: 'Failed to update user' 
+    });
+  }
+});
+
 // Import Puzzles page
 router.get('/import-puzzles', (req, res) => {
   res.render('admin/import-puzzles', {
