@@ -4,20 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Puzzle Details - Admin</title>
-    <link rel="stylesheet" href="/styles.css">
-    <link rel="stylesheet" href="/admin-styles.css">
+    <link rel="stylesheet" href="/v1/styles.css">
+    <link rel="stylesheet" href="/v1/admin-styles.css">
 </head>
 <body class="admin-body">
     <header class="admin-header">
         <h1>Puzzle Details</h1>
         <nav>
             <ul>
-                <li><a href="/admin">Dashboard</a></li>
-                <li><a href="/admin/users">Users</a></li>
-                <li><a href="/admin/puzzles" class="active">Puzzles</a></li>
-                <li><a href="/admin/import-puzzles">Import Puzzles</a></li>
-                <li><a href="/game/dashboard">Game Dashboard</a></li>
-                <li><a href="/auth/logout">Logout</a></li>
+                <li><a href="/v1/admin">Dashboard</a></li>
+                <li><a href="/v1/admin/users">Users</a></li>
+                <li><a href="/v1/admin/puzzles" class="active">Puzzles</a></li>
+                <li><a href="/v1/admin/import-puzzles">Import Puzzles</a></li>
+                <li><a href="/v1/game/dashboard">Game Dashboard</a></li>
+                <li><a href="/v1/auth/logout">Logout</a></li>
             </ul>
         </nav>
     </header>
@@ -28,8 +28,8 @@
                 <h2>Puzzle: <%= puzzle.title || 'Untitled Puzzle' %></h2>
             </div>
             <div class="controls-right">
-                <a href="/admin/puzzles/<%= puzzle.id %>/edit" class="admin-button primary">Edit Puzzle</a>
-                <a href="/admin/puzzles" class="admin-button secondary">Back to Puzzles</a>
+                <a href="/v1/admin/puzzles/<%= puzzle.id %>/edit" class="admin-button primary">Edit Puzzle</a>
+                <a href="/v1/admin/puzzles" class="admin-button secondary">Back to Puzzles</a>
             </div>
         </section>
         
@@ -150,7 +150,7 @@
             </div>
             
             <div class="admin-actions puzzle-actions">
-                <form action="/admin/puzzles/<%= puzzle.id %>/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this puzzle? This action cannot be undone.');" class="delete-form">
+                <form action="/v1/admin/puzzles/<%= puzzle.id %>/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this puzzle? This action cannot be undone.');" class="delete-form">
                     <button type="submit" class="admin-button danger">Delete Puzzle</button>
                 </form>
             </div>

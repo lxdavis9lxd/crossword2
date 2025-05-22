@@ -4,20 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Puzzle - Admin</title>
-    <link rel="stylesheet" href="/styles.css">
-    <link rel="stylesheet" href="/admin-styles.css">
+    <link rel="stylesheet" href="/v1/styles.css">
+    <link rel="stylesheet" href="/v1/admin-styles.css">
 </head>
 <body class="admin-body">
     <header class="admin-header">
         <h1>Edit Puzzle</h1>
         <nav>
             <ul>
-                <li><a href="/admin">Dashboard</a></li>
-                <li><a href="/admin/users">Users</a></li>
-                <li><a href="/admin/puzzles" class="active">Puzzles</a></li>
-                <li><a href="/admin/import-puzzles">Import Puzzles</a></li>
-                <li><a href="/game/dashboard">Game Dashboard</a></li>
-                <li><a href="/auth/logout">Logout</a></li>
+                <li><a href="/v1/admin">Dashboard</a></li>
+                <li><a href="/v1/admin/users">Users</a></li>
+                <li><a href="/v1/admin/puzzles" class="active">Puzzles</a></li>
+                <li><a href="/v1/admin/import-puzzles">Import Puzzles</a></li>
+                <li><a href="/v1/game/dashboard">Game Dashboard</a></li>
+                <li><a href="/v1/auth/logout">Logout</a></li>
             </ul>
         </nav>
     </header>
@@ -32,7 +32,7 @@
                 </div>
             <% } %>
             
-            <form action="/admin/puzzles/<%= puzzle.id %>" method="POST">
+            <form action="/v1/admin/puzzles/<%= puzzle.id %>" method="POST">
                 <div class="form-group">
                     <label for="title">Title</label>
                     <input type="text" id="title" name="title" class="form-control" value="<%= puzzle.title || '' %>">

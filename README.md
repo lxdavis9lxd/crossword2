@@ -4,6 +4,13 @@
 
 This project is a crossword game with three difficulty levels: easy, intermediate, and advanced. The game allows players to register, log in, and keep track of their completed games. Users can also save their game progress. The project is built using NodeJS, Express, and EJS, and uses a SQLite3 database with Sequelize REST APIs.
 
+## API Versioning
+
+This application uses API versioning with a `/v1` prefix on all routes. All API endpoints must be accessed through this version prefix, for example:
+- `/v1/auth/login` instead of `/auth/login`
+- `/v1/game/dashboard` instead of `/game/dashboard`
+- `/v1/admin/puzzles` instead of `/admin/puzzles`
+
 ## Setup Instructions
 
 1. Clone the repository:

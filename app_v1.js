@@ -74,13 +74,27 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).send('Server error: ' + (err.message || 'Something went wrong'));
 });
 
-// Set up routes with versioning (/v1 prefix)
+// Original routes
+app.use('/auth', authRoutes);
+app.use('/game', gameRoutes);
+app.use('/achievements', achievementRoutes);
+app.use('/admin', adminRoutes);
+
+// New v1 API routes
 app.use('/v1/auth', authRoutes);
 app.use('/v1/game', gameRoutes);
 app.use('/v1/achievements', achievementRoutes);
 app.use('/v1/admin', adminRoutes);
 
-// Debug route for session with versioning
+// Debug route for session
+app.get('/debug-session', (req, res) => {
+  res.json({
+    session: req.session,
+    user: req.session.user || null
+  });
+});
+
+// v1 debug route for session
 app.get('/v1/debug-session', (req, res) => {
   res.json({
     session: req.session,
@@ -88,12 +102,20 @@ app.get('/v1/debug-session', (req, res) => {
   });
 });
 
-// Home route - redirect to versioned route
+// Home route
 app.get('/', (req, res) => {
   res.render('index');
 });
 
-// Achievements page route with versioning
+// Achievements page route
+app.get('/achievements', (req, res) => {
+  if (!req.session.userId) {
+    return res.redirect('/auth/login');
+  }
+  res.render('achievements');
+});
+
+// v1 Achievements page route
 app.get('/v1/achievements', (req, res) => {
   if (!req.session.userId) {
     return res.redirect('/v1/auth/login');
@@ -106,3 +128,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+module.exports = app;

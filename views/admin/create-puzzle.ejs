@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create New Puzzle - Admin</title>
-    <link rel="stylesheet" href="/styles.css">
-    <link rel="stylesheet" href="/admin-styles.css">
+    <link rel="stylesheet" href="/v1/styles.css">
+    <link rel="stylesheet" href="/v1/admin-styles.css">
     <style>
         .grid-editor {
             margin: 20px 0;
@@ -114,12 +114,12 @@
         <h1>Create New Puzzle</h1>
         <nav>
             <ul>
-                <li><a href="/admin">Dashboard</a></li>
-                <li><a href="/admin/users">Users</a></li>
-                <li><a href="/admin/puzzles" class="active">Puzzles</a></li>
-                <li><a href="/admin/import-puzzles">Import Puzzles</a></li>
-                <li><a href="/game/dashboard">Game Dashboard</a></li>
-                <li><a href="/auth/logout">Logout</a></li>
+                <li><a href="/v1/admin">Dashboard</a></li>
+                <li><a href="/v1/admin/users">Users</a></li>
+                <li><a href="/v1/admin/puzzles" class="active">Puzzles</a></li>
+                <li><a href="/v1/admin/import-puzzles">Import Puzzles</a></li>
+                <li><a href="/v1/game/dashboard">Game Dashboard</a></li>
+                <li><a href="/v1/auth/logout">Logout</a></li>
             </ul>
         </nav>
     </header>
@@ -127,7 +127,7 @@
     <main class="admin-main">
         <section class="admin-content">
             <div class="breadcrumb">
-                <a href="/admin/puzzles">Puzzles</a> &raquo; Create New Puzzle
+                <a href="/v1/admin/puzzles">Puzzles</a> &raquo; Create New Puzzle
             </div>
             
             <% if (typeof error !== 'undefined') { %>
@@ -136,7 +136,7 @@
                 </div>
             <% } %>
             
-            <form action="/admin/puzzles/create" method="POST" id="createPuzzleForm">
+            <form action="/v1/admin/puzzles/create" method="POST" id="createPuzzleForm">
                 <div class="form-group">
                     <label for="title">Puzzle Title</label>
                     <input type="text" id="title" name="title" class="form-control" placeholder="Enter a title for this puzzle" value="<%= typeof formData !== 'undefined' ? formData.title || '' : '' %>">
@@ -214,7 +214,7 @@
                 </div>
                 
                 <div class="form-actions">
-                    <a href="/admin/puzzles" class="admin-button secondary">Cancel</a>
+                    <a href="/v1/admin/puzzles" class="admin-button secondary">Cancel</a>
                     <button type="submit" class="admin-button primary">Create Puzzle</button>
                 </div>
             </form>

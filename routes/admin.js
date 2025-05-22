@@ -456,7 +456,7 @@ router.post('/puzzles/create', async (req, res) => {
       puzzleData: JSON.stringify(puzzleData)
     });
     
-    res.redirect('/admin/puzzles');
+    res.redirect('/v1/admin/puzzles');
   } catch (error) {
     console.error('Error creating puzzle:', error);
     res.status(500).render('admin/create-puzzle', {
@@ -488,7 +488,7 @@ router.post('/puzzles/:id', async (req, res) => {
     
     await puzzle.save();
     
-    res.redirect('/admin/puzzles');
+    res.redirect('/v1/admin/puzzles');
   } catch (error) {
     console.error('Error updating puzzle:', error);
     res.status(500).render('error', { 
@@ -512,7 +512,7 @@ router.post('/puzzles/:id/delete', async (req, res) => {
     
     await puzzle.destroy();
     
-    res.redirect('/admin/puzzles');
+    res.redirect('/v1/admin/puzzles');
   } catch (error) {
     console.error('Error deleting puzzle:', error);
     res.status(500).render('error', { 

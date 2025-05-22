@@ -4,20 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Management - Admin</title>
-    <link rel="stylesheet" href="/styles.css">
-    <link rel="stylesheet" href="/admin-styles.css">
+    <link rel="stylesheet" href="/v1/styles.css">
+    <link rel="stylesheet" href="/v1/admin-styles.css">
 </head>
 <body class="admin-body">
     <header class="admin-header">
         <h1>User Management</h1>
         <nav>
             <ul>
-                <li><a href="/admin">Dashboard</a></li>
-                <li><a href="/admin/users" class="active">Users</a></li>
-                <li><a href="/admin/puzzles">Puzzles</a></li>
-                <li><a href="/admin/import-puzzles">Import Puzzles</a></li>
-                <li><a href="/game/dashboard">Game Dashboard</a></li>
-                <li><a href="/auth/logout">Logout</a></li>
+                <li><a href="/v1/admin">Dashboard</a></li>
+                <li><a href="/v1/admin/users" class="active">Users</a></li>
+                <li><a href="/v1/admin/puzzles">Puzzles</a></li>
+                <li><a href="/v1/admin/import-puzzles">Import Puzzles</a></li>
+                <li><a href="/v1/game/dashboard">Game Dashboard</a></li>
+                <li><a href="/v1/auth/logout">Logout</a></li>
             </ul>
         </nav>
     </header>
@@ -28,7 +28,7 @@
                 <h2>User Accounts</h2>
             </div>
             <div class="controls-right">
-                <a href="/admin/users/new" class="admin-button primary">Create New User</a>
+                <a href="/v1/admin/users/new" class="admin-button primary">Create New User</a>
             </div>
         </section>
         
@@ -65,10 +65,10 @@
                                     </td>
                                     <td><%= new Date(user.createdAt).toLocaleDateString() %></td>
                                     <td class="actions">
-                                        <a href="/admin/users/<%= user.id %>" class="action-link view">View</a>
-                                        <a href="/admin/users/<%= user.id %>/edit" class="action-link edit">Edit</a>
+                                        <a href="/v1/admin/users/<%= user.id %>" class="action-link view">View</a>
+                                        <a href="/v1/admin/users/<%= user.id %>/edit" class="action-link edit">Edit</a>
                                         <% if (user.id !== locals.user.id) { %>
-                                            <form action="/admin/users/<%= user.id %>/delete" method="POST" onsubmit="return confirm('Are you sure you want to deactivate this user?');" class="inline-form">
+                                            <form action="/v1/admin/users/<%= user.id %>/delete" method="POST" onsubmit="return confirm('Are you sure you want to deactivate this user?');" class="inline-form">
                                                 <button type="submit" class="action-link delete">Delete</button>
                                             </form>
                                         <% } %>

@@ -12,12 +12,12 @@
         <h1>Import Puzzles</h1>
         <nav>
             <ul>
-                <li><a href="/v1/admin">Dashboard</a></li>
-                <li><a href="/v1/admin/users">Users</a></li>
-                <li><a href="/v1/admin/puzzles">Puzzles</a></li>
-                <li><a href="/v1/admin/import-puzzles" class="active">Import Puzzles</a></li>
-                <li><a href="/v1/game/dashboard">Game Dashboard</a></li>
-                <li><a href="/v1/auth/logout">Logout</a></li>
+                <li><a href="/admin">Dashboard</a></li>
+                <li><a href="/admin/users">Users</a></li>
+                <li><a href="/admin/puzzles">Puzzles</a></li>
+                <li><a href="/admin/import-puzzles" class="active">Import Puzzles</a></li>
+                <li><a href="/game/dashboard">Game Dashboard</a></li>
+                <li><a href="/auth/logout">Logout</a></li>
             </ul>
         </nav>
     </header>
@@ -28,7 +28,7 @@
                 <h2>Import Puzzles from Excel</h2>
             </div>
             <div class="controls-right">
-                <a href="/v1/admin/puzzle-template" class="admin-button secondary">Download Template</a>
+                <a href="/admin/puzzle-template" class="admin-button secondary">Download Template</a>
             </div>
         </section>
         
@@ -59,7 +59,7 @@
             
             
             <div class="import-form">
-                <form action="/v1/admin/import-puzzles" method="POST" enctype="multipart/form-data">
+                <form action="/admin/import-puzzles" method="POST" enctype="multipart/form-data">
                     <div class="file-upload">
                         <label for="puzzleFile">Select Excel File (.xlsx or .xls)</label>
                         <div class="file-input-wrapper">

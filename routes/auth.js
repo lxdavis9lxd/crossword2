@@ -47,7 +47,7 @@ router.post('/register', async (req, res) => {
     });
 
     // Redirect to login page after successful registration
-    res.redirect('/auth/login');
+    res.redirect('/v1/auth/login');
   } catch (error) {
     res.status(500).send('Server error');
   }
@@ -116,7 +116,7 @@ router.post('/login', async (req, res) => {
 
     // Redirect to game dashboard
     console.log('Redirecting to dashboard...');
-    res.redirect('/game/dashboard');
+    res.redirect('/v1/game/dashboard');
   } catch (error) {
     console.error('Server error during login:', error);
     res.status(500).send('Server error');

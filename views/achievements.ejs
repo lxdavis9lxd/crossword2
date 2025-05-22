@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Achievements - Crossword Game</title>
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/v1/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         .achievements-container {
@@ -83,12 +83,12 @@
         <h1>Crossword Game</h1>
         <nav>
             <ul>
-                <li><a href="/game/dashboard">Dashboard</a></li>
-                <li><a href="/achievements" class="active">Achievements</a></li>
+                <li><a href="/v1/game/dashboard">Dashboard</a></li>
+                <li><a href="/v1/achievements" class="active">Achievements</a></li>
                 <% if (typeof user !== 'undefined' && user && user.role === 'admin') { %>
-                <li><a href="/admin" class="admin-button">👑 Admin Dashboard</a></li>
+                <li><a href="/v1/admin" class="admin-button">👑 Admin Dashboard</a></li>
                 <% } %>
-                <li><a href="/auth/logout">Logout</a></li>
+                <li><a href="/v1/auth/logout">Logout</a></li>
             </ul>
         </nav>
     </header>
@@ -111,7 +111,7 @@
             const achievementsContainer = document.getElementById('achievements-container');
             
             try {
-                const response = await fetch('/achievements');
+                const response = await fetch('/v1/achievements');
                 if (!response.ok) {
                     throw new Error(`Failed to fetch achievements: ${response.status}`);
                 }

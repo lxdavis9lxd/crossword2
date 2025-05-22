@@ -4,20 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Import Puzzles - Admin</title>
-    <link rel="stylesheet" href="/styles.css">
-    <link rel="stylesheet" href="/admin-styles.css">
+    <link rel="stylesheet" href="/v1/styles.css">
+    <link rel="stylesheet" href="/v1/admin-styles.css">
 </head>
 <body class="admin-body">
     <header class="admin-header">
         <h1>Import Puzzles</h1>
         <nav>
             <ul>
-                <li><a href="/admin">Dashboard</a></li>
-                <li><a href="/admin/users">Users</a></li>
-                <li><a href="/admin/puzzles">Puzzles</a></li>
-                <li><a href="/admin/import-puzzles" class="active">Import Puzzles</a></li>
-                <li><a href="/game/dashboard">Game Dashboard</a></li>
-                <li><a href="/auth/logout">Logout</a></li>
+                <li><a href="/v1/admin">Dashboard</a></li>
+                <li><a href="/v1/admin/users">Users</a></li>
+                <li><a href="/v1/admin/puzzles">Puzzles</a></li>
+                <li><a href="/v1/admin/import-puzzles" class="active">Import Puzzles</a></li>
+                <li><a href="/v1/game/dashboard">Game Dashboard</a></li>
+                <li><a href="/v1/auth/logout">Logout</a></li>
             </ul>
         </nav>
     </header>
@@ -28,7 +28,7 @@
                 <h2>Import Puzzles from Excel</h2>
             </div>
             <div class="controls-right">
-                <a href="/admin/puzzle-template" class="admin-button secondary">Download Template</a>
+                <a href="/v1/admin/puzzle-template" class="admin-button secondary">Download Template</a>
             </div>
         </section>
         
@@ -63,7 +63,7 @@
             <% } %>
             
             <div class="import-form">
-                <form action="/admin/import-puzzles" method="POST" enctype="multipart/form-data">
+                <form action="/v1/admin/import-puzzles" method="POST" enctype="multipart/form-data">
                     <div class="file-upload">
                         <label for="puzzleFile">Select Excel File (.xlsx or .xls)</label>
                         <div class="file-input-wrapper">
@@ -87,7 +87,7 @@
                     </div>
                     
                     <div class="form-actions">
-                        <a href="/admin/puzzles" class="admin-button secondary">Cancel</a>
+                        <a href="/v1/admin/puzzles" class="admin-button secondary">Cancel</a>
                         <button type="submit" class="admin-button primary">Upload and Import</button>
                     </div>
                 </form>

@@ -289,7 +289,7 @@ router.post('/start', async (req, res) => {
     req.session.currentPuzzle = puzzle.id;
     
     // Redirect to the game page
-    res.redirect(`/game?puzzleId=${puzzle.id}`);
+    res.redirect(`/v1/game?puzzleId=${puzzle.id}`);
   } catch (error) {
     console.error('Error starting game:', error);
     res.status(500).send('Server error');
