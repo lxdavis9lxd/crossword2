@@ -318,7 +318,8 @@ select#level-select:focus {
 }
 
 .crossword-cell.blocked {
-  background-color: #222;
+  background-color: #000;
+  border: none;
 }
 
 .crossword-cell input {
@@ -347,7 +348,9 @@ select#level-select:focus {
   top: 2px;
   left: 2px;
   font-size: 0.6rem;
-  color: #666;
+  font-weight: bold;
+  color: #333;
+  z-index: 1;
 }
 
 .crossword-cell:focus {

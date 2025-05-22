@@ -135,9 +135,14 @@
                 
                 // Generate grid
                 // Handle puzzles that may not have cellNumbers property
-                generateGrid(puzzle.grid, puzzle.cellNumbers || {});
+                // Ensure cellNumbers is available in some form
+                const cellNumbers = puzzle.cellNumbers || 
+                                   puzzle.cell_numbers || 
+                                   puzzle.cellNumber || 
+                                   {};
                 
-                // Generate clues
+                // Generate grid with the extracted cellNumbers
+                generateGrid(puzzle.grid, cellNumbers);
                 generateClues(puzzle.clues);
                 
                 // Check for saved progress and load it
@@ -184,6 +189,12 @@
             cells.forEach(cell => {
                 cell.style.width = `${cellSize}px`;
                 cell.style.height = `${cellSize}px`;
+                
+                // Ensure cell number is sized appropriately
+                const cellNumber = cell.querySelector('.cell-number');
+                if (cellNumber) {
+                    cellNumber.style.fontSize = `${Math.max(cellSize * 0.2, 8)}px`;
+                }
             });
         }
         
@@ -203,9 +214,11 @@
                 const cellElement = document.createElement('div');
                 cellElement.classList.add('crossword-cell');
                 
-                if (cell === '#' || cell === '.') {
+                // If cell is a blocked cell (marked as # or . or empty)
+                if (cell === '#' || cell === '.' || cell === '' || cell === ' ') {
                     cellElement.classList.add('blocked');
                 } else {
+                    // Cell has a letter (not blocked)
                     const input = document.createElement('input');
                     input.type = 'text';
                     input.maxLength = 1;
@@ -218,11 +231,23 @@
                     input.style.textTransform = 'uppercase';
                     cellElement.appendChild(input);
                     
-                    // Add cell number if cellNumbers exists and has a value for this index
-                    if (cellNumbers && cellNumbers[i]) {
+                    // Add cell number if it exists
+                    // Checking all possible formats for cell numbers
+                    let cellNumber = null;
+                    
+                    // Check for cell numbers in different formats
+                    if (cellNumbers) {
+                        if (typeof cellNumbers[i] !== 'undefined') {
+                            cellNumber = cellNumbers[i];
+                        } else if (typeof cellNumbers[i.toString()] !== 'undefined') {
+                            cellNumber = cellNumbers[i.toString()];
+                        }
+                    }
+                    
+                    if (cellNumber) {
                         const numberElement = document.createElement('span');
                         numberElement.classList.add('cell-number');
-                        numberElement.textContent = cellNumbers[i];
+                        numberElement.textContent = cellNumber;
                         cellElement.appendChild(numberElement);
                     }
                 }
