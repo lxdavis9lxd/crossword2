@@ -1,0 +1,14 @@
+Modernize game interface to match admin styling
+
+This commit modernizes the game interface (game.ejs and dashboard.ejs) to match the modern styling already applied to the admin interface.
+
+Changes:
+- Created a new CSS file (game-styles-modern.css) with consistent green theme for game features
+- Updated dashboard.ejs to use the modern styling
+- Updated game.ejs to use the modern styling
+- Added Google Fonts integration for the Inter font family
+- Improved UI with card-based layouts, shadows, and rounded corners
+- Enhanced typography and component styling
+- Created modern achievement notification system
+- Added responsive design elements
+- Maintained all existing game functionality while improving UI
