@@ -4,20 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Import Results - Admin</title>
-    <link rel="stylesheet" href="/styles.css">
-    <link rel="stylesheet" href="/admin-styles.css">
+    <link rel="stylesheet" href="/v1/styles.css">
+    <link rel="stylesheet" href="/admin-styles-modern.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="admin-body">
     <header class="admin-header">
         <h1>Import Results</h1>
         <nav>
             <ul>
-                <li><a href="/admin">Dashboard</a></li>
-                <li><a href="/admin/users">Users</a></li>
-                <li><a href="/admin/puzzles">Puzzles</a></li>
-                <li><a href="/admin/import-puzzles" class="active">Import Puzzles</a></li>
-                <li><a href="/game/dashboard">Game Dashboard</a></li>
-                <li><a href="/auth/logout">Logout</a></li>
+                <li><a href="/v1/admin">Dashboard</a></li>
+                <li><a href="/v1/admin/users">Users</a></li>
+                <li><a href="/v1/admin/puzzles">Puzzles</a></li>
+                <li><a href="/v1/admin/import-puzzles" class="active">Import Puzzles</a></li>
+                <li><a href="/v1/game/dashboard">Game Dashboard</a></li>
+                <li><a href="/v1/auth/logout">Logout</a></li>
             </ul>
         </nav>
     </header>
@@ -28,8 +31,8 @@
                 <h2>Excel Import Results</h2>
             </div>
             <div class="controls-right">
-                <a href="/admin/puzzles" class="admin-button primary">View All Puzzles</a>
-                <a href="/admin/import-puzzles" class="admin-button secondary">Import More</a>
+                <a href="/v1/admin/puzzles" class="admin-button primary">View All Puzzles</a>
+                <a href="/v1/admin/import-puzzles" class="admin-button secondary">Import More</a>
             </div>
         </section>
         
@@ -56,7 +59,7 @@
                 <div class="import-success">
                     <h3>Successfully Imported Puzzles</h3>
                     <p><%= results.success %> puzzles were successfully imported into the database.</p>
-                    <a href="/admin/puzzles" class="action-link view">View All Puzzles</a>
+                    <a href="/v1/admin/puzzles" class="action-link view">View All Puzzles</a>
                 </div>
             <% } %>
             
@@ -76,8 +79,8 @@
             <% } %>
             
             <div class="import-actions">
-                <a href="/admin/import-puzzles" class="admin-button primary">Import More Puzzles</a>
-                <a href="/admin" class="admin-button secondary">Back to Dashboard</a>
+                <a href="/v1/admin/import-puzzles" class="admin-button primary">Import More Puzzles</a>
+                <a href="/v1/admin" class="admin-button secondary">Back to Dashboard</a>
             </div>
         </section>
     </main>

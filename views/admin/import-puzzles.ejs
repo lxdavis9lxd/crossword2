@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Import Puzzles - Admin</title>
     <link rel="stylesheet" href="/v1/styles.css">
-    <link rel="stylesheet" href="/v1/admin-styles.css">
+    <link rel="stylesheet" href="/admin-styles-modern.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="admin-body">
     <header class="admin-header">
@@ -119,10 +122,11 @@
     
     <style>
         .import-instructions {
-            background-color: #f8f9fa;
+            background-color: var(--card-bg);
             padding: 1.5rem;
-            border-radius: 8px;
+            border-radius: var(--border-radius);
             margin-bottom: 2rem;
+            box-shadow: var(--box-shadow);
         }
         
         .import-instructions ol {
@@ -139,42 +143,122 @@
         }
         
         .import-form {
-            background-color: white;
+            background-color: var(--card-bg);
             padding: 2rem;
-            border-radius: 8px;
+            border-radius: var(--border-radius);
             margin-bottom: 2rem;
-            border: 1px solid #eee;
+            box-shadow: var(--box-shadow);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            margin: 1rem 0;
+        }
+        
+        .file-input-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2.5rem 1rem;
+            border: 2px dashed var(--primary-light);
+            border-radius: var(--border-radius);
+            background-color: rgba(58, 134, 255, 0.05);
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+        
+        .file-input-button:hover, .file-input-button.highlight {
+            background-color: rgba(58, 134, 255, 0.1);
+            border-color: var(--primary-color);
+        }
+        
+        .file-input-button.file-selected {
+            border-style: solid;
+            background-color: rgba(58, 134, 255, 0.1);
+        }
+        
+        .file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .selected-file {
+            margin-top: 0.5rem;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .file-format-hint {
+            margin-top: 0.5rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .file-format-hint ul {
+            background-color: rgba(0,0,0,0.02);
+            padding: 1rem 1rem 1rem 2.5rem;
+            border-radius: var(--border-radius);
+            margin-top: 0.5rem;
+        }
+        
+        .file-format-hint li {
+            margin-bottom: 0.5rem;
         }
         
         .file-icon {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-            display: block;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
         }
         
         .import-help {
-            background-color: #f8f9fa;
+            background-color: var(--card-bg);
             padding: 1.5rem;
-            border-radius: 8px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-top: 2rem;
         }
         
         .code-example {
             margin-bottom: 1.5rem;
         }
         
+        .code-example h4 {
+            color: var(--primary-color);
+            margin-bottom: 0.75rem;
+        }
+        
         .code-example pre {
-            background-color: #f1f1f1;
+            background-color: #f5f7fa;
             padding: 1rem;
-            border-radius: 4px;
+            border-radius: var(--border-radius);
             overflow-x: auto;
-            font-family: monospace;
+            font-family: 'Consolas', 'Monaco', monospace;
             margin: 0.5rem 0;
+            border: 1px solid rgba(0,0,0,0.05);
         }
         
         .code-example p {
             font-size: 0.9rem;
             color: #666;
             margin-top: 0.5rem;
+        }
+        
+        .error-message {
+            background-color: #ffebee;
+            border-left: 4px solid var(--danger-color);
+            color: var(--danger-color);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: var(--border-radius);
         }
     </style>
     
