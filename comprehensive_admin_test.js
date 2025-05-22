@@ -5,7 +5,7 @@ const path = require('path');
 // Configuration
 const BASE_URL = 'http://localhost:3000';
 const ADMIN_USERNAME = 'admin';
-const ADMIN_PASSWORD = 'Admin123!';
+const ADMIN_PASSWORD = 't123';
 let sessionCookie = null;
 
 // Create logs directory if it doesn't exist
