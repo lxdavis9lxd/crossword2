@@ -4,10 +4,7 @@
   "description": "## Project Overview",
   "main": "app.js",
   "scripts": {
-    "test": "node test.js",
-    "test:game": "node game_test.js",
-    "start": "node app.js",
-    "test:api": "./test_excel_upload.sh"
+    "start": "node app.js"
   },
   "keywords": [],
   "author": "",
