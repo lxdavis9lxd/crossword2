@@ -106,6 +106,9 @@
             const urlParams = new URLSearchParams(window.location.search);
             const puzzleId = urlParams.get('puzzleId');
             
+            // Add window resize handler to adjust grid size
+            window.addEventListener('resize', adjustGridSize);
+            
             if (!puzzleId) {
                 showMessage('No puzzle selected', 'error');
                 return;
@@ -159,11 +162,44 @@
             }
         });
         
+        // Function to adjust grid size based on window size
+        function adjustGridSize() {
+            const gridContainer = document.getElementById('crossword-grid');
+            if (!gridContainer) return;
+            
+            // Get current grid dimensions
+            const gridSize = parseInt(gridContainer.style.gridTemplateColumns.match(/repeat\((\d+)/)?.[1] || 15, 10);
+            
+            // Determine the available width (limiting to 95% of viewport width up to 600px)
+            const availableWidth = Math.min(window.innerWidth * 0.95, 600);
+            
+            // Calculate cell size (with 2px gap)
+            const cellSize = Math.floor((availableWidth - (gridSize - 1) * 2) / gridSize);
+            
+            // Apply responsive styles
+            gridContainer.style.gridTemplateColumns = `repeat(${gridSize}, ${cellSize}px)`;
+            
+            // Get all cells and set their explicit size
+            const cells = gridContainer.querySelectorAll('.crossword-cell');
+            cells.forEach(cell => {
+                cell.style.width = `${cellSize}px`;
+                cell.style.height = `${cellSize}px`;
+            });
+        }
+        
         function generateGrid(grid, cellNumbers) {
             const gridContainer = document.getElementById('crossword-grid');
             gridContainer.innerHTML = '';
             
-            grid.forEach((cell, index) => {
+            // Calculate grid dimensions (assuming it's a square grid)
+            const gridSize = Math.sqrt(grid.length);
+            
+            // Set explicit grid columns based on puzzle size
+            gridContainer.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+            
+            // Create cells with proper layout
+            for (let i = 0; i < grid.length; i++) {
+                const cell = grid[i];
                 const cellElement = document.createElement('div');
                 cellElement.classList.add('crossword-cell');
                 
@@ -173,7 +209,7 @@
                     const input = document.createElement('input');
                     input.type = 'text';
                     input.maxLength = 1;
-                    input.dataset.index = index;
+                    input.dataset.index = i;
                     input.style.width = '80%';
                     input.style.height = '80%';
                     input.style.textAlign = 'center';
@@ -183,16 +219,19 @@
                     cellElement.appendChild(input);
                     
                     // Add cell number if cellNumbers exists and has a value for this index
-                    if (cellNumbers && cellNumbers[index]) {
+                    if (cellNumbers && cellNumbers[i]) {
                         const numberElement = document.createElement('span');
                         numberElement.classList.add('cell-number');
-                        numberElement.textContent = cellNumbers[index];
+                        numberElement.textContent = cellNumbers[i];
                         cellElement.appendChild(numberElement);
                     }
                 }
                 
                 gridContainer.appendChild(cellElement);
-            });
+            }
+            
+            // Adjust grid cells to proper size
+            adjustGridSize();
         }
         
         function generateClues(clues) {
