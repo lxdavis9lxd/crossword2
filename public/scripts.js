@@ -1,4 +1,29 @@
 // filepath: /workspaces/crossword2/public/scripts.js
+// Function to determine the base URL for API requests
+// This handles both local development and cPanel hosting environments
+function getBaseUrl() {
+    // Get the current hostname
+    const hostname = window.location.hostname;
+    
+    // Check if we're in a development environment
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return ''; // Empty string for local development (relative paths)
+    } else {
+        // For cPanel or production, check if we have a specific path
+        const pathSegments = window.location.pathname.split('/');
+        
+        // If the site is in a subdirectory on cPanel (e.g., /~username/crossword/)
+        if (pathSegments.length > 2) {
+            // Extract the base path but remove the current page's name
+            const basePath = pathSegments.slice(0, -1).join('/');
+            return basePath;
+        } else {
+            // If it's at the root of the domain
+            return '';
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Get DOM elements
     const levelSelect = document.getElementById('level-select');
@@ -55,7 +80,11 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             puzzlesContainer.innerHTML = '<p>Loading puzzles...</p>';
             
-            const response = await fetch('/v1/game/puzzles/' + level);
+            // Get base URL to handle both development and production paths
+            const baseUrl = getBaseUrl();
+            
+            // Use the base URL for the fetch request
+            const response = await fetch(`${baseUrl}/game/puzzles/${level}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch puzzles: ' + response.status);
             }
@@ -145,7 +174,8 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Loading puzzle ID:', puzzleId);
         
         try {
-            const response = await fetch('/v1/game/puzzles/details/' + puzzleId);
+            const baseUrl = getBaseUrl();
+            const response = await fetch(`${baseUrl}/v1/game/puzzles/details/${puzzleId}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch puzzle details: ' + response.status);
             }
@@ -178,7 +208,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            const response = await fetch('/v1/game/progress/' + userId);
+            const baseUrl = getBaseUrl();
+            const response = await fetch(`${baseUrl}/v1/game/progress/${userId}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch saved games: ' + response.status);
             }
@@ -197,7 +228,8 @@ document.addEventListener('DOMContentLoaded', function() {
             // Fetch puzzle details for each saved game
             for (const puzzleId in progress) {
                 try {
-                    const puzzleResponse = await fetch('/v1/game/puzzles/details/' + puzzleId);
+                    const baseUrl = getBaseUrl();
+                    const puzzleResponse = await fetch(`${baseUrl}/v1/game/puzzles/details/${puzzleId}`);
                     if (!puzzleResponse.ok) continue;
                     
                     const puzzle = await puzzleResponse.json();
@@ -217,8 +249,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Add event listener to the button
                     const loadButton = savedGameItem.querySelector('.load-saved-game-btn');
+                    const baseUrl = getBaseUrl();
                     loadButton.addEventListener('click', function() {
-                        window.location.href = '/v1/game?puzzleId=' + puzzle.id;
+                        window.location.href = `${baseUrl}/v1/game?puzzleId=${puzzle.id}`;
                     });
                     
                     savedGamesList.appendChild(savedGameItem);
@@ -375,7 +408,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         try {
-            const response = await fetch('/v1/game/save', {
+            const baseUrl = getBaseUrl();
+            const response = await fetch(`${baseUrl}/v1/game/save`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -398,7 +432,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Initialize the game if we're on the game page with a puzzleId
-    if (window.location.pathname === '/v1/game') {
+    if (window.location.pathname.includes('/v1/game')) {
         const urlParams = new URLSearchParams(window.location.search);
         const puzzleId = urlParams.get('puzzleId');
         if (puzzleId) {
