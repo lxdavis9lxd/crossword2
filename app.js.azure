@@ -1,0 +1,191 @@
+const express = require('express');
+const bodyParser = require('body-parser');
+const session = require('express-session');
+const path = require('path');
+const fs = require('fs');
+const app = express();
+
+// Load environment variables
+try {
+  require('dotenv').config();
+} catch (err) {
+  console.log('No .env file found, using environment variables directly');
+}
+
+// Set up middleware
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+// Session configuration
+const sessionConfig = {
+  secret: process.env.SESSION_SECRET || 'secret-key',
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production', // only set secure in production
+    maxAge: 1000 * 60 * 60 * 24 // 24 hours
+  }
+};
+
+// If in production with Redis available, use Redis store
+if (process.env.NODE_ENV === 'production' && process.env.REDIS_URL) {
+  try {
+    const RedisStore = require('connect-redis').default;
+    const { createClient } = require('redis');
+    
+    const redisClient = createClient({
+      url: process.env.REDIS_URL
+    });
+    
+    redisClient.connect().catch(console.error);
+    
+    sessionConfig.store = new RedisStore({
+      client: redisClient
+    });
+    
+    console.log('Using Redis session store');
+  } catch (error) {
+    console.error('Failed to initialize Redis session store:', error);
+    console.log('Falling back to memory session store');
+  }
+}
+// If in production with Azure Table Storage available, use AzureTables store
+else if (process.env.NODE_ENV === 'production' && process.env.AZURE_STORAGE_CONNECTION_STRING) {
+  try {
+    const AzureTablesStoreFactory = require('connect-azuretables')(session);
+    
+    sessionConfig.store = AzureTablesStoreFactory.create({
+      sessionTimeOut: 60 * 60 * 24, // 1 day in seconds
+      connectionString: process.env.AZURE_STORAGE_CONNECTION_STRING
+    });
+    
+    console.log('Using Azure Table Storage session store');
+  } catch (error) {
+    console.error('Failed to initialize Azure Table Storage session store:', error);
+    console.log('Falling back to memory session store');
+  }
+}
+
+app.use(session(sessionConfig));
+
+// Serve static files from the public directory
+app.use(express.static(path.join(__dirname, 'public')));
+// Also serve static files with v1 prefix for compatibility
+app.use('/v1', express.static(path.join(__dirname, 'public')));
+
+// Configure EJS as the view engine
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+// Check SQLite database file location based on environment
+const dbPath = process.env.SQLITE_PATH || path.join(__dirname, 'database.sqlite');
+if (!fs.existsSync(dbPath)) {
+  console.warn(`Database file not found at ${dbPath}. If this is the first run, it will be created.`);
+  
+  // Ensure directory exists
+  const dbDir = path.dirname(dbPath);
+  if (!fs.existsSync(dbDir)) {
+    try {
+      fs.mkdirSync(dbDir, { recursive: true });
+      console.log(`Created directory ${dbDir} for database`);
+    } catch (err) {
+      console.error(`Failed to create directory ${dbDir}:`, err);
+    }
+  }
+}
+
+// Import models
+const db = require('./models');
+
+// Test database connection
+db.testConnection()
+  .then(success => {
+    if (!success) {
+      console.error('Could not connect to database. Application may not function correctly.');
+    }
+  });
+
+// Set up routes
+const authRoutes = require('./routes/auth');
+const gameRoutes = require('./routes/game');
+const achievementRoutes = require('./routes/achievements');
+const adminRoutes = require('./routes/admin');
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Global error handler:', err);
+  console.error('Error stack:', err.stack);
+  
+  // Handle different types of errors
+  if (err.name === 'SequelizeValidationError') {
+    return res.status(400).json({
+      error: 'Validation error',
+      details: err.errors.map(e => e.message)
+    });
+  }
+  
+  if (err.name === 'SequelizeUniqueConstraintError') {
+    return res.status(400).json({
+      error: 'Unique constraint error',
+      details: err.errors.map(e => e.message)
+    });
+  }
+  
+  // If this is an API request, return JSON error
+  if (req.path.startsWith('/api/') || req.accepts('json')) {
+    return res.status(err.status || 500).json({
+      error: 'Server error',
+      message: err.message || 'Something went wrong'
+    });
+  }
+  
+  // For regular requests, show an error page or redirect
+  res.status(err.status || 500).send('Server error: ' + (err.message || 'Something went wrong'));
+});
+
+// Set up routes with versioning (/v1 prefix)
+app.use('/v1/auth', authRoutes);
+app.use('/v1/game', gameRoutes);
+app.use('/v1/achievements', achievementRoutes);
+app.use('/v1/admin', adminRoutes);
+
+// Debug route for session with versioning
+app.get('/v1/debug-session', (req, res) => {
+  res.json({
+    session: req.session,
+    user: req.session.user || null
+  });
+});
+
+// Home route - redirect to versioned route
+app.get('/', (req, res) => {
+  res.render('index');
+});
+
+// Achievements page route with versioning
+app.get('/v1/achievements', (req, res) => {
+  if (!req.session.userId) {
+    return res.redirect('/v1/auth/login');
+  }
+  res.render('achievements');
+});
+
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+  console.log(`Node environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Database path: ${dbPath}`);
+});
+
+// Handle graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received. Shutting down gracefully.');
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT received. Shutting down gracefully.');
+  process.exit(0);
+});

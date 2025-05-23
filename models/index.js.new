@@ -1,0 +1,50 @@
+const Sequelize = require('sequelize');
+const path = require('path');
+const fs = require('fs');
+const dbConfig = require('../config/database');
+
+// Determine which environment we're in
+const env = process.env.NODE_ENV || 'development';
+const config = dbConfig[env];
+
+// Initialize Sequelize with environment-specific config
+const sequelize = new Sequelize({
+  dialect: config.dialect,
+  storage: config.storage,
+  logging: config.logging
+});
+
+const db = {
+  sequelize,
+  Sequelize
+};
+
+// Import model definitions from individual files
+const User = require('./user')(sequelize, Sequelize.DataTypes);
+const Puzzle = require('./puzzle')(sequelize, Sequelize.DataTypes);
+const Achievement = require('./achievement')(sequelize, Sequelize.DataTypes);
+const UserAchievement = require('./userAchievement')(sequelize, Sequelize.DataTypes);
+
+// Add models to the db object
+db.User = User;
+db.Puzzle = Puzzle;
+db.Achievement = Achievement;
+db.UserAchievement = UserAchievement;
+
+// Setup associations
+User.associate(db);
+Achievement.associate(db);
+
+// Test database connection
+db.testConnection = async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('Database connection established successfully.');
+    return true;
+  } catch (error) {
+    console.error('Unable to connect to the database:', error);
+    return false;
+  }
+};
+
+module.exports = db;
