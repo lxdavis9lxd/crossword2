@@ -300,7 +300,9 @@ select#level-select:focus {
   background-color: #333;
   padding: 2px;
   box-shadow: var(--box-shadow);
-  overflow: hidden; /* Added to ensure the grid stays contained */
+  overflow: auto; /* Changed from hidden to auto to allow scrolling on small screens */
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS devices */
+  touch-action: manipulation; /* Improved touch handling */
 }
 
 .crossword-cell {
@@ -391,10 +393,12 @@ select#level-select:focus {
 }
 
 .clue-item {
-  padding: 0.5rem 0;
+  padding: 0.75rem 0.5rem;
   border-bottom: 1px solid rgba(0,0,0,0.05);
   cursor: pointer;
   transition: var(--transition);
+  border-radius: 4px;
+  margin-bottom: 0.25rem;
 }
 
 .clue-item:last-child {
@@ -431,6 +435,8 @@ select#level-select:focus {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  min-height: 44px; /* Minimum touch target size for mobile */
+  font-size: 1rem;
 }
 
 .action-save {
@@ -657,6 +663,42 @@ select#level-select:focus {
 }
 
 /* Responsive styles */
+/* Tablet Devices (768px - 1024px) */
+@media (max-width: 1024px) {
+  .game-main {
+    width: 90%;
+  }
+  
+  .puzzle-selection {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .puzzles-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+  
+  .game-controls {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .crossword-action {
+    padding: 0.75rem 1.25rem;
+    flex: 1 0 auto;
+    min-width: 120px;
+    max-width: 200px;
+    justify-content: center;
+  }
+  
+  .crossword-grid {
+    overflow-x: auto;
+    max-width: 100%;
+    padding: 10px;
+  }
+}
+
+/* Mobile Devices (up to 768px) */
 @media (max-width: 768px) {
   .game-header {
     flex-direction: column;
@@ -672,13 +714,13 @@ select#level-select:focus {
     justify-content: center;
   }
   
-  .game-section {
-    padding: 1.25rem;
+  .game-main {
+    width: 95%;
+    margin: 1rem auto;
   }
   
-  .puzzle-selection {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+  .game-section {
+    padding: 1.25rem;
   }
   
   .clue-container {
@@ -688,10 +730,69 @@ select#level-select:focus {
   
   .crossword-grid {
     max-width: 100%;
+    transform-origin: left top;
+    touch-action: pan-x pan-y;
   }
   
   .crossword-cell {
-    font-size: 1rem;
+    font-size: 0.9rem;
+    min-width: 30px;
+    min-height: 30px;
+  }
+  
+  .game-controls {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .crossword-action {
+    width: 100%;
+    max-width: none;
+    justify-content: center;
+  }
+  
+  .puzzle-metadata {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.75rem;
+  }
+  
+  .saved-games-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Small Mobile Devices (up to 480px) */
+@media (max-width: 480px) {
+  .game-header nav ul {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .game-header nav a {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .crossword-cell {
+    font-size: 0.8rem;
+    min-width: 28px;
+    min-height: 28px;
+  }
+  
+  .crossword-cell.number::before {
+    font-size: 0.6rem;
+    top: 1px;
+    left: 2px;
+  }
+  
+  .puzzle-header h2 {
+    font-size: 1.3rem;
+  }
+  
+  .clue-section {
+    padding: 1rem;
   }
 }
 

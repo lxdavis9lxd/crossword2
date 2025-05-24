@@ -108,6 +108,7 @@
             
             // Add window resize handler to adjust grid size
             window.addEventListener('resize', adjustGridSize);
+            window.addEventListener('orientationchange', adjustGridSize);
             
             if (!puzzleId) {
                 showMessage('No puzzle selected', 'error');
@@ -175,8 +176,18 @@
             // Get current grid dimensions
             const gridSize = parseInt(gridContainer.style.gridTemplateColumns.match(/repeat\((\d+)/)?.[1] || 15, 10);
             
-            // Determine the available width (limiting to 95% of viewport width up to 600px)
-            const availableWidth = Math.min(window.innerWidth * 0.95, 600);
+            // Determine the available width based on screen size
+            let availableWidth;
+            if (window.innerWidth <= 480) {
+                // Small mobile - smaller grid with ability to scroll
+                availableWidth = Math.min(window.innerWidth * 0.9, 350);
+            } else if (window.innerWidth <= 768) {
+                // Mobile - adjust grid to fit in viewport width
+                availableWidth = Math.min(window.innerWidth * 0.92, 450);
+            } else {
+                // Tablet and desktop - standard size
+                availableWidth = Math.min(window.innerWidth * 0.95, 600);
+            }
             
             // Calculate cell size (with 2px gap)
             const cellSize = Math.floor((availableWidth - (gridSize - 1) * 2) / gridSize);
@@ -193,7 +204,14 @@
                 // Ensure cell number is sized appropriately
                 const cellNumber = cell.querySelector('.cell-number');
                 if (cellNumber) {
-                    cellNumber.style.fontSize = `${Math.max(cellSize * 0.2, 8)}px`;
+                    // Adjust font size based on cell size but ensure minimum readability
+                    cellNumber.style.fontSize = `${Math.max(cellSize * 0.25, 8)}px`;
+                    
+                    // Adjust position for better visibility
+                    if (window.innerWidth <= 480) {
+                        cellNumber.style.top = '1px';
+                        cellNumber.style.left = '1px';
+                    }
                 }
             });
         }
