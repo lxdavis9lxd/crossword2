@@ -13,7 +13,7 @@ const config = {
   },
   production: {
     dialect: 'sqlite',
-    // In production, we'll use a path that works well with Azure App Service
+    // In production, we'll use a configurable path
     storage: process.env.SQLITE_PATH || 'database.sqlite',
     logging: false
   }

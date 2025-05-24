@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Deployment script for Azure App Service with SQLite
+# Deployment script for web application with SQLite
 # This script ensures the SQLite database is in a persistent location
 
 echo "Starting deployment process for Crossword application with SQLite..."
@@ -54,4 +54,4 @@ if [ -z "$NODE_ENV" ]; then
 fi
 
 echo "Deployment setup complete!"
-echo "Your Crossword application is ready to run with SQLite on Azure App Service."
+echo "Your Crossword application is ready to run with SQLite."
