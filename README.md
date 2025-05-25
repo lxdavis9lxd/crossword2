@@ -10,6 +10,9 @@ This application uses API versioning with a `/v1` prefix on all routes. All API 
 - `/v1/auth/login` instead of `/auth/login`
 - `/v1/game/dashboard` instead of `/game/dashboard`
 - `/v1/admin/puzzles` instead of `/admin/puzzles`
+- `/v1/game/puzzles/:level` instead of `/game/puzzles/:level`
+
+> **Important**: The frontend JavaScript code in scripts.js has been updated to use these versioned API endpoints. All fetch requests now include the `/v1/` prefix.
 
 ## Setup Instructions
 
@@ -28,6 +31,40 @@ This application uses API versioning with a `/v1` prefix on all routes. All API 
    ```
    npx sequelize-cli db:migrate
    ```
+
+## Deployment
+
+### cPanel Deployment
+
+The application has been optimized for cPanel hosting environments:
+
+1. The frontend JavaScript (scripts.js) includes path detection logic to work correctly in cPanel's directory structure
+2. All API endpoints use the `/v1/` prefix for versioning
+3. Debug logging has been added to help troubleshoot any path or URL issues
+
+When deploying to cPanel:
+1. Upload all files to your cPanel hosting
+2. Make sure Node.js is available on your hosting plan
+3. Run `npm install` to install dependencies
+4. Set up the database with `npx sequelize-cli db:migrate`
+5. Configure a custom Node.js application in cPanel (typically under "Setup Node.js App")
+6. Set the application's entry point to `app.js`
+
+### Troubleshooting
+
+If you encounter issues with the "Load Puzzles" button in cPanel:
+1. Check the browser console for debug messages
+2. Verify that API requests are using the correct path with `/v1/` prefix
+3. Check that the SQLite database has puzzle data for the selected level
+
+## Project Updates
+
+### May 2025 Update
+- Removed Azure deployment files and configurations
+- Fixed load-puzzles functionality for cPanel environments
+- Added detailed debug logging to help troubleshoot deployment issues
+- Enhanced URL handling in frontend JavaScript for better compatibility
+- Reorganized codebase for simpler maintenance
 
 ## Codebase Maintenance
 
