@@ -29,3 +29,31 @@ app.log
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# Cleanup and backup directories
+cleanup_backup/
+temp_backup/
+test_backup/
+
+# Azure related files that are kept for reference but not in active use
+AZURE_DEPLOYMENT_GUIDE.md
+AZURE_SQLITE_DEPLOYMENT_GUIDE.md
+AZURE_SQLITE_SUMMARY.md
+app.js.azure
+azure_migration.js
+azuredeploy.json
+deploy_to_azure.sh
+prepare_for_azure.sh
+package.json.new
+
+# Empty placeholder files that were created during cleanup
+app.js.production
+app_v1.js
+ADMIN_IMPLEMENTATION_SUMMARY.md
+GAME_UI_COMMIT_MESSAGE.txt
+GAME_UI_FIX_COMMIT.txt
+add_cultural_puzzles.js
+comprehensive_admin_test.js
+update_admin_password.js
+update_puzzle_difficulties.js
+verify_puzzles.js
