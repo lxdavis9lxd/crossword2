@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Using base URL:', baseUrl);
             
             // Use the base URL for the fetch request
-            const response = await fetch(`${baseUrl}/v1/game/puzzles/${level}`);
+            const response = await fetch(`${baseUrl}/game/puzzles/${level}`);
             if (!response.ok) {
                 throw new Error('Failed to fetch puzzles: ' + response.status);
             }
