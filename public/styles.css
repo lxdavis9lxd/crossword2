@@ -230,6 +230,26 @@ button:disabled {
     color: #c62828;
 }
 
+/* Debug information styling */
+.debug-info {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.debug-info p {
+    margin: 5px 0;
+}
+
+.debug-info strong {
+    color: #333;
+}
+
 /* Saved games styling */
 .saved-games-container {
     margin-top: 1rem;
@@ -507,7 +527,7 @@ button:disabled {
     background-color: #bdc3c7;
 }
 
-/* Add info message type */
+/* Debug info message type */
 #message.info {
     background-color: #d1ecf1;
     color: #0c5460;

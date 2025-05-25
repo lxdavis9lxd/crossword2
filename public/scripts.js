@@ -5,26 +5,36 @@ function getBaseUrl() {
     const hostname = window.location.hostname;
     const pathname = window.location.pathname;
     
+    console.log('getBaseUrl - Current hostname:', hostname);
+    console.log('getBaseUrl - Current pathname:', pathname);
+    
     // Check if we're in a development environment
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        console.log('getBaseUrl - Development environment detected, returning empty base URL');
         return ''; // Empty string for local development (relative paths)
     } else {
+        console.log('getBaseUrl - Production environment detected (cPanel)');
         // For cPanel hosting, check URL structure
         // Common cPanel pattern: example.com/~username/sitename/
         
         // First check for v1 in the URL to handle versioned API paths
         if (pathname.includes('/v1/')) {
+            console.log('getBaseUrl - /v1/ found in pathname');
             const pathSegments = pathname.split('/v1/');
             // Return everything before '/v1/'
+            console.log('getBaseUrl - Base URL from v1 path:', pathSegments[0]);
             return pathSegments[0];
         }
         
         // For other pages (like dashboard)
+        console.log('getBaseUrl - No /v1/ in pathname, using path parts method');
         const pathParts = pathname.split('/');
         // Remove the last part (current page)
         pathParts.pop();
         // Join remaining parts to form the base path
-        return pathParts.join('/');
+        const result = pathParts.join('/');
+        console.log('getBaseUrl - Base URL from path parts:', result);
+        return result;
     }
 }
 
@@ -66,7 +76,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     if (loadPuzzlesBtn) {
-        loadPuzzlesBtn.addEventListener('click', loadPuzzlesForLevel);
+        console.log('Load puzzles button found, adding click event listener');
+        loadPuzzlesBtn.addEventListener('click', function(event) {
+            console.log('Load puzzles button clicked!');
+            console.log('Event details:', event.type);
+            loadPuzzlesForLevel();
+        });
+    } else {
+        console.warn('Load puzzles button not found in the DOM');
     }
     
     if (saveButton) {
@@ -82,9 +99,11 @@ document.addEventListener('DOMContentLoaded', function() {
     async function loadPuzzlesForLevel() {
         const level = levelSelect.value;
         console.log('Loading puzzles for level:', level);
+        console.log('Button clicked - loadPuzzlesForLevel function executing');
         
         // Update the hidden input 
         selectedLevelInput.value = level;
+        console.log('Selected level input updated to:', level);
         
         // Clear previous selection
         selectedPuzzleIdInput.value = '';
@@ -92,19 +111,28 @@ document.addEventListener('DOMContentLoaded', function() {
         
         try {
             puzzlesContainer.innerHTML = '<p>Loading puzzles...</p>';
+            console.log('Loading message displayed');
             
             // Get base URL to handle both development and production paths
             const baseUrl = getCachedBaseUrl();
             console.log('Using base URL:', baseUrl);
             
+            // Build the full URL for debugging
+            const fullUrl = `${baseUrl}/v1/game/puzzles/${level}`;
+            console.log('Full fetch URL:', fullUrl);
+            
             // Use the base URL for the fetch request with v1 prefix for API versioning
-            const response = await fetch(`${baseUrl}/v1/game/puzzles/${level}`);
+            console.log('Attempting fetch request...');
+            const response = await fetch(fullUrl);
+            console.log('Fetch response status:', response.status);
+            
             if (!response.ok) {
+                console.error('Fetch error - status:', response.status, response.statusText);
                 throw new Error('Failed to fetch puzzles: ' + response.status);
             }
             
             const puzzles = await response.json();
-            console.log('Puzzles loaded:', puzzles);
+            console.log('Puzzles loaded successfully:', puzzles);
             
             // Clear current puzzles
             puzzlesContainer.innerHTML = '';
@@ -175,7 +203,21 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } catch (error) {
             console.error('Error loading puzzles:', error);
-            puzzlesContainer.innerHTML = '<p class="error-message">Error loading puzzles: ' + error.message + '</p>';
+            console.error('Error name:', error.name);
+            console.error('Error message:', error.message);
+            console.error('Error stack:', error.stack);
+            
+            // Display diagnostic information in the UI for debugging
+            puzzlesContainer.innerHTML = `
+                <p class="error-message">Error loading puzzles: ${error.message}</p>
+                <div class="debug-info">
+                    <p><strong>Debug Info:</strong></p>
+                    <p>Hostname: ${window.location.hostname}</p>
+                    <p>Pathname: ${window.location.pathname}</p>
+                    <p>Base URL: ${getCachedBaseUrl()}</p>
+                    <p>Full URL attempted: ${getCachedBaseUrl()}/v1/game/puzzles/${level}</p>
+                </div>
+            `;
         }
     }
     
