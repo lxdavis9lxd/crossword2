@@ -28,6 +28,10 @@ app.use((req, res, next) => {
 // Set up middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+// Trust proxy for secure cookies in production environments (like render.com)
+app.set('trust proxy', 1);
+
 app.use(session({
   secret: 'secret-key',
   resave: false,
@@ -146,6 +150,12 @@ app.get('/v1/achievements', (req, res) => {
 app.get('/auth/:path', (req, res) => {
   // Redirect to the versioned route
   res.redirect(`/v1/auth/${req.params.path}`);
+});
+
+// Fallback route for /game/* requests - redirect to versioned routes
+app.get('/game/dashboard', (req, res) => {
+  // Redirect to the versioned route
+  res.redirect('/v1/game/dashboard');
 });
 
 // Start the server

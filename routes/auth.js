@@ -114,9 +114,12 @@ router.post('/login', async (req, res) => {
     };
     console.log('Session set:', req.session.user);
 
-    // Redirect to game dashboard
+    // Redirect to game dashboard with absolute path construction
     console.log('Redirecting to dashboard...');
-    res.redirect('/v1/game/dashboard');
+    // Use absolute URL construction to ensure consistent behavior across environments
+    const baseUrl = req.protocol + '://' + req.get('host');
+    console.log('Base URL for redirect:', baseUrl);
+    res.redirect(baseUrl + '/v1/game/dashboard');
   } catch (error) {
     console.error('Server error during login:', error);
     res.status(500).send('Server error');
@@ -131,8 +134,9 @@ router.get('/logout', (req, res) => {
       return res.status(500).send('Error logging out');
     }
     
-    // Redirect to home page
-    res.redirect('/');
+    // Redirect to home page with absolute URL
+    const baseUrl = req.protocol + '://' + req.get('host');
+    res.redirect(baseUrl + '/');
   });
 });
 
