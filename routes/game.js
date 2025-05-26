@@ -12,30 +12,61 @@ router.get('/api/session-test', isAuthenticatedApi, (req, res) => {
 // Apply authentication middleware to all other game routes
 router.use(isAuthenticated);
 
-// Fetch puzzles based on difficulty level
-router.get('/puzzles/:level', async (req, res) => {
-  const { level } = req.params;
-
-  try {
-    const puzzles = await Puzzle.findAll({ where: { level } });
-    res.json(puzzles);
-  } catch (error) {
-    res.status(500).send('Server error');
-  }
-});
-
-// Fetch a specific puzzle by ID
+// Fetch a specific puzzle by ID - this must come BEFORE the general puzzles route
 router.get('/puzzles/details/:id', async (req, res) => {
   const { id } = req.params;
+  console.log(`GET /puzzles/details/${id} - Fetching puzzle details`);
 
   try {
     const puzzle = await Puzzle.findByPk(id);
     if (!puzzle) {
-      return res.status(404).send('Puzzle not found');
+      console.log(`Puzzle with ID ${id} not found`);
+      return res.status(404).json({ error: 'Puzzle not found' });
     }
+    
+    // Set cache control headers
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    
+    console.log(`Successfully fetched puzzle ${id}`);
     res.json(puzzle);
   } catch (error) {
-    res.status(500).send('Server error');
+    console.error('Error fetching puzzle details:', error);
+    res.status(500).json({ 
+      error: 'Server error',
+      message: error.message,
+      stack: process.env.NODE_ENV === 'production' ? null : error.stack
+    });
+  }
+});
+
+// Fetch puzzles based on difficulty level
+router.get('/puzzles/:level', async (req, res) => {
+  const { level } = req.params;
+  console.log(`GET /puzzles/${level} - Fetching puzzles for level: ${level}`);
+
+  try {
+    const puzzle = await Puzzle.findByPk(id);
+    if (!puzzle) {
+      console.log(`Puzzle with ID ${id} not found`);
+      return res.status(404).json({ error: 'Puzzle not found' });
+    }
+    
+    // Set cache control headers
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    
+    console.log(`Successfully fetched puzzle ${id}`);
+    res.json(puzzle);
+  } catch (error) {
+    console.error('Error fetching puzzle details:', error);
+    res.status(500).json({ 
+      error: 'Server error',
+      message: error.message,
+      stack: process.env.NODE_ENV === 'production' ? null : error.stack
+    });
   }
 });
 

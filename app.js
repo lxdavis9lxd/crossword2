@@ -6,6 +6,25 @@ const path = require('path');
 const bcrypt = require('bcrypt');
 const app = express();
 
+// Enable CORS for API requests in cPanel
+app.use((req, res, next) => {
+  // Allow requests from the same host regardless of subdomain or protocol
+  const origin = req.headers.origin;
+  if (origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,Accept');
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  
+  next();
+});
+
 // Set up middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -88,6 +107,24 @@ app.get('/v1/debug-session', (req, res) => {
     session: req.session,
     user: req.session.user || null
   });
+});
+
+// API test route - useful for debugging cPanel connectivity
+app.get('/v1/api-test', (req, res) => {
+  res.json({
+    success: true,
+    message: 'API is working correctly',
+    timestamp: new Date().toISOString(),
+    headers: req.headers,
+    hostname: req.hostname,
+    path: req.path,
+    protocol: req.protocol
+  });
+});
+
+// API test page - HTML interface for testing API connectivity
+app.get('/v1/api-test-page', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'api_test.html'));
 });
 
 // Home route - redirect to versioned route

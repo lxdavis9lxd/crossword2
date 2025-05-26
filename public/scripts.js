@@ -4,9 +4,13 @@ function getBaseUrl() {
     // Get the current hostname and path
     const hostname = window.location.hostname;
     const pathname = window.location.pathname;
+    const protocol = window.location.protocol;
+    const origin = window.location.origin;
     
     console.log('getBaseUrl - Current hostname:', hostname);
     console.log('getBaseUrl - Current pathname:', pathname);
+    console.log('getBaseUrl - Current protocol:', protocol);
+    console.log('getBaseUrl - Current origin:', origin);
     
     // Check if we're in a development environment
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
@@ -14,27 +18,73 @@ function getBaseUrl() {
         return ''; // Empty string for local development (relative paths)
     } else {
         console.log('getBaseUrl - Production environment detected (cPanel)');
-        // For cPanel hosting, check URL structure
-        // Common cPanel pattern: example.com/~username/sitename/
         
-        // First check for v1 in the URL to handle versioned API paths
+        // For cPanel hosting, we need a more robust approach
+        // Try several methods and pick the best one
+        
+        // Method 1: Find the base path from the v1 prefix in the URL
         if (pathname.includes('/v1/')) {
-            console.log('getBaseUrl - /v1/ found in pathname');
+            console.log('getBaseUrl - Method 1: /v1/ found in pathname');
             const pathSegments = pathname.split('/v1/');
             // Return everything before '/v1/'
-            console.log('getBaseUrl - Base URL from v1 path:', pathSegments[0]);
-            return pathSegments[0];
+            const result1 = pathSegments[0];
+            console.log('getBaseUrl - Method 1 result:', result1);
+            
+            // Special case: if the result is empty, we might be at the root
+            if (result1 === '') {
+                console.log('getBaseUrl - Method 1 empty result, using origin');
+                return origin;
+            }
+            
+            return result1;
         }
         
-        // For other pages (like dashboard)
-        console.log('getBaseUrl - No /v1/ in pathname, using path parts method');
+        // Method 2: Special handling for dashboard and other non-versioned paths
+        console.log('getBaseUrl - Method 2: Handling standard page URLs');
+        
+        // Special case for cPanel: check for specific patterns in the URL
+        if (pathname.includes('/dashboard') || 
+            pathname.includes('/login') || 
+            pathname.includes('/register') || 
+            pathname.includes('/admin')) {
+            
+            const pathSegments = pathname.split('/');
+            // Remove the last part (current page name)
+            pathSegments.pop();
+            
+            // Join remaining parts to form the base path
+            const result2 = pathSegments.join('/');
+            console.log('getBaseUrl - Method 2 result:', result2);
+            
+            // If the result is empty, we're at the root
+            if (result2 === '') {
+                return origin;
+            }
+            
+            return result2;
+        }
+        
+        // Method 3: Fallback - check if we're at the document root
+        if (pathname === '/' || pathname === '') {
+            console.log('getBaseUrl - Method 3: At site root');
+            return origin;
+        }
+        
+        // Method 4: Ultimate fallback - try to use the origin + pathname minus last segment
+        console.log('getBaseUrl - Method 4: Ultimate fallback');
         const pathParts = pathname.split('/');
         // Remove the last part (current page)
         pathParts.pop();
         // Join remaining parts to form the base path
-        const result = pathParts.join('/');
-        console.log('getBaseUrl - Base URL from path parts:', result);
-        return result;
+        const result4 = pathParts.join('/');
+        console.log('getBaseUrl - Method 4 result:', result4);
+        
+        // If result is empty, return just the origin
+        if (result4 === '') {
+            return origin;
+        }
+        
+        return result4;
     }
 }
 
@@ -120,12 +170,25 @@ document.addEventListener('DOMContentLoaded', function() {
             // Build the full URL for debugging
             const fullUrl = `${baseUrl}/v1/game/puzzles/${level}`;
             console.log('Full fetch URL:', fullUrl);
+            console.log('Fetch parameters:', { level, baseUrl });
             
             // Use the base URL for the fetch request with v1 prefix for API versioning
             console.log('Attempting fetch request...');
-            const response = await fetch(fullUrl);
-            console.log('Fetch response status:', response.status);
             
+            const fetchOptions = {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Cache-Control': 'no-cache'
+                },
+                credentials: 'same-origin'
+            };
+            console.log('Fetch options:', fetchOptions);
+            
+            const response = await fetch(fullUrl, fetchOptions);
+            console.log('Fetch response status:', response.status);
+            console.log('Fetch response headers:', [...response.headers].map(h => `${h[0]}: ${h[1]}`));
+        
             if (!response.ok) {
                 console.error('Fetch error - status:', response.status, response.statusText);
                 throw new Error('Failed to fetch puzzles: ' + response.status);
@@ -214,8 +277,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p><strong>Debug Info:</strong></p>
                     <p>Hostname: ${window.location.hostname}</p>
                     <p>Pathname: ${window.location.pathname}</p>
+                    <p>Protocol: ${window.location.protocol}</p>
+                    <p>Origin: ${window.location.origin}</p>
                     <p>Base URL: ${getCachedBaseUrl()}</p>
                     <p>Full URL attempted: ${getCachedBaseUrl()}/v1/game/puzzles/${level}</p>
+                    <p>Error type: ${error.name}</p>
+                    <p>Error details: ${error.message}</p>
+                </div>
+                <div class="debug-actions">
+                    <button onclick="window.location.reload()">Reload Page</button>
+                    <button onclick="document.getElementById('debug-info').style.display='block'">Show Full Debug</button>
+                </div>
+                <div id="debug-info" style="display:none;white-space:pre-wrap;font-family:monospace;font-size:12px;margin-top:20px;padding:10px;background:#f5f5f5;border:1px solid #ddd;overflow:auto;max-height:300px;">
+                    Error stack trace:
+                    ${error.stack}
                 </div>
             `;
         }
@@ -232,7 +307,20 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const baseUrl = getCachedBaseUrl();
             console.log('Using base URL for puzzle details:', baseUrl);
-            const response = await fetch(`${baseUrl}/v1/game/puzzles/details/${puzzleId}`);
+            const fullUrl = `${baseUrl}/v1/game/puzzles/details/${puzzleId}`;
+            console.log('Full fetch URL for puzzle details:', fullUrl);
+            
+            const response = await fetch(fullUrl, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Cache-Control': 'no-cache'
+                },
+                credentials: 'same-origin'
+            });
+            
+            console.log('Puzzle details response status:', response.status);
+            
             if (!response.ok) {
                 throw new Error('Failed to fetch puzzle details: ' + response.status);
             }
@@ -266,7 +354,21 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             const baseUrl = getCachedBaseUrl();
-            const response = await fetch(`${baseUrl}/v1/game/progress/${userId}`);
+            console.log('Loading saved games with base URL:', baseUrl);
+            const fullUrl = `${baseUrl}/v1/game/progress/${userId}`;
+            console.log('Full URL for progress:', fullUrl);
+            
+            const response = await fetch(fullUrl, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Cache-Control': 'no-cache'
+                },
+                credentials: 'same-origin'
+            });
+            
+            console.log('Progress response status:', response.status);
+            
             if (!response.ok) {
                 throw new Error('Failed to fetch saved games: ' + response.status);
             }
@@ -466,16 +568,27 @@ document.addEventListener('DOMContentLoaded', function() {
         
         try {
             const baseUrl = getCachedBaseUrl();
-            const response = await fetch(`${baseUrl}/v1/game/save`, {
+            console.log('Saving game with base URL:', baseUrl);
+            const fullUrl = `${baseUrl}/v1/game/save`;
+            console.log('Full save URL:', fullUrl);
+            
+            const saveData = {
+                puzzleId: currentPuzzle.id,
+                progress: JSON.stringify(gridState)
+            };
+            console.log('Save data:', saveData);
+            
+            const response = await fetch(fullUrl, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                 },
-                body: JSON.stringify({
-                    puzzleId: currentPuzzle.id,
-                    progress: JSON.stringify(gridState)
-                })
+                credentials: 'same-origin',
+                body: JSON.stringify(saveData)
             });
+            
+            console.log('Save response status:', response.status);
             
             if (!response.ok) {
                 throw new Error('Failed to save game: ' + response.status);
@@ -484,6 +597,7 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Game saved successfully!');
         } catch (error) {
             console.error('Error saving game:', error);
+            console.error('Error details:', error.message);
             alert('Failed to save game. Please try again.');
         }
     }
