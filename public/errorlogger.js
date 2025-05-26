@@ -4,32 +4,22 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typeof logToServer !== 'function') {
         window.logToServer = function(message, level = 'info', data = null) {
             // Fallback to console logging if the function doesn't exist yet
-            console.log(`[${level.toUpperCase()}] ${message}`, data || '');
-            
-            // Try to send log to server if we're in production
-            if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-                try {
-                    const logData = {
-                        message: message,
-                        level: level,
-                        timestamp: new Date().toISOString(),
-                        url: window.location.href,
-                        data: data,
-                        source: 'errorlogger.js'
-                    };
-                    
-                    fetch('/v1/api/log', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(logData),
-                        keepalive: true
-                    }).catch(err => console.error('Failed to send log to server:', err));
-                } catch (e) {
-                    console.error('Server logging failed:', e);
-                }
+            switch (level) {
+                case 'error':
+                    console.error(`[${level.toUpperCase()}] ${message}`, data || '');
+                    break;
+                case 'warn':
+                    console.warn(`[${level.toUpperCase()}] ${message}`, data || '');
+                    break;
+                case 'debug':
+                    console.debug(`[${level.toUpperCase()}] ${message}`, data || '');
+                    break;
+                case 'info':
+                default:
+                    console.log(`[${level.toUpperCase()}] ${message}`, data || '');
             }
+            
+            // Server logging removed to prevent logging to cPanel Passenger log files
         };
         
         console.log('Created fallback logToServer function in errorlogger.js');
@@ -37,9 +27,9 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Using existing logToServer function from scripts.js');
     }
     
-    // Add global error handler to send errors to server logs
+    // Add global error handler for browser console logging only
     window.addEventListener('error', function(event) {
-        // Send to server log
+        // Log to console only
         logToServer(`Error: ${event.message} at ${event.filename}:${event.lineno}:${event.colno}`, 'error', { 
             stack: event.error ? event.error.stack : null 
         });
@@ -47,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Also catch unhandled promise rejections
     window.addEventListener('unhandledrejection', function(event) {
-        // Send to server log
+        // Log to console only
         logToServer(`Unhandled Promise Rejection: ${event.reason}`, 'error', {
             stack: event.reason && event.reason.stack ? event.reason.stack : null
         });

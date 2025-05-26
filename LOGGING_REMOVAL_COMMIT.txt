@@ -1,0 +1,9 @@
+Remove client-side logging to cPanel Passenger logs
+
+- Modified errorlogger.js to remove server-side logging functionality
+- Updated the fallback logToServer function to only log to browser console
+- Disabled the API endpoint in routes/api.js that was writing logs to server
+- Maintained the same function interfaces to avoid breaking existing code
+
+These changes should prevent client-side logs from being sent to the server
+and appearing in the cPanel Passenger log files.

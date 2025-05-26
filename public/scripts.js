@@ -1,36 +1,9 @@
 // Function to determine the base URL for API requests
 // This handles both local development and cPanel hosting environments
 
-// Custom logger for cPanel Passenger environment
+// Simple logger for console output only
 function logToServer(message, level = 'info', data = null) {
-    // Only send logs to server in production environment
-    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-        try {
-            const logData = {
-                message: message,
-                level: level,
-                timestamp: new Date().toISOString(),
-                url: window.location.href,
-                data: data
-            };
-            
-            // Send log to server asynchronously
-            fetch('/v1/api/log', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(logData),
-                // Use keepalive to ensure the request completes even if page is unloading
-                keepalive: true
-            }).catch(err => console.error('Failed to send log to server:', err));
-        } catch (e) {
-            // Fallback to regular console if logging fails
-            console.error('Server logging failed:', e);
-        }
-    }
-    
-    // Also log to console for local debugging
+    // Log to console for debugging
     switch (level) {
         case 'error':
             console.error(message, data || '');

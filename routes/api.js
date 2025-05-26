@@ -14,23 +14,9 @@ if (!fs.existsSync(LOG_DIR)) {
 
 // API endpoint for client-side logging
 router.post('/log', (req, res) => {
-    try {
-        const { message, level, timestamp, url, data } = req.body;
-        
-        // Format the log entry
-        const logEntry = `[${timestamp}] [${level.toUpperCase()}] [${url}] ${message} ${data ? JSON.stringify(data) : ''}`;
-        
-        // Write to log file
-        fs.appendFileSync(CLIENT_LOG_FILE, logEntry + '\n');
-        
-        // Also write to stdout (which Passenger captures)
-        console.log(logEntry);
-        
-        res.status(200).json({ success: true });
-    } catch (error) {
-        console.error('Error writing to client log:', error);
-        res.status(500).json({ success: false, error: error.message });
-    }
+    // Client-side logging to server disabled
+    // Returning success status but not writing to logs
+    res.status(200).json({ success: true, message: 'Logging disabled' });
 });
 
 // Test endpoint to verify API is working
