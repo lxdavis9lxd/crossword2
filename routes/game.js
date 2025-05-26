@@ -47,21 +47,20 @@ router.get('/puzzles/:level', async (req, res) => {
   console.log(`GET /puzzles/${level} - Fetching puzzles for level: ${level}`);
 
   try {
-    const puzzle = await Puzzle.findByPk(id);
-    if (!puzzle) {
-      console.log(`Puzzle with ID ${id} not found`);
-      return res.status(404).json({ error: 'Puzzle not found' });
-    }
+    const puzzles = await Puzzle.findAll({
+      where: { level: level },
+      attributes: ['id', 'level', 'puzzleData', 'title']
+    });
     
     // Set cache control headers
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
     
-    console.log(`Successfully fetched puzzle ${id}`);
-    res.json(puzzle);
+    console.log(`Successfully fetched ${puzzles.length} puzzles for level ${level}`);
+    res.json(puzzles);
   } catch (error) {
-    console.error('Error fetching puzzle details:', error);
+    console.error('Error fetching puzzles:', error);
     res.status(500).json({ 
       error: 'Server error',
       message: error.message,
