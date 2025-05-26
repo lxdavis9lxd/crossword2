@@ -551,7 +551,7 @@
                         loadButton.addEventListener('click', function() {
                             // Save current progress before switching
                             saveProgress(currentPuzzleId).then(() => {
-                                window.location.href = `/game?puzzleId=${puzzleId}`;
+                                window.location.href = `/v1/game?puzzleId=${puzzleId}`;
                             });
                         });
                         
@@ -578,7 +578,7 @@
         
         function loadSavedGame(puzzleId) {
             // Redirect to the same puzzle with the saved progress
-            window.location.href = `/game?puzzleId=${puzzleId}`;
+            window.location.href = `/v1/game?puzzleId=${puzzleId}`;
         }
         
         function showAnswers(grid) {

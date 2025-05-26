@@ -158,6 +158,15 @@ app.get('/game/dashboard', (req, res) => {
   res.redirect('/v1/game/dashboard');
 });
 
+// Fallback route for /game with query parameters
+app.get('/game', (req, res) => {
+  // Preserve query parameters when redirecting
+  const queryString = Object.keys(req.query).length > 0 
+    ? '?' + new URLSearchParams(req.query).toString() 
+    : '';
+  res.redirect(`/v1/game${queryString}`);
+});
+
 // Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
