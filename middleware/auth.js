@@ -10,7 +10,7 @@ function isAuthenticated(req, res, next) {
   }
   
   // If not authenticated, redirect to login page
-  res.redirect('/auth/login');
+  res.redirect('/v1/auth/login');
 }
 
 /**

@@ -142,6 +142,12 @@ app.get('/v1/achievements', (req, res) => {
   res.render('achievements');
 });
 
+// Fallback route for /auth/* requests - redirect to versioned routes
+app.get('/auth/:path', (req, res) => {
+  // Redirect to the versioned route
+  res.redirect(`/v1/auth/${req.params.path}`);
+});
+
 // Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
