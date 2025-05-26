@@ -1,36 +1,17 @@
-Implement User Management and Fix Admin Features
+Implement client-side logging to Passenger log in cPanel environment
 
-This commit resolves several critical admin functionality issues:
+This commit implements a robust client-side logging system that routes console logs from scripts.js to the Passenger log file in cPanel, making it easier to debug issues like the load puzzles button functionality.
 
-1. Added complete user management functionality to admin routes
-2. Fixed versioning issues in admin routes (/v1/ prefix)
-3. Updated admin test script to properly test all admin features
-4. Ensured proper authentication and authorization for admin routes
+Changes:
+- Added `logToServer()` function to scripts.js that sends logs to a server endpoint
+- Created a new `/v1/api/log` endpoint in routes/api.js that writes logs to both console and file
+- Replaced all console.log calls with logToServer() in scripts.js
+- Added errorlogger.js for capturing and logging client-side errors
+- Created check_logs.sh utility script to easily view log files
+- Added test-logging.html page to verify the logging system
+- Updated view templates to include the error logger
+- Created LOGGING_TEST_GUIDE.md with instructions for testing in cPanel
 
-## Fixes and Features Implemented
+The logging system works by sending HTTP requests from the client to the server with log messages and contextual data. In production environments (like cPanel), these logs are written to both the console (which Passenger captures) and a dedicated log file in the logs directory.
 
-- Added user listing, creation, editing, and details views to admin.js
-- Fixed route versioning in the comprehensive admin test script
-- Verified all admin middleware is correctly applied for security
-- Ensured admin UI elements properly display on authorized pages
-- Separated UI element tests for better reliability
-
-These changes ensure:
-1. Admins can fully manage users through the admin interface
-2. All admin routes are properly secured and versioned
-3. All core admin features pass comprehensive testing
-4. UI elements consistently display for authorized users
-
-## Testing
-
-A comprehensive test script has been created to verify all admin features:
-- Admin login and authentication
-- Admin dashboard access
-- User management functionality
-- Puzzle management functionality
-- Import/export functionality
-- Template downloads
-- Admin UI elements on dashboard pages
-
-This completes the implementation of the admin features as documented in the 
-ADMIN_FEATURES_SUMMARY.md file.
+This enhancement will make it much easier to debug issues with the load puzzles button functionality by providing detailed logs of fetch requests, responses, and any errors that occur in the cPanel environment.

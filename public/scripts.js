@@ -1,5 +1,52 @@
 // Function to determine the base URL for API requests
 // This handles both local development and cPanel hosting environments
+
+// Custom logger for cPanel Passenger environment
+function logToServer(message, level = 'info', data = null) {
+    // Only send logs to server in production environment
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        try {
+            const logData = {
+                message: message,
+                level: level,
+                timestamp: new Date().toISOString(),
+                url: window.location.href,
+                data: data
+            };
+            
+            // Send log to server asynchronously
+            fetch('/v1/api/log', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(logData),
+                // Use keepalive to ensure the request completes even if page is unloading
+                keepalive: true
+            }).catch(err => console.error('Failed to send log to server:', err));
+        } catch (e) {
+            // Fallback to regular console if logging fails
+            console.error('Server logging failed:', e);
+        }
+    }
+    
+    // Also log to console for local debugging
+    switch (level) {
+        case 'error':
+            console.error(message, data || '');
+            break;
+        case 'warn':
+            console.warn(message, data || '');
+            break;
+        case 'debug':
+            console.debug(message, data || '');
+            break;
+        case 'info':
+        default:
+            console.log(message, data || '');
+    }
+}
+
 function getBaseUrl() {
     // Get the current hostname and path
     const hostname = window.location.hostname;
@@ -7,32 +54,32 @@ function getBaseUrl() {
     const protocol = window.location.protocol;
     const origin = window.location.origin;
     
-    console.log('getBaseUrl - Current hostname:', hostname);
-    console.log('getBaseUrl - Current pathname:', pathname);
-    console.log('getBaseUrl - Current protocol:', protocol);
-    console.log('getBaseUrl - Current origin:', origin);
+    logToServer('getBaseUrl - Current hostname: ' + hostname, 'debug');
+    logToServer('getBaseUrl - Current pathname: ' + pathname, 'debug');
+    logToServer('getBaseUrl - Current protocol: ' + protocol, 'debug');
+    logToServer('getBaseUrl - Current origin: ' + origin, 'debug');
     
     // Check if we're in a development environment
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
-        console.log('getBaseUrl - Development environment detected, returning empty base URL');
+        logToServer('getBaseUrl - Development environment detected, returning empty base URL', 'debug');
         return ''; // Empty string for local development (relative paths)
     } else {
-        console.log('getBaseUrl - Production environment detected (cPanel)');
+        logToServer('getBaseUrl - Production environment detected (cPanel)', 'debug');
         
         // For cPanel hosting, we need a more robust approach
         // Try several methods and pick the best one
         
         // Method 1: Find the base path from the v1 prefix in the URL
         if (pathname.includes('/v1/')) {
-            console.log('getBaseUrl - Method 1: /v1/ found in pathname');
+            logToServer('getBaseUrl - Method 1: /v1/ found in pathname', 'debug');
             const pathSegments = pathname.split('/v1/');
             // Return everything before '/v1/'
             const result1 = pathSegments[0];
-            console.log('getBaseUrl - Method 1 result:', result1);
+            logToServer('getBaseUrl - Method 1 result: ' + result1, 'debug');
             
             // Special case: if the result is empty, we might be at the root
             if (result1 === '') {
-                console.log('getBaseUrl - Method 1 empty result, using origin');
+                logToServer('getBaseUrl - Method 1 empty result, using origin', 'debug');
                 return origin;
             }
             
@@ -40,7 +87,7 @@ function getBaseUrl() {
         }
         
         // Method 2: Special handling for dashboard and other non-versioned paths
-        console.log('getBaseUrl - Method 2: Handling standard page URLs');
+        logToServer('getBaseUrl - Method 2: Handling standard page URLs', 'debug');
         
         // Special case for cPanel: check for specific patterns in the URL
         if (pathname.includes('/dashboard') || 
@@ -54,7 +101,7 @@ function getBaseUrl() {
             
             // Join remaining parts to form the base path
             const result2 = pathSegments.join('/');
-            console.log('getBaseUrl - Method 2 result:', result2);
+            logToServer('getBaseUrl - Method 2 result: ' + result2, 'debug');
             
             // If the result is empty, we're at the root
             if (result2 === '') {
@@ -66,18 +113,18 @@ function getBaseUrl() {
         
         // Method 3: Fallback - check if we're at the document root
         if (pathname === '/' || pathname === '') {
-            console.log('getBaseUrl - Method 3: At site root');
+            logToServer('getBaseUrl - Method 3: At site root', 'debug');
             return origin;
         }
         
         // Method 4: Ultimate fallback - try to use the origin + pathname minus last segment
-        console.log('getBaseUrl - Method 4: Ultimate fallback');
+        logToServer('getBaseUrl - Method 4: Ultimate fallback', 'debug');
         const pathParts = pathname.split('/');
         // Remove the last part (current page)
         pathParts.pop();
         // Join remaining parts to form the base path
         const result4 = pathParts.join('/');
-        console.log('getBaseUrl - Method 4 result:', result4);
+        logToServer('getBaseUrl - Method 4 result: ' + result4, 'debug');
         
         // If result is empty, return just the origin
         if (result4 === '') {
@@ -126,14 +173,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     if (loadPuzzlesBtn) {
-        console.log('Load puzzles button found, adding click event listener');
+        logToServer('Load puzzles button found, adding click event listener', 'info');
         loadPuzzlesBtn.addEventListener('click', function(event) {
-            console.log('Load puzzles button clicked!');
-            console.log('Event details:', event.type);
+            logToServer('Load puzzles button clicked!', 'info');
+            logToServer('Event details: ' + event.type, 'debug');
             loadPuzzlesForLevel();
         });
     } else {
-        console.warn('Load puzzles button not found in the DOM');
+        logToServer('Load puzzles button not found in the DOM', 'warn');
     }
     
     if (saveButton) {
@@ -148,12 +195,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Functions
     async function loadPuzzlesForLevel() {
         const level = levelSelect.value;
-        console.log('Loading puzzles for level:', level);
-        console.log('Button clicked - loadPuzzlesForLevel function executing');
+        logToServer('Loading puzzles for level: ' + level, 'info');
+        logToServer('Button clicked - loadPuzzlesForLevel function executing', 'info');
         
         // Update the hidden input 
         selectedLevelInput.value = level;
-        console.log('Selected level input updated to:', level);
+        logToServer('Selected level input updated to: ' + level, 'info');
         
         // Clear previous selection
         selectedPuzzleIdInput.value = '';
@@ -161,19 +208,19 @@ document.addEventListener('DOMContentLoaded', function() {
         
         try {
             puzzlesContainer.innerHTML = '<p>Loading puzzles...</p>';
-            console.log('Loading message displayed');
+            logToServer('Loading message displayed', 'info');
             
             // Get base URL to handle both development and production paths
             const baseUrl = getCachedBaseUrl();
-            console.log('Using base URL:', baseUrl);
+            logToServer('Using base URL: ' + baseUrl, 'info');
             
             // Build the full URL for debugging
             const fullUrl = `${baseUrl}/v1/game/puzzles/${level}`;
-            console.log('Full fetch URL:', fullUrl);
-            console.log('Fetch parameters:', { level, baseUrl });
+            logToServer('Full fetch URL: ' + fullUrl, 'info');
+            logToServer('Fetch parameters', 'info', { level, baseUrl });
             
             // Use the base URL for the fetch request with v1 prefix for API versioning
-            console.log('Attempting fetch request...');
+            logToServer('Attempting fetch request...', 'info');
             
             const fetchOptions = {
                 method: 'GET',
@@ -183,19 +230,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 credentials: 'same-origin'
             };
-            console.log('Fetch options:', fetchOptions);
+            logToServer('Fetch options: ' + JSON.stringify(fetchOptions), 'debug');
             
             const response = await fetch(fullUrl, fetchOptions);
-            console.log('Fetch response status:', response.status);
-            console.log('Fetch response headers:', [...response.headers].map(h => `${h[0]}: ${h[1]}`));
+            logToServer('Fetch response status: ' + response.status, 'info');
+            logToServer('Fetch response headers: ' + JSON.stringify([...response.headers].map(h => `${h[0]}: ${h[1]}`)), 'debug');
         
             if (!response.ok) {
-                console.error('Fetch error - status:', response.status, response.statusText);
+                logToServer('Fetch error - status: ' + response.status + ' ' + response.statusText, 'error');
                 throw new Error('Failed to fetch puzzles: ' + response.status);
             }
             
             const puzzles = await response.json();
-            console.log('Puzzles loaded successfully:', puzzles);
+            logToServer('Puzzles loaded successfully: ' + puzzles.length + ' puzzles found', 'info', { count: puzzles.length });
             
             // Clear current puzzles
             puzzlesContainer.innerHTML = '';
@@ -265,10 +312,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         } catch (error) {
-            console.error('Error loading puzzles:', error);
-            console.error('Error name:', error.name);
-            console.error('Error message:', error.message);
-            console.error('Error stack:', error.stack);
+            logToServer('Error loading puzzles: ' + error.message, 'error', {
+                errorName: error.name,
+                errorStack: error.stack,
+                hostname: window.location.hostname,
+                pathname: window.location.pathname,
+                protocol: window.location.protocol,
+                origin: window.location.origin,
+                baseUrl: getCachedBaseUrl(),
+                fullUrl: getCachedBaseUrl() + '/v1/game/puzzles/' + level
+            });
             
             // Display diagnostic information in the UI for debugging
             puzzlesContainer.innerHTML = `
@@ -302,13 +355,13 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        console.log('Loading puzzle ID:', puzzleId);
+        logToServer('Loading puzzle ID: ' + puzzleId, 'info');
         
         try {
             const baseUrl = getCachedBaseUrl();
-            console.log('Using base URL for puzzle details:', baseUrl);
+            logToServer('Using base URL for puzzle details: ' + baseUrl, 'info');
             const fullUrl = `${baseUrl}/v1/game/puzzles/details/${puzzleId}`;
-            console.log('Full fetch URL for puzzle details:', fullUrl);
+            logToServer('Full fetch URL for puzzle details: ' + fullUrl, 'info');
             
             const response = await fetch(fullUrl, {
                 method: 'GET',
@@ -319,14 +372,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 credentials: 'same-origin'
             });
             
-            console.log('Puzzle details response status:', response.status);
+            logToServer('Puzzle details response status: ' + response.status, 'info');
             
             if (!response.ok) {
                 throw new Error('Failed to fetch puzzle details: ' + response.status);
             }
             
             const puzzle = await response.json();
-            console.log('Puzzle details:', puzzle);
+            logToServer('Puzzle details loaded successfully', 'info', { puzzleId: puzzle.id, title: puzzle.title || 'Untitled' });
             
             // Store current puzzle
             currentPuzzle = puzzle;
@@ -337,7 +390,13 @@ document.addEventListener('DOMContentLoaded', function() {
             // Render the crossword grid
             renderCrosswordGrid(puzzleData);
         } catch (error) {
-            console.error('Error loading puzzle details:', error);
+            logToServer('Error loading puzzle details: ' + error.message, 'error', {
+                errorName: error.name,
+                errorStack: error.stack,
+                puzzleId: puzzleId,
+                baseUrl: getCachedBaseUrl(),
+                fullUrl: `${getCachedBaseUrl()}/v1/game/puzzles/details/${puzzleId}`
+            });
             alert('Failed to load puzzle. Please try again.');
         }
     }
@@ -349,14 +408,14 @@ document.addEventListener('DOMContentLoaded', function() {
             // Assuming a route that returns the user's saved games
             const userId = document.querySelector('meta[name="user-id"]')?.content;
             if (!userId) {
-                console.error('User ID not found');
+                logToServer('User ID not found for loading saved games', 'error');
                 return;
             }
             
             const baseUrl = getCachedBaseUrl();
-            console.log('Loading saved games with base URL:', baseUrl);
+            logToServer('Loading saved games with base URL: ' + baseUrl, 'info');
             const fullUrl = `${baseUrl}/v1/game/progress/${userId}`;
-            console.log('Full URL for progress:', fullUrl);
+            logToServer('Full URL for progress: ' + fullUrl, 'debug');
             
             const response = await fetch(fullUrl, {
                 method: 'GET',
@@ -367,7 +426,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 credentials: 'same-origin'
             });
             
-            console.log('Progress response status:', response.status);
+            logToServer('Progress response status: ' + response.status, 'info');
             
             if (!response.ok) {
                 throw new Error('Failed to fetch saved games: ' + response.status);
@@ -415,18 +474,29 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     savedGamesList.appendChild(savedGameItem);
                 } catch (error) {
-                    console.error('Error loading saved game for puzzle ' + puzzleId + ':', error);
+                    logToServer('Error loading saved game for puzzle ' + puzzleId, 'error', {
+                        errorMessage: error.message,
+                        errorName: error.name
+                    });
                 }
             }
         } catch (error) {
-            console.error('Error loading saved games:', error);
+            logToServer('Error loading saved games', 'error', {
+                errorMessage: error.message,
+                errorName: error.name,
+                errorStack: error.stack
+            });
             savedGamesList.innerHTML = '<li class="error-message">Error loading saved games</li>';
         }
     }
     
     function renderCrosswordGrid(puzzleData) {
         if (!puzzleData || !puzzleData.grid || !crosswordContainer) {
-            console.error('Invalid puzzle data or crossword container not found');
+            logToServer('Invalid puzzle data or crossword container not found', 'error', {
+                puzzleDataExists: !!puzzleData,
+                gridExists: puzzleData && !!puzzleData.grid,
+                containerExists: !!crosswordContainer
+            });
             return;
         }
         

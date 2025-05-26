@@ -9,6 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/v1/game-styles-modern.css">
     <link rel="stylesheet" href="/v1/message-styles.css">
+    <!-- Load errorlogger.js first to ensure error capture is available -->
+    <script src="/errorlogger.js" defer></script>
     <% if (typeof user !== 'undefined' && user) { %>
     <meta name="user-id" content="<%= user.id %>">
     <% } %>

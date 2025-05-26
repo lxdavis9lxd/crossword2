@@ -2,7 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     </section>
+    <footer class="game-footer">
+        <p>&copy; <%= new Date().getFullYear() %> Crossword Game. All rights reserved.</p>
+    </footer>
+    <!-- Load errorlogger.js first to ensure logging is available -->
+    <script src="/errorlogger.js"></script>
+    <script src="/utils.js"></script>
+    <script src="/scripts.js"></script>
+</body>
+</html>name="viewport" content="width=device-width, initial-scale=1.0">
     <% if (typeof user !== 'undefined' && user) { %>
     <meta name="user-id" content="<%= user.id %>">
     <% } %>
@@ -70,6 +79,7 @@
     <footer class="game-footer">
         <p>&copy; <%= new Date().getFullYear() %> Crossword Game. All rights reserved.</p>
     </footer>
+    <script src="/errorlogger.js"></script>
     <script src="/utils.js"></script>
     <script src="/scripts.js"></script>
 </body>

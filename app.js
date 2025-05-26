@@ -62,6 +62,7 @@ const authRoutes = require('./routes/auth');
 const gameRoutes = require('./routes/game');
 const achievementRoutes = require('./routes/achievements');
 const adminRoutes = require('./routes/admin');
+const apiRoutes = require('./routes/api');
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -100,6 +101,7 @@ app.use('/v1/auth', authRoutes);
 app.use('/v1/game', gameRoutes);
 app.use('/v1/achievements', achievementRoutes);
 app.use('/v1/admin', adminRoutes);
+app.use('/v1/api', apiRoutes);
 
 // Debug route for session with versioning
 app.get('/v1/debug-session', (req, res) => {
